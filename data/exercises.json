@@ -1,0 +1,44 @@
+{
+  "logs": [
+    {
+      "id": 1,
+      "date": "2026-06-23",
+      "type": "Musculação",
+      "duration_min": 60,
+      "calories_burned": 350,
+      "steps": 4200,
+      "sleep_score": 78,
+      "notes": "Peito e tríceps"
+    },
+    {
+      "id": 2,
+      "date": "2026-06-25",
+      "type": "Musculação",
+      "duration_min": 55,
+      "calories_burned": 320,
+      "steps": 5100,
+      "sleep_score": 82,
+      "notes": "Costas e bíceps"
+    },
+    {
+      "id": 3,
+      "date": "2026-06-27",
+      "type": "Musculação",
+      "duration_min": 50,
+      "calories_burned": 300,
+      "steps": 3800,
+      "sleep_score": 75,
+      "notes": "Pernas"
+    },
+    {
+      "id": 4,
+      "date": "2026-06-29",
+      "type": "Musculação",
+      "duration_min": 60,
+      "calories_burned": 340,
+      "steps": 6200,
+      "sleep_score": 80,
+      "notes": "Ombros e abdômen"
+    }
+  ]
+}

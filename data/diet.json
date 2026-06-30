@@ -1,0 +1,93 @@
+{
+  "plan_date": "2026-06-02",
+  "nutritionist": "Maria Eduarda Tardin",
+  "nutritionist_crn": "23101875",
+  "goal": "Emagrecimento com ganho de massa magra",
+  "notes": "1 refeição livre por semana. Whey protein no lanche (2 medidas 30g) ou leite em pó 30g.",
+  "meals": [
+    {
+      "id": "cafe",
+      "name": "Café da Manhã",
+      "time_suggested": "07:00",
+      "kcal_estimated": 350,
+      "foods": [
+        {"item": "Pão integral", "qty": "2 fatias", "unit": "g", "qty_g": 60, "kcal": 140, "prot_g": 6, "carb_g": 26, "fat_g": 2},
+        {"item": "Ovo mexido (2 ovos)", "qty": "2 unid", "unit": "unid", "qty_g": 100, "kcal": 140, "prot_g": 12, "carb_g": 1, "fat_g": 10},
+        {"item": "Café preto sem açúcar", "qty": "200", "unit": "mL", "qty_g": 200, "kcal": 5, "prot_g": 0.3, "carb_g": 0.5, "fat_g": 0},
+        {"item": "Fruta (banana ou maçã)", "qty": "1 unid média", "unit": "unid", "qty_g": 120, "kcal": 65, "prot_g": 0.8, "carb_g": 17, "fat_g": 0.2}
+      ],
+      "substitutions": [
+        "Pão integral → tapioca 2 colheres sopa de goma",
+        "Ovo → queijo cottage 2 colheres sopa",
+        "Fruta → mamão 1 fatia média"
+      ]
+    },
+    {
+      "id": "almoco",
+      "name": "Almoço",
+      "time_suggested": "12:00",
+      "kcal_estimated": 600,
+      "foods": [
+        {"item": "Arroz integral", "qty": "4 colheres sopa", "unit": "g", "qty_g": 120, "kcal": 155, "prot_g": 4, "carb_g": 32, "fat_g": 1},
+        {"item": "Feijão / lentilha", "qty": "2 conchas", "unit": "g", "qty_g": 120, "kcal": 100, "prot_g": 7, "carb_g": 18, "fat_g": 0.5},
+        {"item": "Carne grelhada (frango/patinho/tilápia)", "qty": "150", "unit": "g", "qty_g": 150, "kcal": 200, "prot_g": 30, "carb_g": 0, "fat_g": 8},
+        {"item": "Salada (folhas + legumes crus)", "qty": "à vontade", "unit": "", "qty_g": 200, "kcal": 60, "prot_g": 2, "carb_g": 12, "fat_g": 0.5},
+        {"item": "Azeite de oliva (1 fio)", "qty": "1 colher sopa", "unit": "mL", "qty_g": 13, "kcal": 85, "prot_g": 0, "carb_g": 0, "fat_g": 10}
+      ],
+      "substitutions": [
+        "Arroz integral → quinoa 4 col sopa",
+        "Frango → salmão 150g",
+        "Feijão → grão-de-bico 2 conchas"
+      ]
+    },
+    {
+      "id": "lanche",
+      "name": "Lanche da Tarde",
+      "time_suggested": "15:30",
+      "kcal_estimated": 280,
+      "foods": [
+        {"item": "Whey protein", "qty": "2 medidas (30g cada)", "unit": "g", "qty_g": 60, "kcal": 220, "prot_g": 48, "carb_g": 4, "fat_g": 2},
+        {"item": "Banana (para o shake)", "qty": "1 unid pequena", "unit": "unid", "qty_g": 80, "kcal": 60, "prot_g": 0.7, "carb_g": 15, "fat_g": 0.2}
+      ],
+      "substitutions": [
+        "Whey → leite em pó desnatado 30g",
+        "Banana → morango 100g"
+      ]
+    },
+    {
+      "id": "jantar",
+      "name": "Jantar",
+      "time_suggested": "19:00",
+      "kcal_estimated": 450,
+      "foods": [
+        {"item": "Proteína magra (frango/ovo/atum)", "qty": "150", "unit": "g", "qty_g": 150, "kcal": 200, "prot_g": 30, "carb_g": 0, "fat_g": 8},
+        {"item": "Legumes refogados (abobrinha/brócolis/couve-flor)", "qty": "200", "unit": "g", "qty_g": 200, "kcal": 80, "prot_g": 4, "carb_g": 14, "fat_g": 1},
+        {"item": "Batata doce ou mandioquinha", "qty": "100", "unit": "g", "qty_g": 100, "kcal": 85, "prot_g": 2, "carb_g": 20, "fat_g": 0.1},
+        {"item": "Azeite (1 fio)", "qty": "1 col sopa", "unit": "mL", "qty_g": 13, "kcal": 85, "prot_g": 0, "carb_g": 0, "fat_g": 10}
+      ],
+      "substitutions": [
+        "Batata doce → cará ou inhame",
+        "Legumes → salada crua",
+        "Ovo → omelete com queijo minas"
+      ]
+    },
+    {
+      "id": "cha",
+      "name": "Hora do Chá (opcional)",
+      "time_suggested": "21:00",
+      "kcal_estimated": 60,
+      "foods": [
+        {"item": "Chá sem açúcar (camomila / hibisco)", "qty": "200", "unit": "mL", "qty_g": 200, "kcal": 5, "prot_g": 0, "carb_g": 1, "fat_g": 0},
+        {"item": "Psyllium (1 col sopa)", "qty": "1 col sopa", "unit": "g", "qty_g": 10, "kcal": 15, "prot_g": 0.5, "carb_g": 4, "fat_g": 0},
+        {"item": "Castanha-do-Pará (2 unid)", "qty": "2 unid", "unit": "unid", "qty_g": 10, "kcal": 66, "prot_g": 1.4, "carb_g": 1.2, "fat_g": 6.6}
+      ],
+      "substitutions": [
+        "Castanha-do-Pará → amendoim sem sal 15g"
+      ]
+    }
+  ],
+  "total_kcal_plan": 1740,
+  "total_prot_plan_g": 148,
+  "total_carb_plan_g": 165,
+  "total_fat_plan_g": 49
+}

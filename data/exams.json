@@ -1,0 +1,130 @@
+{
+  "sessions": [
+    {
+      "id": "s001",
+      "date": "2025-10-18",
+      "lab": "Lavoisier",
+      "doctor": "Dra. Celina Prado de Lima Souza",
+      "notes": "Exame de rotina completo — 21 laudos"
+    },
+    {
+      "id": "s002",
+      "date": "2026-05-06",
+      "lab": "Lavoisier",
+      "doctor": "Dra. Celina Prado de Lima Souza",
+      "notes": "Acompanhamento semestral"
+    },
+    {
+      "id": "s003",
+      "date": "2026-05-13",
+      "lab": "Delboni",
+      "doctor": "Dra. Celina Prado de Lima Souza",
+      "notes": "Exames complementares: tireoide, transaminases, sorologias — pedido em 12/05/2026"
+    }
+  ],
+  "results": [
+    {"session_id": "s001", "category": "Hemograma", "exam": "Eritrócitos", "value": 5.17, "unit": "10⁶/µL", "ref_min": 4.50, "ref_max": 5.50, "ref_text": "4,50 – 5,50", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Hemograma", "exam": "Hemoglobina", "value": 15.7, "unit": "g/dL", "ref_min": 13.0, "ref_max": 17.0, "ref_text": "13,0 – 17,0", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Hemograma", "exam": "Hematócrito", "value": 47.4, "unit": "%", "ref_min": 40.0, "ref_max": 50.0, "ref_text": "40,0 – 50,0", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Hemograma", "exam": "VCM", "value": 91.6, "unit": "fL", "ref_min": 83.0, "ref_max": 101.0, "ref_text": "83,0 – 101,0", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Hemograma", "exam": "HCM", "value": 30.4, "unit": "pg", "ref_min": 27.0, "ref_max": 32.0, "ref_text": "27,0 – 32,0", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Hemograma", "exam": "CHCM", "value": 33.1, "unit": "g/dL", "ref_min": 31.0, "ref_max": 35.0, "ref_text": "31,0 – 35,0", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Hemograma", "exam": "RDW", "value": 12.8, "unit": "%", "ref_min": 11.6, "ref_max": 14.0, "ref_text": "11,6 – 14,0", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Hemograma", "exam": "Leucócitos", "value": 5110, "unit": "/µL", "ref_min": 4000, "ref_max": 10000, "ref_text": "4.000 – 10.000", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Hemograma", "exam": "Neutrófilos (abs)", "value": 2800, "unit": "/µL", "ref_min": 1800, "ref_max": 7800, "ref_text": "1.800 – 7.800", "status": "normal", "notes": "54,8%"},
+    {"session_id": "s001", "category": "Hemograma", "exam": "Linfócitos (abs)", "value": 1845, "unit": "/µL", "ref_min": 1000, "ref_max": 3000, "ref_text": "1.000 – 3.000", "status": "normal", "notes": "36,1%"},
+    {"session_id": "s001", "category": "Hemograma", "exam": "Monócitos (abs)", "value": 327, "unit": "/µL", "ref_min": 200, "ref_max": 1000, "ref_text": "200 – 1.000", "status": "normal", "notes": "6,4%"},
+    {"session_id": "s001", "category": "Hemograma", "exam": "Plaquetas", "value": 284000, "unit": "/µL", "ref_min": 150000, "ref_max": 450000, "ref_text": "150.000 – 450.000", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Hemograma", "exam": "VPM", "value": 10.9, "unit": "fL", "ref_min": 8.3, "ref_max": 12.5, "ref_text": "8,3 – 12,5", "status": "normal", "notes": ""},
+
+    {"session_id": "s001", "category": "Função Renal", "exam": "Ureia", "value": 25, "unit": "mg/dL", "ref_min": 19, "ref_max": 49, "ref_text": "19 – 49", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Função Renal", "exam": "Creatinina", "value": 1.07, "unit": "mg/dL", "ref_min": 0.70, "ref_max": 1.30, "ref_text": "0,70 – 1,30", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Função Renal", "exam": "TFG estimada (eGFR)", "value": 88, "unit": "mL/min/1,73m²", "ref_min": 90, "ref_max": null, "ref_text": "> 90", "status": "baixa", "notes": "Atenção: abaixo de 90. Monitorar."},
+    {"session_id": "s001", "category": "Eletrólitos", "exam": "Potássio", "value": 4.9, "unit": "mmol/L", "ref_min": 3.5, "ref_max": 5.1, "ref_text": "3,5 – 5,1", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Eletrólitos", "exam": "Sódio", "value": 139, "unit": "mmol/L", "ref_min": 136, "ref_max": 145, "ref_text": "136 – 145", "status": "normal", "notes": ""},
+
+    {"session_id": "s001", "category": "Vitaminas e Minerais", "exam": "Vitamina D (25-OH)", "value": 23.93, "unit": "ng/mL", "ref_min": 20.0, "ref_max": null, "ref_text": "> 20,0 (para < 60 anos)", "status": "normal", "notes": "Borderline — suplementar para atingir 40-60 ng/mL (ideal)"},
+
+    {"session_id": "s001", "category": "Metabolismo Cardiovascular", "exam": "Homocisteína", "value": 19.0, "unit": "µmol/L", "ref_min": null, "ref_max": 15.0, "ref_text": "≤ 15,0", "status": "alta", "notes": "ELEVADA — fator de risco cardiovascular. Investigar deficiência de B12/B9/B6"},
+
+    {"session_id": "s001", "category": "Metabolismo Glicídico", "exam": "Glicose", "value": 103, "unit": "mg/dL", "ref_min": 70, "ref_max": 99, "ref_text": "70 – 99", "status": "alta", "notes": "Acima do normal — zona pré-diabética"},
+    {"session_id": "s001", "category": "Metabolismo Glicídico", "exam": "HbA1c", "value": 5.8, "unit": "%", "ref_min": null, "ref_max": 5.7, "ref_text": "< 5,7% normal | 5,7–6,4% pré-diabetes", "status": "alta", "notes": "Zona pré-diabetes. Monitorar de perto."},
+
+    {"session_id": "s001", "category": "Perfil Lipídico", "exam": "Triglicérides", "value": 82, "unit": "mg/dL", "ref_min": null, "ref_max": 150, "ref_text": "< 150", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Perfil Lipídico", "exam": "Colesterol Total", "value": 222, "unit": "mg/dL", "ref_min": null, "ref_max": 190, "ref_text": "< 190", "status": "alta", "notes": "Elevado"},
+    {"session_id": "s001", "category": "Perfil Lipídico", "exam": "HDL", "value": 41, "unit": "mg/dL", "ref_min": 40, "ref_max": null, "ref_text": "> 40", "status": "normal", "notes": "Borderline — ideal > 60 para proteção cardiovascular"},
+    {"session_id": "s001", "category": "Perfil Lipídico", "exam": "LDL", "value": 162, "unit": "mg/dL", "ref_min": null, "ref_max": 130, "ref_text": "< 130 (desejável)", "status": "alta", "notes": "Elevado — risco cardiovascular"},
+    {"session_id": "s001", "category": "Perfil Lipídico", "exam": "VLDL", "value": 19, "unit": "mg/dL", "ref_min": null, "ref_max": 30, "ref_text": "< 30", "status": "normal", "notes": ""},
+
+    {"session_id": "s001", "category": "Ácido Úrico", "exam": "Ácido Úrico", "value": 6.4, "unit": "mg/dL", "ref_min": 3.8, "ref_max": 8.6, "ref_text": "3,8 – 8,6", "status": "normal", "notes": ""},
+
+    {"session_id": "s001", "category": "Função Hepática", "exam": "TGO (AST)", "value": 22, "unit": "U/L", "ref_min": null, "ref_max": 34, "ref_text": "< 34", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Função Hepática", "exam": "TGP (ALT)", "value": 34, "unit": "U/L", "ref_min": 10, "ref_max": 49, "ref_text": "10 – 49", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Função Hepática", "exam": "Gama-GT (GGT)", "value": 57, "unit": "U/L", "ref_min": null, "ref_max": 73, "ref_text": "< 73", "status": "normal", "notes": ""},
+
+    {"session_id": "s001", "category": "Tireoide", "exam": "TSH", "value": 4.31, "unit": "µUI/mL", "ref_min": 0.40, "ref_max": 4.30, "ref_text": "0,40 – 4,30", "status": "alta", "notes": "BORDELINE — discretamente acima. Monitorar."},
+    {"session_id": "s001", "category": "Tireoide", "exam": "T4 Livre", "value": 1.31, "unit": "ng/dL", "ref_min": 0.89, "ref_max": 1.76, "ref_text": "0,89 – 1,76", "status": "normal", "notes": ""},
+
+    {"session_id": "s001", "category": "Próstata", "exam": "PSA Total", "value": 0.96, "unit": "ng/mL", "ref_min": null, "ref_max": 4.0, "ref_text": "< 4,0", "status": "normal", "notes": ""},
+    {"session_id": "s001", "category": "Próstata", "exam": "PSA Livre", "value": 0.24, "unit": "ng/mL", "ref_min": null, "ref_max": null, "ref_text": "—", "status": "info", "notes": ""},
+
+    {"session_id": "s001", "category": "Sorologias", "exam": "Anti-HIV", "value": null, "unit": "", "ref_min": null, "ref_max": null, "ref_text": "Não Reagente", "status": "info", "notes": "Não Reagente ✓"},
+    {"session_id": "s001", "category": "Sorologias", "exam": "HBsAg (Hepatite B)", "value": null, "unit": "", "ref_min": null, "ref_max": null, "ref_text": "Não Reagente", "status": "info", "notes": "Não Reagente ✓"},
+    {"session_id": "s001", "category": "Sorologias", "exam": "Anti-HBs (Imunidade Hep B)", "value": 2.0, "unit": "mUI/mL", "ref_min": 10.0, "ref_max": null, "ref_text": "> 10,0 (proteção)", "status": "baixa", "notes": "SEM IMUNIDADE — nunca vacinou ou vacina ineficaz. VACINAR URGENTE."},
+    {"session_id": "s001", "category": "Sorologias", "exam": "Anti-HBc Total", "value": null, "unit": "", "ref_min": null, "ref_max": null, "ref_text": "Não Reagente", "status": "info", "notes": "Não Reagente ✓ — nunca teve hepatite B"},
+    {"session_id": "s001", "category": "Sorologias", "exam": "Anti-HCV (Hepatite C)", "value": null, "unit": "", "ref_min": null, "ref_max": null, "ref_text": "Não Reagente", "status": "info", "notes": "Não Reagente ✓"},
+    {"session_id": "s001", "category": "Sorologias", "exam": "Sífilis (VDRL/FTA)", "value": null, "unit": "", "ref_min": null, "ref_max": null, "ref_text": "Não Reagente", "status": "info", "notes": "Não Reagente ✓"},
+
+    {"session_id": "s001", "category": "Urina Tipo I", "exam": "Hemácias (sedimento)", "value": 23900, "unit": "/mL", "ref_min": null, "ref_max": 23000, "ref_text": "< 23.000", "status": "alta", "notes": "Discretamente acima — monitorar"},
+    {"session_id": "s001", "category": "Urina Tipo I", "exam": "Leucócitos (sedimento)", "value": 1600, "unit": "/mL", "ref_min": null, "ref_max": 25000, "ref_text": "< 25.000", "status": "normal", "notes": ""},
+
+    {"session_id": "s002", "category": "Hemograma", "exam": "Eritrócitos", "value": 5.28, "unit": "10⁶/µL", "ref_min": 4.50, "ref_max": 5.50, "ref_text": "4,50 – 5,50", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Hemograma", "exam": "Hemoglobina", "value": 16.0, "unit": "g/dL", "ref_min": 13.0, "ref_max": 17.0, "ref_text": "13,0 – 17,0", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Hemograma", "exam": "Hematócrito", "value": 46.4, "unit": "%", "ref_min": 40.0, "ref_max": 50.0, "ref_text": "40,0 – 50,0", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Hemograma", "exam": "VCM", "value": 87.9, "unit": "fL", "ref_min": 83.0, "ref_max": 101.0, "ref_text": "83,0 – 101,0", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Hemograma", "exam": "HCM", "value": 30.2, "unit": "pg", "ref_min": 27.0, "ref_max": 32.0, "ref_text": "27,0 – 32,0", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Hemograma", "exam": "CHCM", "value": 34.5, "unit": "g/dL", "ref_min": 31.0, "ref_max": 35.0, "ref_text": "31,0 – 35,0", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Hemograma", "exam": "RDW", "value": 13.4, "unit": "%", "ref_min": 11.6, "ref_max": 14.0, "ref_text": "11,6 – 14,0", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Hemograma", "exam": "Leucócitos", "value": 5740, "unit": "/µL", "ref_min": 4000, "ref_max": 10000, "ref_text": "4.000 – 10.000", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Hemograma", "exam": "Neutrófilos (abs)", "value": 3289, "unit": "/µL", "ref_min": 1800, "ref_max": 7800, "ref_text": "1.800 – 7.800", "status": "normal", "notes": "57,3%"},
+    {"session_id": "s002", "category": "Hemograma", "exam": "Linfócitos (abs)", "value": 1866, "unit": "/µL", "ref_min": 1000, "ref_max": 3000, "ref_text": "1.000 – 3.000", "status": "normal", "notes": "32,5%"},
+    {"session_id": "s002", "category": "Hemograma", "exam": "Monócitos (abs)", "value": 453, "unit": "/µL", "ref_min": 200, "ref_max": 1000, "ref_text": "200 – 1.000", "status": "normal", "notes": "7,9%"},
+    {"session_id": "s002", "category": "Hemograma", "exam": "Plaquetas", "value": 298000, "unit": "/µL", "ref_min": 150000, "ref_max": 450000, "ref_text": "150.000 – 450.000", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Hemograma", "exam": "VPM", "value": 11.1, "unit": "fL", "ref_min": 8.3, "ref_max": 12.5, "ref_text": "8,3 – 12,5", "status": "normal", "notes": ""},
+
+    {"session_id": "s002", "category": "Função Renal", "exam": "Ureia", "value": 30, "unit": "mg/dL", "ref_min": 19, "ref_max": 49, "ref_text": "19 – 49", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Função Renal", "exam": "Creatinina", "value": 1.12, "unit": "mg/dL", "ref_min": 0.70, "ref_max": 1.30, "ref_text": "0,70 – 1,30", "status": "normal", "notes": ""},
+    {"session_id": "s002", "category": "Função Renal", "exam": "TFG estimada (eGFR)", "value": 83, "unit": "mL/min/1,73m²", "ref_min": 90, "ref_max": null, "ref_text": "> 90", "status": "baixa", "notes": "Abaixo do ideal. Monitorar hidratação e função renal."},
+
+    {"session_id": "s002", "category": "Metabolismo Glicídico", "exam": "Glicose", "value": 96, "unit": "mg/dL", "ref_min": 70, "ref_max": 99, "ref_text": "70 – 99", "status": "normal", "notes": "Melhora em relação a out/2025 (103 → 96)"},
+    {"session_id": "s002", "category": "Metabolismo Glicídico", "exam": "HbA1c", "value": 5.9, "unit": "%", "ref_min": null, "ref_max": 5.7, "ref_text": "< 5,7% normal | 5,7–6,4% pré-diabetes", "status": "alta", "notes": "Pré-diabetes — piora discreta em relação a out/2025 (5,8% → 5,9%)"},
+
+    {"session_id": "s002", "category": "Perfil Lipídico", "exam": "Triglicérides", "value": 117, "unit": "mg/dL", "ref_min": null, "ref_max": 150, "ref_text": "< 150", "status": "normal", "notes": "Aumento em relação a out/2025 (82 → 117). Monitorar."},
+    {"session_id": "s002", "category": "Perfil Lipídico", "exam": "Colesterol Total", "value": 199, "unit": "mg/dL", "ref_min": null, "ref_max": 190, "ref_text": "< 190", "status": "alta", "notes": "Melhora (222 → 199) mas ainda acima do desejável"},
+    {"session_id": "s002", "category": "Perfil Lipídico", "exam": "HDL", "value": 33, "unit": "mg/dL", "ref_min": 40, "ref_max": null, "ref_text": "> 40", "status": "baixa", "notes": "BAIXO e piorou (41 → 33). Risco cardiovascular. Aumentar cardio urgente."},
+    {"session_id": "s002", "category": "Perfil Lipídico", "exam": "LDL", "value": 143, "unit": "mg/dL", "ref_min": null, "ref_max": 130, "ref_text": "< 130 (desejável)", "status": "alta", "notes": "Melhora (162 → 143). Ainda acima."},
+    {"session_id": "s002", "category": "Perfil Lipídico", "exam": "VLDL", "value": 23, "unit": "mg/dL", "ref_min": null, "ref_max": 30, "ref_text": "< 30", "status": "normal", "notes": ""},
+
+    {"session_id": "s002", "category": "Função Hepática", "exam": "TGO (AST)", "value": 53, "unit": "U/L", "ref_min": null, "ref_max": 40, "ref_text": "≤ 40", "status": "alta", "notes": "ELEVADO — aumento significativo (22 → 53). Investigar causa."},
+    {"session_id": "s002", "category": "Função Hepática", "exam": "TGP (ALT)", "value": 35, "unit": "U/L", "ref_min": 10, "ref_max": 49, "ref_text": "10 – 49", "status": "normal", "notes": ""},
+
+    {"session_id": "s002", "category": "Tireoide", "exam": "TSH", "value": 4.50, "unit": "µUI/mL", "ref_min": 0.40, "ref_max": 4.30, "ref_text": "0,40 – 4,30", "status": "alta", "notes": "ELEVADO e piorando (4,31 → 4,50). Hipotireoidismo subclínico."},
+
+    {"session_id": "s003", "category": "Função Renal", "exam": "Creatinina", "value": 0.97, "unit": "mg/dL", "ref_min": 0.70, "ref_max": 1.30, "ref_text": "0,70 – 1,30", "status": "normal", "notes": "Melhora (1,12 → 0,97)"},
+    {"session_id": "s003", "category": "Função Renal", "exam": "TFG estimada (eGFR)", "value": 91, "unit": "mL/min/1,73m²", "ref_min": 90, "ref_max": null, "ref_text": "> 90", "status": "normal", "notes": "Normalizado"},
+
+    {"session_id": "s003", "category": "Função Hepática", "exam": "TGO (AST)", "value": 60, "unit": "U/L", "ref_min": null, "ref_max": 34, "ref_text": "< 34", "status": "alta", "notes": "PIOROU (53 → 60). Investigação com ultrassom abdominal em andamento."},
+    {"session_id": "s003", "category": "Função Hepática", "exam": "TGP (ALT)", "value": 61, "unit": "U/L", "ref_min": 10, "ref_max": 49, "ref_text": "10 – 49", "status": "alta", "notes": "NOVA ELEVAÇÃO (35 → 61). Envolvimento hepático — aguardar ultrassom."},
+
+    {"session_id": "s003", "category": "Tireoide", "exam": "TSH", "value": 7.48, "unit": "µUI/mL", "ref_min": 0.40, "ref_max": 4.30, "ref_text": "0,40 – 4,30", "status": "alta", "notes": "MUITO ELEVADO (4,50 → 7,48). Hipotireoidismo confirmado. Discutir levotiroxina com médica."},
+    {"session_id": "s003", "category": "Tireoide", "exam": "T4 Livre", "value": 1.22, "unit": "ng/dL", "ref_min": 0.89, "ref_max": 1.76, "ref_text": "0,89 – 1,76", "status": "normal", "notes": "Normal — T4 ainda compensado apesar do TSH alto"},
+    {"session_id": "s003", "category": "Tireoide", "exam": "Anti-tireoglobulina (anti-TG)", "value": 8.2, "unit": "UI/mL", "ref_min": null, "ref_max": 4.5, "ref_text": "< 4,5", "status": "alta", "notes": "ELEVADO — possível Tireoidite de Hashimoto (doença autoimune)"},
+    {"session_id": "s003", "category": "Tireoide", "exam": "Anti-TPO (Antiperoxidase)", "value": 10.4, "unit": "U/mL", "ref_min": null, "ref_max": 13.8, "ref_text": "< 13,8", "status": "normal", "notes": "Normal"},
+
+    {"session_id": "s003", "category": "Sorologias", "exam": "Anti-HIV", "value": null, "unit": "", "ref_min": null, "ref_max": null, "ref_text": "Não Reagente", "status": "info", "notes": "Não Reagente ✓"},
+    {"session_id": "s003", "category": "Sorologias", "exam": "HBsAg (Hepatite B)", "value": null, "unit": "", "ref_min": null, "ref_max": null, "ref_text": "Não Reagente", "status": "info", "notes": "Não Reagente ✓"},
+    {"session_id": "s003", "category": "Sorologias", "exam": "Anti-HCV (Hepatite C)", "value": null, "unit": "", "ref_min": null, "ref_max": null, "ref_text": "Não Reagente", "status": "info", "notes": "Não Reagente ✓"},
+
+    {"session_id": "s003", "category": "Urina", "exam": "Albumina Urinária", "value": 3.0, "unit": "mg/L", "ref_min": null, "ref_max": 30, "ref_text": "< 30 (normal)", "status": "normal", "notes": "Normal — sem microalbuminúria"}
+  ]
+}

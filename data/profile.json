@@ -1,0 +1,24 @@
+{
+  "nome": "Leandro Leme Crespo",
+  "data_nascimento": "1981-06-30",
+  "sexo": "M",
+  "altura_m": 1.82,
+  "medico": "Dra. Celina Prado de Lima Souza",
+  "medico_crm": "208522-SP",
+  "nutricionista": "Maria Eduarda Tardin",
+  "nutricionista_crn": "23101875",
+  "medicamentos": [
+    {"nome": "Mounjaro (Tirzepatida)", "inicio": "2026-01-01", "obs": "GLP-1/GIP agonista — controle glicêmico e emagrecimento"}
+  ],
+  "condicoes": [
+    "Sobrepeso (IMC > 28)",
+    "Pré-diabetes (HbA1c 5.8-5.9%)",
+    "Hipotireoidismo subclínico (TSH progressivamente elevado)",
+    "Possível Tireoidite de Hashimoto (anti-TG 8.2 UI/mL)",
+    "Dislipidemia (HDL baixo, LDL elevado)",
+    "Homocisteína elevada",
+    "Transaminases elevadas (TGO/TGP — investigar causa)",
+    "Coluna lombar — RM realizada (verificar laudo)"
+  ],
+  "objetivo": "Emagrecimento com preservação/ganho de massa muscular"
+}

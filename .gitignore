@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+
+# PDFs e documentos originais (dados pessoais — não enviar ao GitHub)
+*.pdf
+*.docx
+*.doc
+*.jpg
+*.jpeg
+*.png
+
+# Streamlit cache
+.streamlit/secrets.toml
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -169,9 +169,11 @@ with tabs[1]:
     refs = {"Colesterol Total":190,"HDL":40,"LDL":130,"Triglicérides":150}
     for exam_name, ref_val in refs.items():
         fig.add_hline(y=ref_val, line_dash="dot", line_color=colors.get(exam_name,"#ccc"), opacity=0.5)
-    fig.update_layout(height=360, title="Evolução do Perfil Lipídico", plot_bgcolor="white", paper_bgcolor="white",
-        xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#eee", title="mg/dL"),
-        legend=dict(orientation="h", yanchor="bottom", y=-0.3))
+    fig.update_layout(height=380, title="Evolução do Perfil Lipídico", plot_bgcolor="white", paper_bgcolor="white",
+        xaxis=dict(showgrid=False, automargin=True),
+        yaxis=dict(showgrid=True, gridcolor="#eee", title="mg/dL", automargin=True),
+        legend=dict(orientation="h", yanchor="bottom", y=-0.25),
+        margin=dict(l=60, r=30, t=55, b=90))
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("""
@@ -228,9 +230,11 @@ with tabs[2]:
     fig.add_hrect(y0=0.40, y1=4.30, fillcolor="rgba(39,174,96,0.1)", line_width=0, annotation_text="Zona normal")
     fig.add_hrect(y0=4.30, y1=10, fillcolor="rgba(231,76,60,0.1)", line_width=0, annotation_text="Hipotireoidismo")
     fig.add_hline(y=4.30, line_dash="dash", line_color="#E74C3C", annotation_text="Limite sup. 4,30")
-    fig.update_layout(height=300, title="Evolução do TSH (µUI/mL) — Tendência Preocupante",
-        plot_bgcolor="white", paper_bgcolor="white", xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=True, gridcolor="#eee", title="TSH µUI/mL"), showlegend=False)
+    fig.update_layout(height=320, title="Evolução do TSH (µUI/mL) — Tendência Preocupante",
+        plot_bgcolor="white", paper_bgcolor="white",
+        xaxis=dict(showgrid=False, automargin=True),
+        yaxis=dict(showgrid=True, gridcolor="#eee", title="TSH µUI/mL", automargin=True),
+        showlegend=False, margin=dict(l=60, r=160, t=55, b=50))
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("""
@@ -279,9 +283,11 @@ with tabs[3]:
             ))
             fig.add_hline(y=ref, line_dash="dot", line_color=color, opacity=0.5,
                           annotation_text=f"Ref sup {exam_name}: {ref}")
-    fig.update_layout(height=300, title="Evolução das Transaminases", plot_bgcolor="white", paper_bgcolor="white",
-        xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#eee", title="U/L"),
-        legend=dict(orientation="h", yanchor="bottom", y=-0.3))
+    fig.update_layout(height=340, title="Evolução das Transaminases", plot_bgcolor="white", paper_bgcolor="white",
+        xaxis=dict(showgrid=False, automargin=True),
+        yaxis=dict(showgrid=True, gridcolor="#eee", title="U/L", automargin=True),
+        legend=dict(orientation="h", yanchor="bottom", y=-0.25),
+        margin=dict(l=60, r=160, t=55, b=90))
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("""
@@ -326,11 +332,12 @@ with tabs[4]:
                 name=exam_name, line=dict(width=2.5, color=color), marker=dict(size=10),
                 yaxis="y2" if "HbA1c" in exam_name else "y"
             ))
-    fig.update_layout(height=300, title="Glicose vs. HbA1c ao longo do tempo", plot_bgcolor="white",
-        paper_bgcolor="white", xaxis=dict(showgrid=False),
-        yaxis=dict(title="Glicose (mg/dL)", showgrid=True, gridcolor="#eee"),
-        yaxis2=dict(title="HbA1c (%)", overlaying="y", side="right"),
-        legend=dict(orientation="h", yanchor="bottom", y=-0.3))
+    fig.update_layout(height=340, title="Glicose vs. HbA1c ao longo do tempo", plot_bgcolor="white",
+        paper_bgcolor="white", xaxis=dict(showgrid=False, automargin=True),
+        yaxis=dict(title="Glicose (mg/dL)", showgrid=True, gridcolor="#eee", automargin=True),
+        yaxis2=dict(title="HbA1c (%)", overlaying="y", side="right", automargin=True),
+        legend=dict(orientation="h", yanchor="bottom", y=-0.25),
+        margin=dict(l=60, r=80, t=55, b=90))
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("""

@@ -311,8 +311,8 @@
       "date": "2026-06-23",
       "peso_kg": 95.8,
       "imc": 28.9,
-      "percentual_gordura": 30.7,
-      "massa_gordura_kg": 29.4,
+      "percentual_gordura": 30.9,
+      "massa_gordura_kg": 29.6,
       "massa_magra_kg": 66.4,
       "musculo_esqueletico_kg": 36.7,
       "percentual_musculo": 67.3,
@@ -322,25 +322,56 @@
       "gordura_visceral": 14,
       "idade_corporal": 45,
       "device": "Smartwatch",
-      "notes": "Dados confirmados — crise na lombar, sem treino, peso temporariamente elevado"
+      "notes": "Dados confirmados via app AiLink — crise na lombar, sem treino, peso elevado temporariamente"
     },
     {
       "id": 19,
       "date": "2026-06-30",
       "peso_kg": 94.0,
-      "imc": 28.4,
-      "percentual_gordura": 29.9,
-      "massa_gordura_kg": 28.1,
-      "massa_magra_kg": 65.9,
-      "musculo_esqueletico_kg": 36.4,
-      "percentual_musculo": 67.3,
+      "imc": 28.3,
+      "percentual_gordura": 30.2,
+      "massa_gordura_kg": 28.2,
+      "massa_magra_kg": 65.8,
+      "musculo_esqueletico_kg": 36.3,
+      "percentual_musculo": 66.3,
       "percentual_agua": 49.7,
       "massa_ossea_kg": 3.3,
-      "tmb_kcal": 1783,
+      "tmb_kcal": 1743,
       "gordura_visceral": 14,
-      "idade_corporal": 45,
-      "device": "Smartwatch",
-      "notes": "Medição de hoje — 30/06/2026 (45 anos!). Aguardando imagem do app para confirmar demais valores."
+      "idade_corporal": 47,
+      "device": "Smartwatch AiLink",
+      "notes": "Medição confirmada via imagem do app AiLink — 30/06/2026 09:05",
+      "percentual_proteina": 13.5,
+      "gordura_subcutanea_pct": 25.0,
+      "massa_muscular_total_kg": 56.7,
+      "massa_agua_kg": 46.7,
+      "proteina_kg": 12.7,
+      "indice_musculo_membro": 8.3,
+      "tipo_corpo": "Robusto e obeso",
+      "indice_obesidade": 132,
+      "peso_mineral_kg": 6.2,
+      "segmental": {
+        "braco_d": {
+          "gordura_kg": 1.6,
+          "musculo_kg": 3.2
+        },
+        "braco_e": {
+          "gordura_kg": 1.7,
+          "musculo_kg": 3.5
+        },
+        "tronco": {
+          "gordura_kg": 14.2,
+          "musculo_kg": 29.2
+        },
+        "perna_d": {
+          "gordura_kg": 3.5,
+          "musculo_kg": 9.3
+        },
+        "perna_e": {
+          "gordura_kg": 4.2,
+          "musculo_kg": 11.3
+        }
+      }
     }
   ]
 }

@@ -232,41 +232,68 @@ df_show.columns = ["Data","Peso (kg)","IMC","Gordura (%)","Gordura (kg)",
 df_show = df_show.sort_values("Data", ascending=False)
 st.dataframe(df_show, use_container_width=True, hide_index=True)
 
-# ── Adicionar nova medição ────────────────────────────────────────────────────
-st.markdown("<div class='section-header'>➕ Registrar Nova Medição</div>", unsafe_allow_html=True)
-with st.form("nova_bio", clear_on_submit=True):
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        data_med    = st.date_input("Data", value=date.today())
-        peso        = st.number_input("Peso (kg)", 50.0, 200.0, float(latest["peso_kg"]), 0.1)
-        imc         = st.number_input("IMC", 15.0, 50.0, float(latest["imc"]), 0.1)
-        pct_gordura = st.number_input("% Gordura", 1.0, 60.0, float(latest["percentual_gordura"]), 0.1)
-    with col2:
-        massa_gordura = st.number_input("Gordura (kg)", 1.0, 100.0, float(latest["massa_gordura_kg"]), 0.1)
-        musculo       = st.number_input("Músculo Esq. (kg)", 10.0, 80.0, float(latest["musculo_esqueletico_kg"]), 0.1)
-        pct_agua      = st.number_input("% Água", 20.0, 80.0, float(latest.get("percentual_agua", 48)), 0.1)
-        pct_musculo   = st.number_input("% Músculo", 10.0, 80.0, float(latest.get("percentual_musculo", 65)), 0.1)
-    with col3:
-        tmb          = st.number_input("TMB (kcal)", 1000, 4000, int(latest.get("tmb_kcal", 1780)), 1)
-        gordura_visc = st.number_input("Gordura Visceral", 1, 30, int(latest.get("gordura_visceral", 10)), 1)
-        massa_ossea  = st.number_input("Massa Óssea (kg)", 1.0, 6.0, float(latest.get("massa_ossea_kg", 3.3)), 0.1)
-        device       = st.selectbox("Dispositivo", ["Smartwatch Ultra","Balança Bioimpedância","InBody","Heath Pro","Outro"])
-    notas = st.text_input("Observações (opcional)")
-    submitted = st.form_submit_button("💾 Salvar Medição", type="primary")
+# ── Upload de imagem + Nova Medição ───────────────────────────────────────────
+st.markdown("<div class='section-header'>📷 Registrar Nova Medição (App AiLink)</div>", unsafe_allow_html=True)
+st.caption("Envie a imagem do app AiLink (tela 'Compartilhamento' ou 'Antevisão') e preencha o formulário lendo os valores da imagem.")
+
+img_col, form_col = st.columns([1, 1])
+
+with img_col:
+    uploaded = st.file_uploader(
+        "Imagem do app AiLink:", type=["jpg","jpeg","png"], key="bio_img",
+        help="Telas 'Compartilhamento d...' ou 'Antevisão' do app"
+    )
+    if uploaded:
+        st.image(uploaded, use_container_width=True)
+    else:
+        st.markdown("""
+        <div style='background:#f0f9ff;border:2px dashed #90caf9;border-radius:12px;padding:28px;text-align:center;color:#1565C0'>
+            <div style='font-size:40px;margin-bottom:8px'>📷</div>
+            <div style='font-weight:700;font-size:15px'>Envie a tela do app AiLink</div>
+            <div style='font-size:13px;margin-top:6px;opacity:0.8'>
+                Tela <b>Compartilhamento</b> ou <b>Antevisão</b><br>
+                Preencha o formulário com os valores da imagem
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+with form_col:
+    st.caption("**Campos do app AiLink → preencha com os valores da imagem:**")
+    with st.form("nova_bio", clear_on_submit=True):
+        data_med    = st.date_input("📅 Data da medição", value=date.today())
+        c1, c2 = st.columns(2)
+        with c1:
+            peso        = st.number_input("Peso (kg)",              50.0, 200.0, float(latest["peso_kg"]), 0.1)
+            imc         = st.number_input("BMI",                    15.0, 50.0,  float(latest["imc"]), 0.1)
+            pct_gordura = st.number_input("BFR — % Gordura",        1.0,  60.0,  float(latest["percentual_gordura"]), 0.1)
+            massa_gordura=st.number_input("Massa Gorda (kg)",        1.0, 100.0, float(latest["massa_gordura_kg"]), 0.1)
+            musculo     = st.number_input("Massa Musc. Esq. (kg)",  10.0, 80.0,  float(latest["musculo_esqueletico_kg"]), 0.1)
+            pct_musculo = st.number_input("Velocidade Muscular (%)",10.0, 80.0,  float(latest.get("percentual_musculo", 66.3)), 0.1)
+        with c2:
+            pct_agua    = st.number_input("Taxa de Umidade (%)",    20.0, 80.0,  float(latest.get("percentual_agua", 49.7)), 0.1)
+            massa_ossea = st.number_input("Massa Óssea (kg)",        1.0,  6.0,  float(latest.get("massa_ossea_kg", 3.3)), 0.1)
+            tmb         = st.number_input("BMR (kcal)",            1000, 4000,   int(latest.get("tmb_kcal", 1743)), 1)
+            gordura_visc= st.number_input("Gordura Visceral",          1,   30,  int(latest.get("gordura_visceral", 14)), 1)
+            idade_corp  = st.number_input("Idade do Corpo",           20,   90,  int(latest.get("idade_corporal", 47)), 1)
+            pct_proteina= st.number_input("Taxa de Proteína (%)",   5.0, 30.0,   float(latest.get("percentual_proteina", 13.5)), 0.1)
+        notas = st.text_input("Observações (opcional)")
+        submitted = st.form_submit_button("💾 Salvar Medição", type="primary", use_container_width=True)
 
 if submitted:
     new_id = max([b.get("id", 0) for b in bio_list], default=0) + 1
     new_entry = {
         "id": new_id, "date": str(data_med),
         "peso_kg": peso, "imc": imc,
-        "percentual_gordura": pct_gordura, "massa_gordura_kg": massa_gordura,
+        "percentual_gordura": pct_gordura, "massa_gordura_kg": round(massa_gordura, 1),
         "massa_magra_kg": round(peso - massa_gordura, 1),
         "musculo_esqueletico_kg": musculo, "percentual_musculo": pct_musculo,
         "percentual_agua": pct_agua, "massa_ossea_kg": massa_ossea,
         "tmb_kcal": tmb, "gordura_visceral": gordura_visc,
-        "idade_corporal": 0, "device": device, "notes": notas
+        "idade_corporal": int(idade_corp),
+        "percentual_proteina": pct_proteina,
+        "device": "Smartwatch AiLink", "notes": notas
     }
     bio_list.append(new_entry)
     save_bioimpedance(bio_list)
-    st.success(f"✅ Medição de {data_med.strftime('%d/%m/%Y')} salva com sucesso!")
+    st.success(f"✅ Medição de {data_med.strftime('%d/%m/%Y')} salva — {peso} kg")
     st.rerun()

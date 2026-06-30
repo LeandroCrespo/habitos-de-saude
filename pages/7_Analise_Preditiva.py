@@ -15,10 +15,13 @@ st.markdown("""
 <style>
 .section-header{font-size:22px;font-weight:700;color:#7B2FBE;border-bottom:3px solid #7B2FBE;padding-bottom:8px;margin:20px 0 16px}
 .kpi-box{background:linear-gradient(135deg,#f5f0ff,#ede0ff);border:1px solid #9B59B6;border-radius:12px;padding:14px;text-align:center;margin:4px}
+.kpi-box-adj{background:linear-gradient(135deg,#f0fff4,#dcfce7);border:1px solid #27AE60;border-radius:12px;padding:14px;text-align:center;margin:4px}
 .proj-good{background:#f0fff4;border-left:4px solid #27AE60;padding:10px 14px;border-radius:0 8px 8px 0;margin:6px 0;font-size:13px}
 .proj-warn{background:#fffbf0;border-left:4px solid #F39C12;padding:10px 14px;border-radius:0 8px 8px 0;margin:6px 0;font-size:13px}
 .proj-alert{background:#fff5f5;border-left:4px solid #E74C3C;padding:10px 14px;border-radius:0 8px 8px 0;margin:6px 0;font-size:13px}
+.proj-scenario{background:#f0f8ff;border-left:4px solid #2980B9;padding:10px 14px;border-radius:0 8px 8px 0;margin:6px 0;font-size:13px}
 .timeline-item{padding:8px 14px;border-left:3px solid #9B59B6;margin:6px 0;background:#faf5ff;border-radius:0 8px 8px 0;font-size:13px}
+.scenario-box{background:linear-gradient(135deg,#e8f5e9,#f0fff4);border:2px solid #27AE60;border-radius:12px;padding:14px;margin:10px 0}
 </style>
 """, unsafe_allow_html=True)
 
@@ -26,14 +29,13 @@ st.markdown("## 🔮 Análise Preditiva")
 st.caption("Projeções baseadas nos seus dados históricos e evidências médicas. As datas são estimativas — não substituem avaliação médica.")
 
 # ── Carregar dados ──────────────────────────────────────────────────────────────
-bio_list = sorted(load_bioimpedance(), key=lambda x: x["date"])
+bio_list  = sorted(load_bioimpedance(), key=lambda x: x["date"])
 exams_data = load_exams()
 
 if len(bio_list) < 3:
     st.warning("Dados insuficientes para projeções. Adicione mais medições de bioimpedância.")
     st.stop()
 
-# Usar dados de 2026 (fase atual de acompanhamento)
 REF_DATE = datetime(2026, 1, 1)
 TODAY    = datetime.now()
 TODAY_X  = (TODAY - REF_DATE).days
@@ -47,7 +49,7 @@ pesos    = [b["peso_kg"] for b in bio_recente]
 gorduras = [b.get("percentual_gordura", 0) for b in bio_recente]
 musculos = [b.get("musculo_esqueletico_kg", 0) for b in bio_recente]
 
-# Regressão linear
+# Regressão linear (histórico real = baseline 3x/semana)
 coef_peso = np.polyfit(x_dias, pesos, 1)
 coef_gord = np.polyfit(x_dias, gorduras, 1)
 coef_musc = np.polyfit(x_dias, musculos, 1)
@@ -56,101 +58,195 @@ peso_atual = bio_recente[-1]["peso_kg"]
 gord_atual = bio_recente[-1].get("percentual_gordura", 0)
 musc_atual = bio_recente[-1].get("musculo_esqueletico_kg", 0)
 
-taxa_peso_sem = coef_peso[0] * 7  # kg/semana
-taxa_gord_sem = coef_gord[0] * 7  # %/semana
-taxa_musc_sem = coef_musc[0] * 7  # kg/semana
+# Taxas semanais da linha de base (3x/semana)
+taxa_peso_sem = coef_peso[0] * 7
+taxa_gord_sem = coef_gord[0] * 7
+taxa_musc_sem = coef_musc[0] * 7
 
 PESO_META = 82.0
 GORD_META = 22.0
 MUSC_META = 40.0
 
-def _dias_para_meta(valor, meta, coef):
-    if coef == 0:
-        return None, None
-    dias = (meta - coef[1] - valor) / coef[0] if False else (meta - np.polyval(coef, TODAY_X)) / coef[0]
-    if days_raw := (meta - np.polyval(coef, TODAY_X)) / coef[0]:
-        if days_raw <= 0:
-            return None, None
-        d = int(days_raw)
-        return d, (TODAY + timedelta(days=d)).date()
-    return None, None
+# Ponto projetado hoje (pelo modelo de regressão)
+val_hoje_peso = float(np.polyval(coef_peso, TODAY_X))
+val_hoje_gord = float(np.polyval(coef_gord, TODAY_X))
+val_hoje_musc = float(np.polyval(coef_musc, TODAY_X))
 
-# Calcular datas de meta
-if coef_peso[0] < 0:
-    dias_peso_falta = (PESO_META - np.polyval(coef_peso, TODAY_X)) / coef_peso[0]
-    dt_peso = (TODAY + timedelta(days=int(dias_peso_falta))).date() if dias_peso_falta > 0 else None
-else:
-    dias_peso_falta, dt_peso = None, None
+# ── Configurador de Cenário de Treino ─────────────────────────────────────────
+st.markdown("<div class='section-header'>⚙️ Simular Frequência de Treino</div>", unsafe_allow_html=True)
 
-if coef_gord[0] < 0:
-    dias_gord_falta = (GORD_META - np.polyval(coef_gord, TODAY_X)) / coef_gord[0]
-    dt_gord = (TODAY + timedelta(days=int(dias_gord_falta))).date() if dias_gord_falta > 0 else None
-else:
-    dias_gord_falta, dt_gord = None, None
+c_s1, c_s2, c_s3 = st.columns([3, 2, 3])
+with c_s1:
+    freq_treino = st.select_slider(
+        "Treinos por semana:",
+        options=[3, 4, 5, 6, 7],
+        value=3,
+        format_func=lambda x: f"{x}x/semana",
+        key="freq_treino_slider",
+        help="Seu histórico atual reflete 3x/semana. Ajuste para ver projeções de diferentes cenários."
+    )
+with c_s2:
+    kcal_por_sessao = st.number_input(
+        "Kcal por treino:",
+        min_value=200, max_value=700, value=420, step=10,
+        key="kcal_sessao_input",
+        help="Gasto calórico médio por sessão de musculação (~420 kcal para ~60 min)"
+    )
 
-if coef_musc[0] > 0:
-    dias_musc_falta = (MUSC_META - np.polyval(coef_musc, TODAY_X)) / coef_musc[0]
-    dt_musc = (TODAY + timedelta(days=int(dias_musc_falta))).date() if dias_musc_falta > 0 else None
-else:
-    dias_musc_falta, dt_musc = None, None
+# Cálculo do ajuste de cenário
+KCAL_POR_KG_GORDURA = 7700  # kcal necessárias para perder 1 kg de gordura
+extra_sessoes = freq_treino - 3
 
-# Dados projetados (40 semanas à frente)
-proj_x       = list(range(TODAY_X, TODAY_X + 40 * 7, 7))
-proj_datas   = [REF_DATE + timedelta(days=d) for d in proj_x]
-proj_pesos   = [float(np.polyval(coef_peso, d)) for d in proj_x]
+# Impacto extra semanal (adicional ao baseline de 3x/sem)
+extra_kcal_sem   = extra_sessoes * kcal_por_sessao
+extra_peso_sem   = extra_kcal_sem / KCAL_POR_KG_GORDURA          # kg/semana a mais
+extra_gord_sem   = extra_sessoes * 0.04                            # pp/semana a mais (gordura %)
+extra_musc_sem   = min(extra_sessoes * 0.012, 0.048)              # kg/semana a mais (limite fisiológico)
+
+# Taxas ajustadas para o cenário
+taxa_peso_aj = taxa_peso_sem - extra_peso_sem   # mais negativo = mais perda
+taxa_gord_aj = taxa_gord_sem - extra_gord_sem
+taxa_musc_aj = taxa_musc_sem + extra_musc_sem
+
+# Slopes ajustados por dia (para projeção)
+adj_slope_peso = -extra_peso_sem / 7
+adj_slope_gord = -extra_gord_sem / 7
+adj_slope_musc = +extra_musc_sem / 7
+
+with c_s3:
+    if extra_sessoes == 0:
+        st.info("📊 **Cenário atual** — baseado no seu histórico de 3 treinos/semana.")
+    else:
+        extra_kg_mes = extra_peso_sem * 4.3
+        st.markdown(f"""<div class='scenario-box'>
+<b>✅ Cenário: {freq_treino}x/semana</b><br>
++{extra_sessoes} treino(s)/sem = <b>+{extra_kcal_sem:.0f} kcal/sem</b> gastas<br>
+→ <b>~{extra_kg_mes:.1f} kg a mais</b> de perda por mês<br>
+→ <b>~{extra_peso_sem * 4.3:.1f} kg</b> extras em relação ao ritmo atual
+</div>""", unsafe_allow_html=True)
+
+# Dados para gráficos
+proj_x      = list(range(TODAY_X, TODAY_X + 40 * 7, 7))
+proj_datas  = [REF_DATE + timedelta(days=d) for d in proj_x]
+
+# Projeções baseline (3x/sem)
+proj_pesos    = [float(np.polyval(coef_peso, d)) for d in proj_x]
 proj_gorduras = [float(np.polyval(coef_gord, d)) for d in proj_x]
 proj_musculos = [float(np.polyval(coef_musc, d)) for d in proj_x]
+
+# Projeções ajustadas (cenário Xx/sem) — partem do valor de hoje projetado pelo modelo
+proj_pesos_aj    = [val_hoje_peso + (coef_peso[0] + adj_slope_peso) * (d - TODAY_X) for d in proj_x]
+proj_gorduras_aj = [val_hoje_gord + (coef_gord[0] + adj_slope_gord) * (d - TODAY_X) for d in proj_x]
+proj_musculos_aj = [val_hoje_musc + (coef_musc[0] + adj_slope_musc) * (d - TODAY_X) for d in proj_x]
 
 # Linha de tendência sobre histórico
 trend_x     = list(range(x_dias[0], TODAY_X + 1))
 trend_datas = [REF_DATE + timedelta(days=d) for d in trend_x]
 hist_datas  = [datetime.strptime(b["date"], "%Y-%m-%d") for b in bio_recente]
 
+# Datas de meta — baseline
+if coef_peso[0] < 0:
+    d_falta = (PESO_META - val_hoje_peso) / coef_peso[0]
+    dt_peso = (TODAY + timedelta(days=int(d_falta))).date() if d_falta > 0 else None
+    dias_peso_falta = d_falta
+else:
+    dt_peso, dias_peso_falta = None, None
+
+if coef_gord[0] < 0:
+    d_falta = (GORD_META - val_hoje_gord) / coef_gord[0]
+    dt_gord = (TODAY + timedelta(days=int(d_falta))).date() if d_falta > 0 else None
+else:
+    dt_gord = None
+
+if coef_musc[0] > 0:
+    d_falta = (MUSC_META - val_hoje_musc) / coef_musc[0]
+    dt_musc = (TODAY + timedelta(days=int(d_falta))).date() if d_falta > 0 else None
+    dias_musc_falta = d_falta
+else:
+    dt_musc, dias_musc_falta = None, None
+
+# Datas de meta — cenário ajustado
+slope_peso_aj_dia = coef_peso[0] + adj_slope_peso
+slope_gord_aj_dia = coef_gord[0] + adj_slope_gord
+slope_musc_aj_dia = coef_musc[0] + adj_slope_musc
+
+if slope_peso_aj_dia < 0:
+    d_aj = (PESO_META - val_hoje_peso) / slope_peso_aj_dia
+    dt_peso_aj = (TODAY + timedelta(days=int(d_aj))).date() if d_aj > 0 else None
+    dias_peso_aj = d_aj
+else:
+    dt_peso_aj, dias_peso_aj = None, None
+
+if slope_gord_aj_dia < 0:
+    d_aj = (GORD_META - val_hoje_gord) / slope_gord_aj_dia
+    dt_gord_aj = (TODAY + timedelta(days=int(d_aj))).date() if d_aj > 0 else None
+else:
+    dt_gord_aj = None
+
+if slope_musc_aj_dia > 0:
+    d_aj = (MUSC_META - val_hoje_musc) / slope_musc_aj_dia
+    dt_musc_aj = (TODAY + timedelta(days=int(d_aj))).date() if d_aj > 0 else None
+    dias_musc_aj = d_aj
+else:
+    dt_musc_aj, dias_musc_aj = None, None
+
+# Escolhe quais valores mostrar nos KPIs (ajustado quando freq > 3)
+usar_aj = extra_sessoes > 0
+taxa_peso_kpi = taxa_peso_aj if usar_aj else taxa_peso_sem
+taxa_gord_kpi = taxa_gord_aj if usar_aj else taxa_gord_sem
+taxa_musc_kpi = taxa_musc_aj if usar_aj else taxa_musc_sem
+dt_peso_kpi   = dt_peso_aj   if usar_aj else dt_peso
+dias_peso_kpi = dias_peso_aj if usar_aj else dias_peso_falta
+
 # ── KPIs ──────────────────────────────────────────────────────────────────────
-st.markdown("<div class='section-header'>📊 Ritmo Atual</div>", unsafe_allow_html=True)
+st.markdown("<div class='section-header'>📊 Ritmo Projetado</div>", unsafe_allow_html=True)
+kpi_class = "kpi-box-adj" if usar_aj else "kpi-box"
+if usar_aj:
+    st.caption(f"Valores para o cenário de **{freq_treino}x/semana** (linha verde nos gráficos)")
+
 c1, c2, c3, c4 = st.columns(4)
 
 with c1:
-    cor = "#27AE60" if taxa_peso_sem < 0 else "#E74C3C"
-    seta = "↓" if taxa_peso_sem < 0 else "↑"
-    st.markdown(f"""<div class='kpi-box'>
+    cor = "#27AE60" if taxa_peso_kpi < 0 else "#E74C3C"
+    seta = "↓" if taxa_peso_kpi < 0 else "↑"
+    st.markdown(f"""<div class='{kpi_class}'>
 <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Perda de Peso</div>
-<div style='font-size:32px;font-weight:700;color:{cor}'>{seta} {abs(taxa_peso_sem):.2f}</div>
+<div style='font-size:32px;font-weight:700;color:{cor}'>{seta} {abs(taxa_peso_kpi):.2f}</div>
 <div style='font-size:12px;color:#888'>kg/semana</div>
-<div style='font-size:12px;color:{cor};font-weight:600'>{abs(taxa_peso_sem*4.3):.1f} kg/mês</div>
+<div style='font-size:12px;color:{cor};font-weight:600'>{abs(taxa_peso_kpi*4.3):.1f} kg/mês</div>
 </div>""", unsafe_allow_html=True)
 
 with c2:
-    cor2 = "#27AE60" if taxa_gord_sem < 0 else "#E74C3C"
-    seta2 = "↓" if taxa_gord_sem < 0 else "↑"
-    st.markdown(f"""<div class='kpi-box'>
+    cor2 = "#27AE60" if taxa_gord_kpi < 0 else "#E74C3C"
+    seta2 = "↓" if taxa_gord_kpi < 0 else "↑"
+    st.markdown(f"""<div class='{kpi_class}'>
 <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Gordura Corporal</div>
-<div style='font-size:32px;font-weight:700;color:{cor2}'>{seta2} {abs(taxa_gord_sem):.2f}</div>
+<div style='font-size:32px;font-weight:700;color:{cor2}'>{seta2} {abs(taxa_gord_kpi):.2f}</div>
 <div style='font-size:12px;color:#888'>%/semana</div>
 <div style='font-size:12px;color:{cor2};font-weight:600'>Atual: {gord_atual:.1f}%</div>
 </div>""", unsafe_allow_html=True)
 
 with c3:
-    cor3 = "#27AE60" if taxa_musc_sem > 0 else "#F39C12"
-    seta3 = "↑" if taxa_musc_sem > 0 else "→"
-    st.markdown(f"""<div class='kpi-box'>
+    cor3 = "#27AE60" if taxa_musc_kpi > 0 else "#F39C12"
+    seta3 = "↑" if taxa_musc_kpi > 0 else "→"
+    st.markdown(f"""<div class='{kpi_class}'>
 <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Ganho Muscular</div>
-<div style='font-size:32px;font-weight:700;color:{cor3}'>{seta3} {abs(taxa_musc_sem):.3f}</div>
+<div style='font-size:32px;font-weight:700;color:{cor3}'>{seta3} {abs(taxa_musc_kpi):.3f}</div>
 <div style='font-size:12px;color:#888'>kg/semana</div>
-<div style='font-size:12px;color:{cor3};font-weight:600'>+{taxa_musc_sem*4.3:.2f} kg/mês</div>
+<div style='font-size:12px;color:{cor3};font-weight:600'>+{taxa_musc_kpi*4.3:.2f} kg/mês</div>
 </div>""", unsafe_allow_html=True)
 
 with c4:
-    if dt_peso:
-        meses = int(dias_peso_falta / 30)
-        st.markdown(f"""<div class='kpi-box'>
+    if dt_peso_kpi:
+        meses = int(dias_peso_kpi / 30)
+        st.markdown(f"""<div class='{kpi_class}'>
 <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Meta 82 kg</div>
-<div style='font-size:24px;font-weight:700;color:#7B2FBE'>{dt_peso.strftime('%b/%Y')}</div>
+<div style='font-size:24px;font-weight:700;color:#7B2FBE'>{dt_peso_kpi.strftime('%b/%Y')}</div>
 <div style='font-size:12px;color:#888'>em ~{meses} meses</div>
 <div style='font-size:12px;color:#7B2FBE;font-weight:600'>Faltam {peso_atual - PESO_META:.1f} kg</div>
 </div>""", unsafe_allow_html=True)
     else:
-        st.markdown(f"""<div class='kpi-box'>
+        st.markdown(f"""<div class='{kpi_class}'>
 <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Meta 82 kg</div>
 <div style='font-size:22px;font-weight:700;color:#E74C3C'>Sem tendência</div>
 <div style='font-size:12px;color:#888'>Ajustar dieta/treino</div>
@@ -164,7 +260,6 @@ tab1, tab2, tab3 = st.tabs(["⚖️ Peso & Gordura", "💪 Músculo", "🧪 Exam
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab1:
     col_g, col_r = st.columns([3, 1])
-
     with col_g:
         # Gráfico de peso
         fig_peso = go.Figure()
@@ -177,31 +272,44 @@ with tab1:
         fig_peso.add_trace(go.Scatter(
             x=trend_datas,
             y=[float(np.polyval(coef_peso, d)) for d in trend_x],
-            name="Tendência",
+            name="Tendência histórica",
             mode="lines",
             line=dict(color="#27AE60", width=1.5, dash="dot"),
         ))
         fig_peso.add_trace(go.Scatter(
-            x=proj_datas, y=proj_pesos, name="Projeção",
+            x=proj_datas, y=proj_pesos, name="Projeção 3x/sem",
             mode="lines",
             line=dict(color="#9B59B6", width=2, dash="dash"),
         ))
+        if usar_aj:
+            fig_peso.add_trace(go.Scatter(
+                x=proj_datas, y=proj_pesos_aj,
+                name=f"Projeção {freq_treino}x/sem",
+                mode="lines",
+                line=dict(color="#27AE60", width=2.5, dash="longdash"),
+            ))
         fig_peso.add_hline(y=PESO_META, line_dash="dot", line_color="#E74C3C", line_width=1.5,
                            annotation_text="Meta: 82 kg", annotation_position="right")
         if dt_peso:
             fig_peso.add_vline(
                 x=datetime.combine(dt_peso, datetime.min.time()),
-                line_dash="dot", line_color="#E74C3C", line_width=1,
-                annotation_text=dt_peso.strftime("%d/%m/%Y"), annotation_position="top right",
+                line_dash="dot", line_color="#9B59B6", line_width=1,
+                annotation_text=f"3x: {dt_peso.strftime('%m/%Y')}", annotation_position="top right",
+            )
+        if usar_aj and dt_peso_aj:
+            fig_peso.add_vline(
+                x=datetime.combine(dt_peso_aj, datetime.min.time()),
+                line_dash="dot", line_color="#27AE60", line_width=1.5,
+                annotation_text=f"{freq_treino}x: {dt_peso_aj.strftime('%m/%Y')}", annotation_position="top left",
             )
         fig_peso.update_layout(
-            title="Projeção de Peso",
+            title=f"Projeção de Peso" + (f" — Comparativo 3x vs {freq_treino}x/semana" if usar_aj else ""),
             height=360, plot_bgcolor="white", paper_bgcolor="white",
             xaxis=dict(showgrid=False, automargin=True, tickangle=-15, tickformat="%b/%y"),
             yaxis=dict(showgrid=True, gridcolor="#eee", title="kg", automargin=True,
-                       range=[80, max(pesos) + 2]),
-            legend=dict(orientation="h", yanchor="bottom", y=-0.28),
-            margin=dict(l=50, r=150, t=50, b=80),
+                       range=[79, max(pesos) + 2]),
+            legend=dict(orientation="h", yanchor="bottom", y=-0.32),
+            margin=dict(l=50, r=150, t=60, b=80),
         )
         st.plotly_chart(fig_peso, use_container_width=True, key="pred_peso")
 
@@ -213,58 +321,93 @@ with tab1:
             line=dict(color="#E74C3C", width=2.5), marker=dict(size=7),
         ))
         fig_gord.add_trace(go.Scatter(
-            x=proj_datas, y=proj_gorduras, name="Projeção",
+            x=proj_datas, y=proj_gorduras, name="Projeção 3x/sem",
             mode="lines",
             line=dict(color="#9B59B6", width=2, dash="dash"),
         ))
+        if usar_aj:
+            fig_gord.add_trace(go.Scatter(
+                x=proj_datas, y=proj_gorduras_aj,
+                name=f"Projeção {freq_treino}x/sem",
+                mode="lines",
+                line=dict(color="#27AE60", width=2.5, dash="longdash"),
+            ))
         fig_gord.add_hline(y=GORD_META, line_dash="dot", line_color="#27AE60", line_width=1.5,
                            annotation_text=f"Meta: {GORD_META}%", annotation_position="right")
         if dt_gord:
             fig_gord.add_vline(
                 x=datetime.combine(dt_gord, datetime.min.time()),
-                line_dash="dot", line_color="#27AE60", line_width=1,
-                annotation_text=dt_gord.strftime("%d/%m/%Y"), annotation_position="top right",
+                line_dash="dot", line_color="#9B59B6", line_width=1,
+                annotation_text=f"3x: {dt_gord.strftime('%m/%Y')}", annotation_position="top right",
+            )
+        if usar_aj and dt_gord_aj:
+            fig_gord.add_vline(
+                x=datetime.combine(dt_gord_aj, datetime.min.time()),
+                line_dash="dot", line_color="#27AE60", line_width=1.5,
+                annotation_text=f"{freq_treino}x: {dt_gord_aj.strftime('%m/%Y')}", annotation_position="top left",
             )
         fig_gord.update_layout(
             title="Projeção de Gordura Corporal (%)",
             height=300, plot_bgcolor="white", paper_bgcolor="white",
             xaxis=dict(showgrid=False, automargin=True, tickangle=-15, tickformat="%b/%y"),
             yaxis=dict(showgrid=True, gridcolor="#eee", title="%", automargin=True),
-            legend=dict(orientation="h", yanchor="bottom", y=-0.32),
+            legend=dict(orientation="h", yanchor="bottom", y=-0.36),
             margin=dict(l=50, r=150, t=50, b=80),
         )
         st.plotly_chart(fig_gord, use_container_width=True, key="pred_gord")
 
     with col_r:
         st.markdown("**📋 Projeções**")
-
-        # Peso
         falta_peso = peso_atual - PESO_META
+        falta_gord = gord_atual - GORD_META
+
+        # Cenário baseline
         if dt_peso:
-            st.markdown(f"<div class='proj-good'><b>⚖️ Meta 82 kg</b><br>"
-                        f"Faltam <b>{falta_peso:.1f} kg</b><br>"
-                        f"Chegará em <b>{dt_peso.strftime('%d/%m/%Y')}</b><br>"
-                        f"<span style='color:#888'>ao ritmo de {taxa_peso_sem:.2f} kg/sem</span></div>",
-                        unsafe_allow_html=True)
+            meses_b = int(dias_peso_falta / 30)
+            st.markdown(
+                f"<div class='proj-warn'><b>⚖️ 3x/sem — Meta 82 kg</b><br>"
+                f"Chegará em <b>{dt_peso.strftime('%d/%m/%Y')}</b><br>"
+                f"~{meses_b} meses · {taxa_peso_sem:.2f} kg/sem</div>",
+                unsafe_allow_html=True,
+            )
         else:
-            st.markdown(f"<div class='proj-alert'><b>⚖️ Meta 82 kg</b><br>"
-                        f"Faltam <b>{falta_peso:.1f} kg</b><br>"
-                        f"Tendência atual não alcança a meta</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div class='proj-alert'><b>⚖️ Meta 82 kg</b><br>"
+                f"Faltam {falta_peso:.1f} kg<br>"
+                f"Tendência não alcança a meta</div>",
+                unsafe_allow_html=True,
+            )
+
+        # Cenário ajustado
+        if usar_aj:
+            if dt_peso_aj:
+                meses_aj = int(dias_peso_aj / 30)
+                acelerou = (int(dias_peso_falta) - int(dias_peso_aj)) if dt_peso and dt_peso_aj else 0
+                st.markdown(
+                    f"<div class='proj-scenario'><b>✅ {freq_treino}x/sem — Meta 82 kg</b><br>"
+                    f"Chegará em <b>{dt_peso_aj.strftime('%d/%m/%Y')}</b><br>"
+                    f"~{meses_aj} meses · {taxa_peso_aj:.2f} kg/sem<br>"
+                    + (f"<span style='color:#27AE60;font-weight:700'>⚡ {acelerou} dias mais rápido!</span>" if acelerou > 0 else "")
+                    + "</div>",
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown(
+                    f"<div class='proj-alert'><b>{freq_treino}x/sem — Meta 82 kg</b><br>"
+                    f"Tendência não alcança a meta</div>",
+                    unsafe_allow_html=True,
+                )
 
         # Gordura
-        falta_gord = gord_atual - GORD_META
         if dt_gord:
-            st.markdown(f"<div class='proj-good'><b>🔴 Meta &lt;{GORD_META}% gordura</b><br>"
-                        f"Faltam <b>{falta_gord:.1f}%</b><br>"
-                        f"Chegará em <b>{dt_gord.strftime('%d/%m/%Y')}</b><br>"
-                        f"<span style='color:#888'>ao ritmo de {taxa_gord_sem:.2f}%/sem</span></div>",
-                        unsafe_allow_html=True)
-        else:
-            st.markdown(f"<div class='proj-alert'><b>🔴 Meta &lt;{GORD_META}%</b><br>"
-                        f"Faltam <b>{falta_gord:.1f}%</b><br>"
-                        f"Ritmo insuficiente — ajustar déficit</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div class='proj-good'><b>🔴 Meta &lt;{GORD_META}% gordura</b><br>"
+                f"Chegará em <b>{dt_gord.strftime('%d/%m/%Y')}</b><br>"
+                f"ao ritmo {taxa_gord_sem:.2f}%/sem</div>",
+                unsafe_allow_html=True,
+            )
 
-        # Comparativo vs melhor histórico
+        # vs melhor 2025
         bio_2025 = [b for b in bio_list if "2025" in b["date"]]
         if bio_2025:
             melhor_2025 = min(b["peso_kg"] for b in bio_2025)
@@ -283,7 +426,6 @@ with tab1:
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab2:
     col_mg, col_mr = st.columns([3, 1])
-
     with col_mg:
         fig_musc = go.Figure()
         fig_musc.add_trace(go.Scatter(
@@ -294,22 +436,35 @@ with tab2:
         fig_musc.add_trace(go.Scatter(
             x=trend_datas,
             y=[float(np.polyval(coef_musc, d)) for d in trend_x],
-            name="Tendência",
+            name="Tendência histórica",
             mode="lines",
             line=dict(color="#1ABC9C", width=1.5, dash="dot"),
         ))
         fig_musc.add_trace(go.Scatter(
-            x=proj_datas, y=proj_musculos, name="Projeção",
+            x=proj_datas, y=proj_musculos, name="Projeção 3x/sem",
             mode="lines",
             line=dict(color="#9B59B6", width=2, dash="dash"),
         ))
+        if usar_aj:
+            fig_musc.add_trace(go.Scatter(
+                x=proj_datas, y=proj_musculos_aj,
+                name=f"Projeção {freq_treino}x/sem",
+                mode="lines",
+                line=dict(color="#F39C12", width=2.5, dash="longdash"),
+            ))
         fig_musc.add_hline(y=MUSC_META, line_dash="dot", line_color="#F39C12", line_width=1.5,
                            annotation_text=f"Meta: {MUSC_META} kg", annotation_position="right")
         if dt_musc:
             fig_musc.add_vline(
                 x=datetime.combine(dt_musc, datetime.min.time()),
-                line_dash="dot", line_color="#F39C12", line_width=1,
-                annotation_text=dt_musc.strftime("%d/%m/%Y"), annotation_position="top right",
+                line_dash="dot", line_color="#9B59B6", line_width=1,
+                annotation_text=f"3x: {dt_musc.strftime('%m/%Y')}", annotation_position="top right",
+            )
+        if usar_aj and dt_musc_aj:
+            fig_musc.add_vline(
+                x=datetime.combine(dt_musc_aj, datetime.min.time()),
+                line_dash="dot", line_color="#F39C12", line_width=1.5,
+                annotation_text=f"{freq_treino}x: {dt_musc_aj.strftime('%m/%Y')}", annotation_position="top left",
             )
         fig_musc.update_layout(
             title="Projeção de Massa Muscular Esquelética",
@@ -317,13 +472,12 @@ with tab2:
             xaxis=dict(showgrid=False, automargin=True, tickangle=-15, tickformat="%b/%y"),
             yaxis=dict(showgrid=True, gridcolor="#eee", title="kg", automargin=True,
                        range=[min(musculos) - 1, max(max(musculos), MUSC_META) + 1]),
-            legend=dict(orientation="h", yanchor="bottom", y=-0.3),
-            margin=dict(l=50, r=150, t=50, b=80),
+            legend=dict(orientation="h", yanchor="bottom", y=-0.32),
+            margin=dict(l=50, r=150, t=60, b=80),
         )
         st.plotly_chart(fig_musc, use_container_width=True, key="pred_musc")
 
-        # KPIs de músculo
-        musc_pct = (musc_atual / peso_atual * 100) if peso_atual > 0 else 0
+        musc_pct   = (musc_atual / peso_atual * 100) if peso_atual > 0 else 0
         ganho_total = musc_atual - bio_recente[0].get("musculo_esqueletico_kg", musc_atual)
         periodo_dias = (datetime.strptime(bio_recente[-1]["date"], "%Y-%m-%d") -
                         datetime.strptime(bio_recente[0]["date"], "%Y-%m-%d")).days
@@ -335,26 +489,39 @@ with tab2:
         with c_m2:
             st.metric("% do peso corporal", f"{musc_pct:.1f}%")
         with c_m3:
-            st.metric("Ritmo atual", f"+{ganho_mes:.2f} kg/mês")
+            taxa_kpi = taxa_musc_aj if usar_aj else taxa_musc_sem
+            st.metric("Ritmo projetado", f"+{taxa_kpi * 4.3:.2f} kg/mês",
+                      delta=f"{freq_treino}x/sem" if usar_aj else "3x/sem")
 
     with col_mr:
         st.markdown("**📋 Projeção Muscular**")
         falta_musc = MUSC_META - musc_atual
+
         if dt_musc and taxa_musc_sem > 0:
             meses_musc = int(dias_musc_falta / 30)
             st.markdown(
-                f"<div class='proj-good'><b>💪 Meta {MUSC_META} kg</b><br>"
-                f"Faltam <b>{falta_musc:.1f} kg</b><br>"
+                f"<div class='proj-warn'><b>💪 3x/sem — Meta {MUSC_META} kg</b><br>"
                 f"Chegará em <b>{dt_musc.strftime('%d/%m/%Y')}</b><br>"
-                f"<span style='color:#888'>em ~{meses_musc} meses</span></div>",
+                f"~{meses_musc} meses</div>",
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
                 f"<div class='proj-warn'><b>💪 Meta {MUSC_META} kg</b><br>"
                 f"Faltam <b>{falta_musc:.1f} kg</b><br>"
-                f"Ritmo: {taxa_musc_sem:+.3f} kg/sem<br>"
-                f"<span style='color:#888'>Intensifique musculação</span></div>",
+                f"Ritmo: {taxa_musc_sem:+.3f} kg/sem</div>",
+                unsafe_allow_html=True,
+            )
+
+        if usar_aj and dt_musc_aj:
+            meses_aj = int(dias_musc_aj / 30)
+            acelerou = (int(dias_musc_falta) - int(dias_musc_aj)) if dt_musc and dt_musc_aj else 0
+            st.markdown(
+                f"<div class='proj-scenario'><b>✅ {freq_treino}x/sem</b><br>"
+                f"Chegará em <b>{dt_musc_aj.strftime('%d/%m/%Y')}</b><br>"
+                f"~{meses_aj} meses<br>"
+                + (f"<span style='color:#27AE60;font-weight:700'>⚡ {acelerou} dias antes!</span>" if acelerou > 0 else "")
+                + "</div>",
                 unsafe_allow_html=True,
             )
 
@@ -373,6 +540,9 @@ with tab2:
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab3:
     st.markdown("**Projeções baseadas em evidências médicas e no seu histórico de tratamento (Puran T4 + dieta + exercício)**")
+    if usar_aj:
+        extra_hdl_mes = extra_sessoes * 0.5  # +0.5 mg/dL/mês por sessão extra (cardio)
+        st.info(f"Com {freq_treino}x/semana de treino, o HDL sobe ~{extra_hdl_mes:.1f} mg/dL a mais por mês do que a estimativa base.")
 
     results  = exams_data.get("results", [])
     sessions = {s["id"]: s["date"] for s in exams_data.get("sessions", [])}
@@ -393,13 +563,13 @@ with tab3:
     # Tabela comparativa histórica
     st.markdown("### 📊 Comparativo de Exames ao Longo do Tempo")
     exams_compare = [
-        ("TSH", "µUI/mL", "< 4,3", None, 4.3),
-        ("TGO (AST)", "U/L", "< 34", None, 40),
-        ("TGP (ALT)", "U/L", "< 49", 10, 49),
-        ("HDL", "mg/dL", "> 40", 40, None),
-        ("LDL", "mg/dL", "< 130", None, 130),
-        ("HbA1c", "%", "< 5,7%", None, 5.7),
-        ("Colesterol Total", "mg/dL", "< 190", None, 190),
+        ("TSH",             "µUI/mL", "< 4,3",   None, 4.3),
+        ("TGO (AST)",       "U/L",    "< 34",    None, 40),
+        ("TGP (ALT)",       "U/L",    "< 49",    10,   49),
+        ("HDL",             "mg/dL",  "> 40",    40,   None),
+        ("LDL",             "mg/dL",  "< 130",   None, 130),
+        ("HbA1c",           "%",      "< 5,7%",  None, 5.7),
+        ("Colesterol Total","mg/dL",  "< 190",   None, 190),
     ]
 
     rows = []
@@ -409,9 +579,9 @@ with tab3:
             if r["exam"] == exam_name and r["value"] is not None:
                 vals_by_session[sessions.get(r["session_id"], "")] = r["value"]
 
-        s1 = vals_by_session.get("2025-10-18", "—")
-        s2 = vals_by_session.get("2026-05-06", "—")
-        s3 = vals_by_session.get("2026-05-13", "—")
+        s1  = vals_by_session.get("2025-10-18", "—")
+        s2  = vals_by_session.get("2026-05-06", "—")
+        s3  = vals_by_session.get("2026-05-13", "—")
         cur = _val(exam_name)
 
         if cur is not None and ref_max is not None:
@@ -421,114 +591,120 @@ with tab3:
         else:
             ok = True
 
-        status = "✅ Normal" if ok else "🔴 Alterado"
         rows.append({
-            "Exame": exam_name,
-            "Out/2025": s1,
-            "Mai 06/2026": s2,
-            "Mai 13/2026": s3,
-            "Referência": ref_label,
-            "Status": status,
+            "Exame":       exam_name,
+            "Out/2025":    s1,
+            "Mai 06/26":   s2,
+            "Mai 13/26":   s3,
+            "Referência":  ref_label,
+            "Status":      "✅ Normal" if ok else "🔴 Alterado",
         })
 
-    df_comp = pd.DataFrame(rows)
-    st.dataframe(df_comp, use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
     # Projeções individuais
     st.markdown("### 🎯 Projeção de Normalização por Exame")
 
+    # HDL: ajustado pela frequência de treino
+    hdl_atual = _val("HDL") or 33
+    hdl_melhora_mes_base = 1.5  # mg/dL/mês com exercício aeróbico ≥ 150 min/sem
+    hdl_melhora_mes_aj   = hdl_melhora_mes_base + (extra_sessoes * 0.5)
+    hdl_meses_para_40    = max(1, int((40 - hdl_atual) / hdl_melhora_mes_aj)) if usar_aj else max(1, int((40 - hdl_atual) / hdl_melhora_mes_base))
+    hdl_expected         = today_date + timedelta(weeks=int(hdl_meses_para_40 * 4.3))
+
     exam_projs = [
         {
-            "exam": "TSH",
-            "unit": "µUI/mL",
-            "current": _val("TSH"),
+            "exam":       "TSH",
+            "unit":       "µUI/mL",
+            "current":    _val("TSH"),
             "goal_label": "1,0–2,5 µUI/mL (controle com levotiroxina)",
-            "up": False,
-            "goal": 2.5,
-            "expected": today_date + timedelta(weeks=10),
+            "up":         False,
+            "goal":       2.5,
+            "expected":   today_date + timedelta(weeks=10),
             "confidence": "Alta",
-            "mechanism": "✅ Puran T4 iniciado em jun/2026",
-            "note": "Com dose adequada, TSH normaliza em 8–12 semanas. Controle esperado em set/2026.",
+            "mechanism":  "✅ Puran T4 iniciado em jun/2026",
+            "note":       "Com dose adequada, TSH normaliza em 8–12 semanas. Controle esperado em set/2026.",
         },
         {
-            "exam": "TGO (AST)",
-            "unit": "U/L",
-            "current": _val("TGO (AST)"),
+            "exam":       "TGO (AST)",
+            "unit":       "U/L",
+            "current":    _val("TGO (AST)"),
             "goal_label": "< 34 U/L",
-            "up": False,
-            "goal": 34,
-            "expected": today_date + timedelta(weeks=18),
+            "up":         False,
+            "goal":       34,
+            "expected":   today_date + timedelta(weeks=18),
             "confidence": "Moderada",
-            "mechanism": "🔧 Tratamento do hipotireoidismo + perda de peso",
-            "note": "Hipotireoidismo é causa direta de TGO elevada. Com TSH controlado e peso reduzindo, TGO deve normalizar em 3–5 meses.",
+            "mechanism":  "🔧 Tratamento do hipotireoidismo + perda de peso",
+            "note":       "Hipotireoidismo é causa direta de TGO elevada. Com TSH controlado e peso reduzindo, TGO deve normalizar em 3–5 meses.",
         },
         {
-            "exam": "TGP (ALT)",
-            "unit": "U/L",
-            "current": _val("TGP (ALT)"),
+            "exam":       "TGP (ALT)",
+            "unit":       "U/L",
+            "current":    _val("TGP (ALT)"),
             "goal_label": "< 49 U/L",
-            "up": False,
-            "goal": 49,
-            "expected": today_date + timedelta(weeks=18),
+            "up":         False,
+            "goal":       49,
+            "expected":   today_date + timedelta(weeks=18),
             "confidence": "Moderada",
-            "mechanism": "🔧 Tratamento do hipotireoidismo + resultado da US abdominal",
-            "note": "TGP elevada junto com TGO indica envolvimento hepático. Aguardar resultado da ultrassonografia para conduta definitiva.",
+            "mechanism":  "🔧 Tratamento do hipotireoidismo + resultado da US abdominal",
+            "note":       "TGP elevada junto com TGO indica envolvimento hepático. Aguardar resultado da ultrassonografia para conduta definitiva.",
         },
         {
-            "exam": "HDL",
-            "unit": "mg/dL",
-            "current": _val("HDL"),
+            "exam":       "HDL",
+            "unit":       "mg/dL",
+            "current":    _val("HDL"),
             "goal_label": "> 40 mg/dL (ideal > 60)",
-            "up": True,
-            "goal": 40,
-            "expected": today_date + timedelta(weeks=20),
+            "up":         True,
+            "goal":       40,
+            "expected":   hdl_expected,
             "confidence": "Alta",
-            "mechanism": "🏃 Exercício aeróbico ≥ 150 min/semana",
-            "note": "HDL aumenta +1,5 mg/dL/mês com cardio regular. De 33 para 40 mg/dL levará ~5 meses de exercício consistente.",
+            "mechanism":  f"🏃 Exercício aeróbico — {freq_treino}x/sem (+{hdl_melhora_mes_aj:.1f} mg/dL/mês estimado)",
+            "note":       (f"Com {freq_treino}x/sem, HDL sobe ~{hdl_melhora_mes_aj:.1f} mg/dL/mês. "
+                          f"De {hdl_atual} para 40 mg/dL em ~{hdl_meses_para_40} meses."),
         },
         {
-            "exam": "LDL",
-            "unit": "mg/dL",
-            "current": _val("LDL"),
+            "exam":       "LDL",
+            "unit":       "mg/dL",
+            "current":    _val("LDL"),
             "goal_label": "< 130 mg/dL",
-            "up": False,
-            "goal": 130,
-            "expected": today_date + timedelta(weeks=14),
+            "up":         False,
+            "goal":       130,
+            "expected":   today_date + timedelta(weeks=14),
             "confidence": "Alta",
-            "mechanism": "🥗 Dieta da nutricionista + perda de peso + Puran T4",
-            "note": "LDL já melhorou (162→143). Com -5 kg a mais, espera-se redução adicional de 8–12%. Normalização em ~3 meses.",
+            "mechanism":  "🥗 Dieta da nutricionista + perda de peso + Puran T4",
+            "note":       "LDL já melhorou (162→143). Com -5 kg a mais, espera-se redução adicional de 8–12%. Normalização em ~3 meses.",
         },
         {
-            "exam": "HbA1c",
-            "unit": "%",
-            "current": _val("HbA1c"),
+            "exam":       "HbA1c",
+            "unit":       "%",
+            "current":    _val("HbA1c"),
             "goal_label": "< 5,7% (normal)",
-            "up": False,
-            "goal": 5.7,
-            "expected": today_date + timedelta(weeks=12),
+            "up":         False,
+            "goal":       5.7,
+            "expected":   today_date + timedelta(weeks=12),
             "confidence": "Moderada",
-            "mechanism": "🌿 Dieta + psyllium + perda de peso + Puran T4",
-            "note": "HbA1c reflete média de 3 meses. Com hipotireoidismo tratado + dieta, pode normalizar na próxima coleta (set/2026).",
+            "mechanism":  "🌿 Dieta + psyllium + perda de peso + Puran T4",
+            "note":       "HbA1c reflete média de 3 meses. Com hipotireoidismo tratado + dieta, pode normalizar na próxima coleta (set/2026).",
         },
         {
-            "exam": "Colesterol Total",
-            "unit": "mg/dL",
-            "current": _val("Colesterol Total"),
+            "exam":       "Colesterol Total",
+            "unit":       "mg/dL",
+            "current":    _val("Colesterol Total"),
             "goal_label": "< 190 mg/dL",
-            "up": False,
-            "goal": 190,
-            "expected": today_date + timedelta(weeks=10),
+            "up":         False,
+            "goal":       190,
+            "expected":   today_date + timedelta(weeks=10),
             "confidence": "Alta",
-            "mechanism": "🥗 Dieta + perda de peso + Puran T4 (hipotireoidismo eleva colesterol)",
-            "note": "Já melhorou (222→199). Com tratamento da tireoide, colesterol tende a cair mais. Normalização em ~2,5 meses.",
+            "mechanism":  "🥗 Dieta + perda de peso + Puran T4 (hipotireoidismo eleva colesterol)",
+            "note":       "Já melhorou (222→199). Com tratamento da tireoide, colesterol tende a cair mais. Normalização em ~2,5 meses.",
         },
     ]
 
     for ep in exam_projs:
         if ep["current"] is None:
             continue
-        cur  = ep["current"]
-        goal = ep["goal"]
+        cur   = ep["current"]
+        goal  = ep["goal"]
         is_up = ep["up"]
         is_ok = (cur >= goal) if is_up else (cur <= goal)
         diff  = abs(cur - goal)
@@ -571,6 +747,9 @@ with tab3:
     st.markdown("---")
     st.markdown("### 📅 Linha do Tempo de Melhoras Esperadas")
 
+    dt_82kg_str = dt_peso_aj.strftime("%b/%Y") if usar_aj and dt_peso_aj else (dt_peso.strftime("%b/%Y") if dt_peso else "2027")
+    dt_musc_str = dt_musc_aj.strftime("%b/%Y") if usar_aj and dt_musc_aj else (dt_musc.strftime("%b/%Y") if dt_musc else "2027+")
+
     timeline = [
         ("Jul/2026", "🟣", "Início do efeito do Puran T4 — primeiros sinais de melhora no metabolismo"),
         ("Ago/2026", "🟢", "TSH normaliza com levotiroxina (8–12 semanas após início)"),
@@ -578,9 +757,9 @@ with tab3:
         ("Set/2026", "🟢", "Colesterol Total < 190 mg/dL com dieta + tratamento da tireoide"),
         ("Out/2026", "🟢", "LDL < 130 mg/dL com dieta + perda de peso"),
         ("Nov/2026", "🟡", "TGO e TGP normalizam após TSH controlado + resultado da US"),
-        ("Dez/2026", "🟡", "HDL atinge 40 mg/dL com cardio consistente (150+ min/sem)"),
-        (f"{dt_peso.strftime('%b/%Y') if dt_peso else '2027'}", "⚖️", f"Meta 82 kg — {peso_atual - PESO_META:.1f} kg a menos do peso atual"),
-        ("2027", "💪", "Meta 40 kg de músculo esquelético"),
+        (f"~{hdl_meses_para_40} meses", "🟡", f"HDL atinge 40 mg/dL — com {freq_treino}x/sem de exercício"),
+        (dt_82kg_str, "⚖️", f"Meta 82 kg — {peso_atual - PESO_META:.1f} kg abaixo do peso atual" + (f" (cenário {freq_treino}x/sem)" if usar_aj else "")),
+        (dt_musc_str, "💪", "Meta 40 kg de músculo esquelético"),
     ]
 
     for mes, icon, desc in timeline:

@@ -3,93 +3,365 @@
   "nutritionist": "Maria Eduarda Tardin",
   "nutritionist_crn": "23101875",
   "goal": "Emagrecimento com ganho de massa magra",
-  "notes": "1 refeição livre por semana. Whey protein no lanche (2 medidas 30g) ou leite em pó 30g.",
+  "notes": "1 refeição livre por semana. Máximo 3 xícaras de café/dia até as 17h. Não ingerir líquidos durante almoço/jantar.",
+  "total_kcal_plan": 1740,
+  "total_prot_plan_g": 148,
+  "total_carb_plan_g": 165,
+  "total_fat_plan_g": 49,
   "meals": [
     {
       "id": "cafe",
       "name": "Café da Manhã",
       "time_suggested": "07:00",
-      "kcal_estimated": 350,
-      "foods": [
-        {"item": "Pão Francês", "qty": "1 unidade", "unit": "unid", "qty_g": 50, "kcal": 130, "prot_g": 4, "carb_g": 27, "fat_g": 1},
-        {"item": "Ovo mexido (2 ovos)", "qty": "2 unid", "unit": "unid", "qty_g": 100, "kcal": 140, "prot_g": 12, "carb_g": 1, "fat_g": 10},
-        {"item": "Café preto sem açúcar", "qty": "200", "unit": "mL", "qty_g": 200, "kcal": 5, "prot_g": 0.3, "carb_g": 0.5, "fat_g": 0},
-        {"item": "Fruta (banana ou maçã)", "qty": "1 unid média", "unit": "unid", "qty_g": 120, "kcal": 65, "prot_g": 0.8, "carb_g": 17, "fat_g": 0.2}
+      "kcal_estimated": 390,
+      "groups": [
+        {
+          "id": "fruta",
+          "name": "Fruta",
+          "emoji": "🍎",
+          "instruction": "1 porção — adicionar 1 col. sopa de psyllium",
+          "items": [
+            {"item": "Banana", "qty": "1 unidade média", "kcal": 90, "prot_g": 1.1, "carb_g": 23, "fat_g": 0.3, "default": true},
+            {"item": "Maçã", "qty": "1 unidade pequena", "kcal": 55, "prot_g": 0.3, "carb_g": 14, "fat_g": 0.2},
+            {"item": "Mamão papaia", "qty": "½ unidade", "kcal": 45, "prot_g": 0.6, "carb_g": 11, "fat_g": 0.1},
+            {"item": "Melão", "qty": "1 fatia", "kcal": 30, "prot_g": 0.5, "carb_g": 7, "fat_g": 0.1},
+            {"item": "Abacaxi", "qty": "1 fatia", "kcal": 45, "prot_g": 0.4, "carb_g": 11, "fat_g": 0.1},
+            {"item": "Morango", "qty": "1 xícara", "kcal": 50, "prot_g": 1.0, "carb_g": 12, "fat_g": 0.5},
+            {"item": "Ameixa vermelha", "qty": "2 unidades", "kcal": 35, "prot_g": 0.5, "carb_g": 9, "fat_g": 0.1},
+            {"item": "Pêra", "qty": "1 unidade pequena", "kcal": 60, "prot_g": 0.4, "carb_g": 15, "fat_g": 0.1}
+          ]
+        },
+        {
+          "id": "psyllium",
+          "name": "Psyllium",
+          "emoji": "🌿",
+          "instruction": "adicionar à fruta",
+          "items": [
+            {"item": "Psyllium", "qty": "1 colher de sopa", "kcal": 15, "prot_g": 0.5, "carb_g": 4, "fat_g": 0.0, "default": true}
+          ]
+        },
+        {
+          "id": "carb",
+          "name": "Carboidrato",
+          "emoji": "🍞",
+          "instruction": "escolha 1 opção",
+          "items": [
+            {"item": "Pão Francês", "qty": "1 unidade (50g)", "kcal": 130, "prot_g": 4.0, "carb_g": 27, "fat_g": 1.0, "default": true},
+            {"item": "Pão árabe integral", "qty": "1 unidade (50g)", "kcal": 115, "prot_g": 4.0, "carb_g": 22, "fat_g": 1.0},
+            {"item": "Biscoito de arroz", "qty": "6 unidades (40g)", "kcal": 150, "prot_g": 3.0, "carb_g": 33, "fat_g": 1.0},
+            {"item": "Goma de tapioca", "qty": "4 col. sopa (60g)", "kcal": 115, "prot_g": 0.5, "carb_g": 28, "fat_g": 0.0},
+            {"item": "Pão de forma integral", "qty": "2 fatias (50g)", "kcal": 125, "prot_g": 5.0, "carb_g": 24, "fat_g": 2.0},
+            {"item": "Aveia em flocos", "qty": "6 col. sopa (40g)", "kcal": 148, "prot_g": 5.0, "carb_g": 26, "fat_g": 3.0},
+            {"item": "Cuscuz de milho cozido", "qty": "6 col. sopa (120g)", "kcal": 115, "prot_g": 2.5, "carb_g": 24, "fat_g": 0.5}
+          ]
+        },
+        {
+          "id": "proteina",
+          "name": "Proteína",
+          "emoji": "🥚",
+          "instruction": "escolha 1 opção",
+          "items": [
+            {"item": "Ovo cozido / mexido", "qty": "2 unidades", "kcal": 140, "prot_g": 12.0, "carb_g": 1.0, "fat_g": 10.0, "default": true},
+            {"item": "Frango desfiado", "qty": "4 col. sopa (60g)", "kcal": 100, "prot_g": 20.0, "carb_g": 0.0, "fat_g": 2.0}
+          ]
+        },
+        {
+          "id": "laticinios",
+          "name": "Laticínio / Spread",
+          "emoji": "🧀",
+          "instruction": "escolha 1 opção (opcional)",
+          "items": [
+            {"item": "Queijo cottage", "qty": "2 col. sopa (30g)", "kcal": 30, "prot_g": 5.0, "carb_g": 1.0, "fat_g": 0.5},
+            {"item": "Húmus", "qty": "1 col. sopa (15g)", "kcal": 35, "prot_g": 1.5, "carb_g": 4.0, "fat_g": 1.5},
+            {"item": "Requeijão light", "qty": "1 col. sopa (15g)", "kcal": 30, "prot_g": 1.5, "carb_g": 0.5, "fat_g": 2.0},
+            {"item": "Queijo minas frescal", "qty": "½ fatia (15g)", "kcal": 35, "prot_g": 3.0, "carb_g": 0.5, "fat_g": 2.0},
+            {"item": "Queijo muçarela light", "qty": "1 fatia (20g)", "kcal": 50, "prot_g": 5.0, "carb_g": 0.0, "fat_g": 3.0}
+          ]
+        },
+        {
+          "id": "bebida",
+          "name": "Bebida",
+          "emoji": "☕",
+          "instruction": "",
+          "items": [
+            {"item": "Café sem açúcar", "qty": "200 mL", "kcal": 5, "prot_g": 0.3, "carb_g": 0.5, "fat_g": 0.0, "default": true}
+          ]
+        }
       ],
-      "substitutions": [
-        "Pão integral → tapioca 2 colheres sopa de goma",
-        "Ovo → queijo cottage 2 colheres sopa",
-        "Fruta → mamão 1 fatia média"
+      "preparations": [
+        {"item": "Panqueca de Banana", "qty": "1 porção", "kcal": 260, "prot_g": 16.0, "carb_g": 26.0, "fat_g": 11.0, "desc": "2 ovos + 1 banana amassada + 2 col. sopa aveia + canela"},
+        {"item": "Crepioca", "qty": "1 porção", "kcal": 240, "prot_g": 15.0, "carb_g": 22.0, "fat_g": 10.0, "desc": "2 ovos + 4 col. sopa goma tapioca + queijo parmesão + cúrcuma"},
+        {"item": "Pãozinho de Frigideira", "qty": "1 porção", "kcal": 270, "prot_g": 15.0, "carb_g": 23.0, "fat_g": 12.0, "desc": "2 ovos + 4 col. sopa farinha aveia + cúrcuma + azeite + fermento"},
+        {"item": "Panqueca de aveia", "qty": "1 porção", "kcal": 240, "prot_g": 14.0, "carb_g": 18.0, "fat_g": 11.0, "desc": "2 col. sopa farelo aveia + iogurte natural + 2 ovos + baunilha"},
+        {"item": "Aveioca", "qty": "1 porção", "kcal": 220, "prot_g": 14.0, "carb_g": 17.0, "fat_g": 10.0, "desc": "2 ovos + 2 col. sopa aveia em flocos + ervas"},
+        {"item": "Vitamina", "qty": "1 copo", "kcal": 210, "prot_g": 8.0, "carb_g": 30.0, "fat_g": 5.0, "desc": "200mL leite + fruta + cacau em pó + canela + aveia/chia"},
+        {"item": "Bolinho de banana", "qty": "1 porção", "kcal": 290, "prot_g": 14.0, "carb_g": 30.0, "fat_g": 12.0, "desc": "2 ovos + 1 banana + farinha aveia + farinha amêndoas + leite"},
+        {"item": "Bolo de microondas", "qty": "1 caneca", "kcal": 280, "prot_g": 12.0, "carb_g": 22.0, "fat_g": 14.0, "desc": "2 ovos + farelo aveia + cacau + xilitol + óleo de coco + chocolate meio amargo"}
       ]
     },
     {
       "id": "almoco",
       "name": "Almoço",
       "time_suggested": "12:00",
-      "kcal_estimated": 600,
-      "foods": [
-        {"item": "Arroz integral", "qty": "4 colheres sopa", "unit": "g", "qty_g": 120, "kcal": 155, "prot_g": 4, "carb_g": 32, "fat_g": 1},
-        {"item": "Feijão / lentilha", "qty": "2 conchas", "unit": "g", "qty_g": 120, "kcal": 100, "prot_g": 7, "carb_g": 18, "fat_g": 0.5},
-        {"item": "Carne grelhada (frango/patinho/tilápia)", "qty": "150", "unit": "g", "qty_g": 150, "kcal": 200, "prot_g": 30, "carb_g": 0, "fat_g": 8},
-        {"item": "Salada (folhas + legumes crus)", "qty": "à vontade", "unit": "", "qty_g": 200, "kcal": 60, "prot_g": 2, "carb_g": 12, "fat_g": 0.5},
-        {"item": "Azeite de oliva (1 fio)", "qty": "1 colher sopa", "unit": "mL", "qty_g": 13, "kcal": 85, "prot_g": 0, "carb_g": 0, "fat_g": 10}
+      "kcal_estimated": 580,
+      "groups": [
+        {
+          "id": "vegetais",
+          "name": "Vegetais",
+          "emoji": "🥗",
+          "instruction": "à vontade — pelo menos 50% do prato",
+          "items": [
+            {"item": "Salada / legumes variados", "qty": "à vontade", "kcal": 50, "prot_g": 2.0, "carb_g": 10.0, "fat_g": 0.5, "default": true}
+          ]
+        },
+        {
+          "id": "proteina",
+          "name": "Proteína",
+          "emoji": "🥩",
+          "instruction": "25% do prato — escolha 1 opção",
+          "items": [
+            {"item": "Peito de frango grelhado", "qty": "1 filé (120g)", "kcal": 200, "prot_g": 38.0, "carb_g": 0.0, "fat_g": 4.0, "default": true},
+            {"item": "Coxa de frango assada", "qty": "1,5 un s/ pele (97g)", "kcal": 185, "prot_g": 26.0, "carb_g": 0.0, "fat_g": 9.0},
+            {"item": "Sobrecoxa de frango assada", "qty": "1,5 un s/ pele (90g)", "kcal": 175, "prot_g": 23.0, "carb_g": 0.0, "fat_g": 9.0},
+            {"item": "Carne bovina magra grelhada", "qty": "1 bife (90g)", "kcal": 180, "prot_g": 26.0, "carb_g": 0.0, "fat_g": 8.0},
+            {"item": "Carne moída magra", "qty": "6 col. sopa (120g)", "kcal": 210, "prot_g": 28.0, "carb_g": 0.0, "fat_g": 10.0},
+            {"item": "Salmão grelhado", "qty": "1 posta (85g)", "kcal": 175, "prot_g": 23.0, "carb_g": 0.0, "fat_g": 9.0},
+            {"item": "Filé de tilápia grelhado", "qty": "2 filés (200g)", "kcal": 200, "prot_g": 42.0, "carb_g": 0.0, "fat_g": 3.0},
+            {"item": "Atum ao natural", "qty": "8 col. sopa (160g)", "kcal": 160, "prot_g": 36.0, "carb_g": 0.0, "fat_g": 1.0},
+            {"item": "Lombo de porco grelhado", "qty": "90g", "kcal": 170, "prot_g": 23.0, "carb_g": 0.0, "fat_g": 8.0}
+          ]
+        },
+        {
+          "id": "carb",
+          "name": "Carboidrato",
+          "emoji": "🍚",
+          "instruction": "25% do prato — escolha 1 opção",
+          "items": [
+            {"item": "Arroz integral cozido", "qty": "6 col. sopa (120g)", "kcal": 155, "prot_g": 4.0, "carb_g": 32.0, "fat_g": 1.0, "default": true},
+            {"item": "Arroz branco cozido", "qty": "4 col. sopa (100g)", "kcal": 130, "prot_g": 2.0, "carb_g": 29.0, "fat_g": 0.3},
+            {"item": "Arroz negro cozido", "qty": "3 col. sopa (75g)", "kcal": 110, "prot_g": 2.0, "carb_g": 24.0, "fat_g": 0.5},
+            {"item": "Batata inglesa cozida", "qty": "8 col. sopa (240g)", "kcal": 185, "prot_g": 4.0, "carb_g": 42.0, "fat_g": 0.0},
+            {"item": "Batata doce cozida", "qty": "3 col. sopa (126g)", "kcal": 115, "prot_g": 1.5, "carb_g": 26.0, "fat_g": 0.1},
+            {"item": "Batata baroa cozida", "qty": "6 col. sopa (180g)", "kcal": 165, "prot_g": 2.5, "carb_g": 37.0, "fat_g": 0.2},
+            {"item": "Mandioca cozida", "qty": "4 col. sopa (120g)", "kcal": 165, "prot_g": 1.0, "carb_g": 39.0, "fat_g": 0.2},
+            {"item": "Inhame cozido", "qty": "4 col. sopa (140g)", "kcal": 140, "prot_g": 2.0, "carb_g": 31.0, "fat_g": 0.1},
+            {"item": "Quinoa cozida", "qty": "6 col. sopa (120g)", "kcal": 140, "prot_g": 5.0, "carb_g": 24.0, "fat_g": 2.0},
+            {"item": "Macarrão integral cozido", "qty": "2 col. servir (100g)", "kcal": 130, "prot_g": 5.0, "carb_g": 25.0, "fat_g": 1.0},
+            {"item": "Macarrão cozido", "qty": "2 col. servir (100g)", "kcal": 130, "prot_g": 4.0, "carb_g": 26.0, "fat_g": 0.5}
+          ]
+        },
+        {
+          "id": "graos",
+          "name": "Grãos",
+          "emoji": "🫘",
+          "instruction": "escolha 1 opção",
+          "items": [
+            {"item": "Feijão carioca cozido", "qty": "4 col. sopa (70g)", "kcal": 80, "prot_g": 5.0, "carb_g": 14.0, "fat_g": 0.5, "default": true},
+            {"item": "Lentilha cozida", "qty": "2 col. sopa (60g)", "kcal": 70, "prot_g": 5.0, "carb_g": 12.0, "fat_g": 0.3},
+            {"item": "Grão-de-bico cozido", "qty": "1 col. sopa (30g)", "kcal": 50, "prot_g": 2.5, "carb_g": 8.0, "fat_g": 1.0},
+            {"item": "Ervilha cozida", "qty": "2 col. sopa (60g)", "kcal": 50, "prot_g": 3.5, "carb_g": 9.0, "fat_g": 0.2}
+          ]
+        }
       ],
-      "substitutions": [
-        "Arroz integral → quinoa 4 col sopa",
-        "Frango → salmão 150g",
-        "Feijão → grão-de-bico 2 conchas"
-      ]
+      "preparations": []
     },
     {
       "id": "lanche",
       "name": "Lanche da Tarde",
       "time_suggested": "15:30",
-      "kcal_estimated": 280,
-      "foods": [
-        {"item": "Whey protein", "qty": "2 medidas (30g cada)", "unit": "g", "qty_g": 60, "kcal": 220, "prot_g": 48, "carb_g": 4, "fat_g": 2},
-        {"item": "Banana (para o shake)", "qty": "1 unid pequena", "unit": "unid", "qty_g": 80, "kcal": 60, "prot_g": 0.7, "carb_g": 15, "fat_g": 0.2}
+      "kcal_estimated": 370,
+      "groups": [
+        {
+          "id": "fruta",
+          "name": "Fruta",
+          "emoji": "🍎",
+          "instruction": "1 porção",
+          "items": [
+            {"item": "Banana", "qty": "1 unidade média", "kcal": 90, "prot_g": 1.1, "carb_g": 23.0, "fat_g": 0.3, "default": true},
+            {"item": "Maçã", "qty": "1 unidade pequena", "kcal": 55, "prot_g": 0.3, "carb_g": 14.0, "fat_g": 0.2},
+            {"item": "Mamão papaia", "qty": "½ unidade", "kcal": 45, "prot_g": 0.6, "carb_g": 11.0, "fat_g": 0.1},
+            {"item": "Melão", "qty": "1 fatia", "kcal": 30, "prot_g": 0.5, "carb_g": 7.0, "fat_g": 0.1},
+            {"item": "Abacaxi", "qty": "1 fatia", "kcal": 45, "prot_g": 0.4, "carb_g": 11.0, "fat_g": 0.1},
+            {"item": "Morango", "qty": "1 xícara", "kcal": 50, "prot_g": 1.0, "carb_g": 12.0, "fat_g": 0.5},
+            {"item": "Ameixa vermelha", "qty": "2 unidades", "kcal": 35, "prot_g": 0.5, "carb_g": 9.0, "fat_g": 0.1},
+            {"item": "Pêra", "qty": "1 unidade pequena", "kcal": 60, "prot_g": 0.4, "carb_g": 15.0, "fat_g": 0.1}
+          ]
+        },
+        {
+          "id": "carb",
+          "name": "Carboidrato",
+          "emoji": "🍞",
+          "instruction": "escolha 1 opção",
+          "items": [
+            {"item": "Pão Francês", "qty": "1 unidade (50g)", "kcal": 130, "prot_g": 4.0, "carb_g": 27.0, "fat_g": 1.0, "default": true},
+            {"item": "Pão árabe integral", "qty": "1 unidade (50g)", "kcal": 115, "prot_g": 4.0, "carb_g": 22.0, "fat_g": 1.0},
+            {"item": "Biscoito de arroz", "qty": "6 unidades (40g)", "kcal": 150, "prot_g": 3.0, "carb_g": 33.0, "fat_g": 1.0},
+            {"item": "Goma de tapioca", "qty": "4 col. sopa (60g)", "kcal": 115, "prot_g": 0.5, "carb_g": 28.0, "fat_g": 0.0},
+            {"item": "Granola", "qty": "3 col. sopa (30g)", "kcal": 120, "prot_g": 3.0, "carb_g": 20.0, "fat_g": 4.0},
+            {"item": "Pão de forma integral", "qty": "2 fatias (50g)", "kcal": 125, "prot_g": 5.0, "carb_g": 24.0, "fat_g": 2.0},
+            {"item": "Biscoito cream cracker", "qty": "4 unidades (28g)", "kcal": 110, "prot_g": 2.0, "carb_g": 18.0, "fat_g": 4.0},
+            {"item": "Aveia em flocos", "qty": "6 col. sopa (40g)", "kcal": 148, "prot_g": 5.0, "carb_g": 26.0, "fat_g": 3.0},
+            {"item": "Cuscuz de milho cozido", "qty": "6 col. sopa (120g)", "kcal": 115, "prot_g": 2.5, "carb_g": 24.0, "fat_g": 0.5}
+          ]
+        },
+        {
+          "id": "proteina",
+          "name": "Proteína",
+          "emoji": "🥚",
+          "instruction": "escolha 1 opção",
+          "items": [
+            {"item": "Ovo cozido", "qty": "2 unidades", "kcal": 140, "prot_g": 12.0, "carb_g": 1.0, "fat_g": 10.0, "default": true},
+            {"item": "Frango desfiado", "qty": "4 col. sopa (60g)", "kcal": 100, "prot_g": 20.0, "carb_g": 0.0, "fat_g": 2.0},
+            {"item": "Carne moída magra", "qty": "4 col. sopa (60g)", "kcal": 105, "prot_g": 14.0, "carb_g": 0.0, "fat_g": 5.0},
+            {"item": "Atum ao natural", "qty": "6 col. sopa (80g)", "kcal": 80, "prot_g": 18.0, "carb_g": 0.0, "fat_g": 1.0}
+          ]
+        },
+        {
+          "id": "laticinios",
+          "name": "Laticínio / Spread",
+          "emoji": "🧀",
+          "instruction": "escolha 1 opção (opcional)",
+          "items": [
+            {"item": "Queijo cottage", "qty": "2 col. sopa (30g)", "kcal": 30, "prot_g": 5.0, "carb_g": 1.0, "fat_g": 0.5},
+            {"item": "Húmus", "qty": "1 col. sopa (15g)", "kcal": 35, "prot_g": 1.5, "carb_g": 4.0, "fat_g": 1.5},
+            {"item": "Requeijão light", "qty": "1 col. sopa (15g)", "kcal": 30, "prot_g": 1.5, "carb_g": 0.5, "fat_g": 2.0},
+            {"item": "Queijo minas frescal", "qty": "½ fatia (15g)", "kcal": 35, "prot_g": 3.0, "carb_g": 0.5, "fat_g": 2.0},
+            {"item": "Queijo muçarela light", "qty": "1 fatia (20g)", "kcal": 50, "prot_g": 5.0, "carb_g": 0.0, "fat_g": 3.0}
+          ]
+        },
+        {
+          "id": "bebida",
+          "name": "Bebida",
+          "emoji": "☕",
+          "instruction": "",
+          "items": [
+            {"item": "Café sem açúcar", "qty": "200 mL", "kcal": 5, "prot_g": 0.3, "carb_g": 0.5, "fat_g": 0.0, "default": true}
+          ]
+        },
+        {
+          "id": "opcao_mix",
+          "name": "OU — Opção Mix de Cereais",
+          "emoji": "🥣",
+          "instruction": "substitui carboidrato acima",
+          "items": [
+            {"item": "Mix de cereais", "qty": "1 col. sopa (castanhas + aveia + gérmen + gergelim + quinoa + nibs cacau)", "kcal": 90, "prot_g": 3.0, "carb_g": 10.0, "fat_g": 5.0},
+            {"item": "Whey protein concentrado", "qty": "2 scoops (30g)", "kcal": 120, "prot_g": 24.0, "carb_g": 3.0, "fat_g": 2.0},
+            {"item": "Iogurte natural desnatado", "qty": "1 copo (170mL)", "kcal": 95, "prot_g": 10.0, "carb_g": 13.0, "fat_g": 0.5}
+          ]
+        }
       ],
-      "substitutions": [
-        "Whey → leite em pó desnatado 30g",
-        "Banana → morango 100g"
+      "preparations": [
+        {"item": "Panqueca de Banana", "qty": "1 porção", "kcal": 260, "prot_g": 16.0, "carb_g": 26.0, "fat_g": 11.0, "desc": "2 ovos + 1 banana amassada + 2 col. sopa aveia + canela"},
+        {"item": "Crepioca", "qty": "1 porção", "kcal": 240, "prot_g": 15.0, "carb_g": 22.0, "fat_g": 10.0, "desc": "2 ovos + 4 col. sopa goma tapioca + queijo parmesão + cúrcuma"},
+        {"item": "Pãozinho de Frigideira", "qty": "1 porção", "kcal": 270, "prot_g": 15.0, "carb_g": 23.0, "fat_g": 12.0, "desc": "2 ovos + 4 col. sopa farinha aveia + cúrcuma + azeite + fermento"},
+        {"item": "Panqueca de aveia", "qty": "1 porção", "kcal": 240, "prot_g": 14.0, "carb_g": 18.0, "fat_g": 11.0, "desc": "2 col. sopa farelo aveia + iogurte natural + 2 ovos + baunilha"},
+        {"item": "Aveioca", "qty": "1 porção", "kcal": 220, "prot_g": 14.0, "carb_g": 17.0, "fat_g": 10.0, "desc": "2 ovos + 2 col. sopa aveia em flocos + ervas"},
+        {"item": "Vitamina", "qty": "1 copo", "kcal": 210, "prot_g": 8.0, "carb_g": 30.0, "fat_g": 5.0, "desc": "200mL leite + fruta + cacau em pó + canela + aveia/chia"},
+        {"item": "Bolinho de banana", "qty": "1 porção", "kcal": 290, "prot_g": 14.0, "carb_g": 30.0, "fat_g": 12.0, "desc": "2 ovos + 1 banana + farinha aveia + farinha amêndoas + leite"},
+        {"item": "Bolo de microondas", "qty": "1 caneca", "kcal": 280, "prot_g": 12.0, "carb_g": 22.0, "fat_g": 14.0, "desc": "2 ovos + farelo aveia + cacau + xilitol + óleo de coco + chocolate meio amargo"}
       ]
     },
     {
       "id": "jantar",
       "name": "Jantar",
       "time_suggested": "19:00",
-      "kcal_estimated": 705,
-      "foods": [
-        {"item": "Arroz integral", "qty": "4 colheres sopa", "unit": "g", "qty_g": 120, "kcal": 155, "prot_g": 4, "carb_g": 32, "fat_g": 1},
-        {"item": "Feijão / lentilha", "qty": "2 conchas", "unit": "g", "qty_g": 120, "kcal": 100, "prot_g": 7, "carb_g": 18, "fat_g": 0.5},
-        {"item": "Proteína magra (frango/ovo/atum)", "qty": "150", "unit": "g", "qty_g": 150, "kcal": 200, "prot_g": 30, "carb_g": 0, "fat_g": 8},
-        {"item": "Legumes refogados (abobrinha/brócolis/couve-flor)", "qty": "200", "unit": "g", "qty_g": 200, "kcal": 80, "prot_g": 4, "carb_g": 14, "fat_g": 1},
-        {"item": "Batata doce ou mandioquinha", "qty": "100", "unit": "g", "qty_g": 100, "kcal": 85, "prot_g": 2, "carb_g": 20, "fat_g": 0.1},
-        {"item": "Azeite (1 fio)", "qty": "1 col sopa", "unit": "mL", "qty_g": 13, "kcal": 85, "prot_g": 0, "carb_g": 0, "fat_g": 10}
+      "kcal_estimated": 580,
+      "groups": [
+        {
+          "id": "vegetais",
+          "name": "Vegetais",
+          "emoji": "🥗",
+          "instruction": "à vontade — pelo menos 50% do prato",
+          "items": [
+            {"item": "Salada / legumes variados", "qty": "à vontade", "kcal": 50, "prot_g": 2.0, "carb_g": 10.0, "fat_g": 0.5, "default": true}
+          ]
+        },
+        {
+          "id": "proteina",
+          "name": "Proteína",
+          "emoji": "🥩",
+          "instruction": "25% do prato — escolha 1 opção",
+          "items": [
+            {"item": "Peito de frango grelhado", "qty": "1 filé (120g)", "kcal": 200, "prot_g": 38.0, "carb_g": 0.0, "fat_g": 4.0, "default": true},
+            {"item": "Coxa de frango assada", "qty": "1,5 un s/ pele (97g)", "kcal": 185, "prot_g": 26.0, "carb_g": 0.0, "fat_g": 9.0},
+            {"item": "Sobrecoxa de frango assada", "qty": "1,5 un s/ pele (90g)", "kcal": 175, "prot_g": 23.0, "carb_g": 0.0, "fat_g": 9.0},
+            {"item": "Carne bovina magra grelhada", "qty": "1 bife (90g)", "kcal": 180, "prot_g": 26.0, "carb_g": 0.0, "fat_g": 8.0},
+            {"item": "Carne moída magra", "qty": "6 col. sopa (120g)", "kcal": 210, "prot_g": 28.0, "carb_g": 0.0, "fat_g": 10.0},
+            {"item": "Salmão grelhado", "qty": "1 posta (85g)", "kcal": 175, "prot_g": 23.0, "carb_g": 0.0, "fat_g": 9.0},
+            {"item": "Filé de tilápia grelhado", "qty": "2 filés (200g)", "kcal": 200, "prot_g": 42.0, "carb_g": 0.0, "fat_g": 3.0},
+            {"item": "Atum ao natural", "qty": "8 col. sopa (160g)", "kcal": 160, "prot_g": 36.0, "carb_g": 0.0, "fat_g": 1.0},
+            {"item": "Lombo de porco grelhado", "qty": "90g", "kcal": 170, "prot_g": 23.0, "carb_g": 0.0, "fat_g": 8.0}
+          ]
+        },
+        {
+          "id": "carb",
+          "name": "Carboidrato",
+          "emoji": "🍚",
+          "instruction": "25% do prato — escolha 1 opção",
+          "items": [
+            {"item": "Arroz integral cozido", "qty": "6 col. sopa (120g)", "kcal": 155, "prot_g": 4.0, "carb_g": 32.0, "fat_g": 1.0, "default": true},
+            {"item": "Arroz branco cozido", "qty": "4 col. sopa (100g)", "kcal": 130, "prot_g": 2.0, "carb_g": 29.0, "fat_g": 0.3},
+            {"item": "Arroz negro cozido", "qty": "3 col. sopa (75g)", "kcal": 110, "prot_g": 2.0, "carb_g": 24.0, "fat_g": 0.5},
+            {"item": "Batata inglesa cozida", "qty": "8 col. sopa (240g)", "kcal": 185, "prot_g": 4.0, "carb_g": 42.0, "fat_g": 0.0},
+            {"item": "Batata doce cozida", "qty": "3 col. sopa (126g)", "kcal": 115, "prot_g": 1.5, "carb_g": 26.0, "fat_g": 0.1},
+            {"item": "Batata baroa cozida", "qty": "6 col. sopa (180g)", "kcal": 165, "prot_g": 2.5, "carb_g": 37.0, "fat_g": 0.2},
+            {"item": "Mandioca cozida", "qty": "4 col. sopa (120g)", "kcal": 165, "prot_g": 1.0, "carb_g": 39.0, "fat_g": 0.2},
+            {"item": "Inhame cozido", "qty": "4 col. sopa (140g)", "kcal": 140, "prot_g": 2.0, "carb_g": 31.0, "fat_g": 0.1},
+            {"item": "Quinoa cozida", "qty": "6 col. sopa (120g)", "kcal": 140, "prot_g": 5.0, "carb_g": 24.0, "fat_g": 2.0},
+            {"item": "Macarrão integral cozido", "qty": "2 col. servir (100g)", "kcal": 130, "prot_g": 5.0, "carb_g": 25.0, "fat_g": 1.0},
+            {"item": "Macarrão cozido", "qty": "2 col. servir (100g)", "kcal": 130, "prot_g": 4.0, "carb_g": 26.0, "fat_g": 0.5}
+          ]
+        },
+        {
+          "id": "graos",
+          "name": "Grãos",
+          "emoji": "🫘",
+          "instruction": "escolha 1 opção",
+          "items": [
+            {"item": "Feijão carioca cozido", "qty": "4 col. sopa (70g)", "kcal": 80, "prot_g": 5.0, "carb_g": 14.0, "fat_g": 0.5, "default": true},
+            {"item": "Lentilha cozida", "qty": "2 col. sopa (60g)", "kcal": 70, "prot_g": 5.0, "carb_g": 12.0, "fat_g": 0.3},
+            {"item": "Grão-de-bico cozido", "qty": "1 col. sopa (30g)", "kcal": 50, "prot_g": 2.5, "carb_g": 8.0, "fat_g": 1.0},
+            {"item": "Ervilha cozida", "qty": "2 col. sopa (60g)", "kcal": 50, "prot_g": 3.5, "carb_g": 9.0, "fat_g": 0.2}
+          ]
+        }
       ],
-      "substitutions": [
-        "Batata doce → cará ou inhame",
-        "Legumes → salada crua",
-        "Ovo → omelete com queijo minas"
+      "preparations": [
+        {"item": "Sanduíche natural", "qty": "1 unidade", "kcal": 380, "prot_g": 30.0, "carb_g": 35.0, "fat_g": 12.0, "desc": "Pão francês + proteína (frango/ovo/atum) + queijo + salada à vontade"},
+        {"item": "Sopa de vegetais com proteína", "qty": "1 prato fundo", "kcal": 300, "prot_g": 28.0, "carb_g": 25.0, "fat_g": 5.0, "desc": "1 carboidrato (batata/inhame/aipim/macarrão) + proteína + vegetais à vontade"},
+        {"item": "Macarrão com molho de tomate", "qty": "3,5 col. servir (172g)", "kcal": 350, "prot_g": 30.0, "carb_g": 40.0, "fat_g": 6.0, "desc": "Macarrão + molho de tomate à vontade + proteína (atum/frango/carne)"}
       ]
     },
     {
       "id": "cha",
-      "name": "Hora do Chá (opcional)",
+      "name": "Hora do Chá",
       "time_suggested": "21:00",
-      "kcal_estimated": 60,
-      "foods": [
-        {"item": "Chá sem açúcar (camomila / hibisco)", "qty": "200", "unit": "mL", "qty_g": 200, "kcal": 5, "prot_g": 0, "carb_g": 1, "fat_g": 0},
-        {"item": "Psyllium (1 col sopa)", "qty": "1 col sopa", "unit": "g", "qty_g": 10, "kcal": 15, "prot_g": 0.5, "carb_g": 4, "fat_g": 0},
-        {"item": "Castanha-do-Pará (2 unid)", "qty": "2 unid", "unit": "unid", "qty_g": 10, "kcal": 66, "prot_g": 1.4, "carb_g": 1.2, "fat_g": 6.6}
+      "kcal_estimated": 30,
+      "groups": [
+        {
+          "id": "cha",
+          "name": "Chá",
+          "emoji": "🍵",
+          "instruction": "escolha 1 opção — 200 mL",
+          "items": [
+            {"item": "Chá de manjericão com limão", "qty": "200 mL", "kcal": 5, "prot_g": 0.0, "carb_g": 1.0, "fat_g": 0.0},
+            {"item": "Chá de hibisco com cravo", "qty": "200 mL", "kcal": 5, "prot_g": 0.0, "carb_g": 1.0, "fat_g": 0.0},
+            {"item": "Chá de camomila + própolis", "qty": "200 mL", "kcal": 5, "prot_g": 0.0, "carb_g": 1.0, "fat_g": 0.0},
+            {"item": "Chá de hortelã / camomila", "qty": "200 mL c/ laranja e canela", "kcal": 5, "prot_g": 0.0, "carb_g": 1.0, "fat_g": 0.0},
+            {"item": "Chá de ameixas secas", "qty": "200 mL (3 ameixas)", "kcal": 20, "prot_g": 0.5, "carb_g": 5.0, "fat_g": 0.0}
+          ]
+        },
+        {
+          "id": "opcionais",
+          "name": "Opcionais",
+          "emoji": "✨",
+          "instruction": "à escolha",
+          "items": [
+            {"item": "Psyllium", "qty": "1 colher de sopa", "kcal": 15, "prot_g": 0.5, "carb_g": 4.0, "fat_g": 0.0},
+            {"item": "Castanha-do-Pará", "qty": "2 unidades", "kcal": 66, "prot_g": 1.4, "carb_g": 1.2, "fat_g": 6.6}
+          ]
+        }
       ],
-      "substitutions": [
-        "Castanha-do-Pará → amendoim sem sal 15g"
-      ]
+      "preparations": []
     }
-  ],
-  "total_kcal_plan": 1740,
-  "total_prot_plan_g": 148,
-  "total_carb_plan_g": 165,
-  "total_fat_plan_g": 49
+  ]
 }

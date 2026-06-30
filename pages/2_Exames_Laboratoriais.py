@@ -150,6 +150,7 @@ def trend_chart(exam_name, unit, ref_min, ref_max, color, height=280):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=dates, y=values, mode="lines+markers+text",
         text=[f"{v}" for v in values], textposition="top center",
+        textfont=dict(size=11), cliponaxis=False,
         line=dict(color=color, width=2.5), marker=dict(size=10, color=colors)))
     if ref_max is not None:
         fig.add_hline(y=ref_max, line_dash="dash", line_color="#E74C3C",
@@ -157,11 +158,13 @@ def trend_chart(exam_name, unit, ref_min, ref_max, color, height=280):
     if ref_min is not None:
         fig.add_hline(y=ref_min, line_dash="dash", line_color="#27AE60",
                       annotation_text=f"Limite inf: {ref_min} {unit}", annotation_position="right")
+    _ypad = max((max(values) - min(values)) * 0.4, abs(max(values)) * 0.08 + 0.5) if values else 1
     fig.update_layout(height=height, title=f"{exam_name} ({unit})", plot_bgcolor="white",
         paper_bgcolor="white",
-        xaxis=dict(showgrid=False, automargin=True),
-        yaxis=dict(showgrid=True, gridcolor="#eee", automargin=True),
-        showlegend=False, margin=dict(l=50, r=175, t=50, b=50))
+        xaxis=dict(showgrid=False, automargin=True, tickangle=-20),
+        yaxis=dict(showgrid=True, gridcolor="#eee", automargin=True,
+                   range=[min(values) - _ypad * 0.3, max(values) + _ypad * 1.8] if values else None),
+        showlegend=False, margin=dict(l=50, r=185, t=55, b=55))
     st.plotly_chart(fig, use_container_width=True)
 
 with tabs[0]:

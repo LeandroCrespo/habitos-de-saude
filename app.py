@@ -178,6 +178,7 @@ if bio_list:
         mode="lines+markers+text",
         text=[f"{v:.1f}" for v in y_vals],
         textposition="top center",
+        textfont=dict(size=11), cliponaxis=False,
         name="Peso (kg)",
         line=dict(color="#1E8449", width=3),
         marker=dict(size=8, color="#1E8449"),
@@ -187,9 +188,9 @@ if bio_list:
     fig.add_hline(y=82, line_dash="dash", line_color="#F39C12",
                   annotation_text="Meta: 82 kg", annotation_position="right")
     y_min = min(y_vals) - 2 if y_vals else 80
-    y_max = max(y_vals) + 3 if y_vals else 100
+    y_max = max(y_vals) + 4 if y_vals else 100
     fig.update_layout(
-        height=340, margin=dict(l=40, r=95, t=25, b=75),
+        height=340, margin=dict(l=40, r=100, t=35, b=75),
         xaxis=dict(showgrid=False, title="", tickvals=x_vals,
                    ticktext=tick_labels, tickangle=-40, tickfont=dict(size=11),
                    automargin=True),

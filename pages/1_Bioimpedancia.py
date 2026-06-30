@@ -71,12 +71,15 @@ def _parse_ailink(text: str) -> dict:
     if m:
         result["date"] = m.group(1)
 
-    # Peso: primeiro número XX.X seguido de kg (tela principal)
-    m = re.search(r"(\d{2,3}[.,]\d)\s*kg(?!\s*/)", text, re.IGNORECASE)
-    if m:
-        v = _f(r"(\d{2,3}[.,]\d)\s*kg")
-        if v:
-            result["peso_kg"] = v
+    # Peso corporal: ignora valores fora de 60–200 kg (ex: "Peso da água 46.7 kg")
+    for _m in re.finditer(r"\b(\d{2,3}[.,]\d)\s*kg", text, re.IGNORECASE):
+        try:
+            _v = float(_m.group(1).replace(",", "."))
+            if 60.0 <= _v <= 200.0:
+                result["peso_kg"] = _v
+                break
+        except Exception:
+            pass
 
     for key, pat in [
         ("imc",                   r"BMI\s*[\(]?\s*(\d{2}[.,]\d)"),
@@ -210,6 +213,8 @@ def make_chart(y_col, title, color, ref_line=None, ref_label="", height=300, fil
         mode="lines+markers+text",
         text=[f"{v:.1f}" for v in y],
         textposition="top center",
+        textfont=dict(size=11),
+        cliponaxis=False,
         line=dict(color=color, width=3),
         marker=dict(size=8, color=color),
         fill="tozeroy" if fill else "none",
@@ -219,14 +224,14 @@ def make_chart(y_col, title, color, ref_line=None, ref_label="", height=300, fil
     if ref_line is not None:
         fig.add_hline(y=ref_line, line_dash="dash", line_color="#F39C12",
                       annotation_text=ref_label, annotation_position="right")
-    y_pad = (max(y) - min(y)) * 0.3 if len(y) > 1 else 2
+    y_pad = max((max(y) - min(y)) * 0.35, 1.5) if len(y) > 1 else 2
     fig.update_layout(
         height=height, title=title, plot_bgcolor="white", paper_bgcolor="white",
-        margin=dict(l=40, r=95, t=40, b=75),
+        margin=dict(l=40, r=100, t=45, b=75),
         xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels,
                    tickangle=-40, tickfont=dict(size=11), automargin=True),
         yaxis=dict(showgrid=True, gridcolor="#eee",
-                   range=[min(y)-y_pad, max(y)+y_pad+1] if y else [0,100]),
+                   range=[min(y)-y_pad*0.3, max(y)+y_pad*1.5] if y else [0,100]),
         showlegend=False
     )
     return fig
@@ -246,15 +251,16 @@ with tab1:
     fig2.add_trace(go.Scatter(
         x=x_dates, y=y_imc, mode="lines+markers+text",
         text=[f"{v:.1f}" for v in y_imc], textposition="top center",
+        textfont=dict(size=11), cliponaxis=False,
         line=dict(color="#8E44AD", width=3), marker=dict(size=8)
     ))
     fig2.add_hline(y=25, line_dash="dash", line_color="#27AE60", annotation_text="IMC Normal < 25", annotation_position="right")
-    y_pad2 = (max(y_imc) - min(y_imc)) * 0.3 if len(y_imc) > 1 else 1
+    y_pad2 = max((max(y_imc) - min(y_imc)) * 0.35, 0.5) if len(y_imc) > 1 else 1
     fig2.update_layout(
-        height=280, title="Índice de Massa Corporal (IMC)", plot_bgcolor="white", paper_bgcolor="white",
-        margin=dict(l=40, r=110, t=40, b=75), showlegend=False,
+        height=300, title="Índice de Massa Corporal (IMC)", plot_bgcolor="white", paper_bgcolor="white",
+        margin=dict(l=40, r=130, t=45, b=75), showlegend=False,
         xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-40, tickfont=dict(size=11), automargin=True),
-        yaxis=dict(showgrid=True, gridcolor="#eee", range=[min(y_imc)-y_pad2, max(y_imc)+y_pad2+0.5])
+        yaxis=dict(showgrid=True, gridcolor="#eee", range=[min(y_imc)-y_pad2*0.3, max(y_imc)+y_pad2*1.5])
     )
     st.plotly_chart(fig2, use_container_width=True)
 
@@ -288,13 +294,15 @@ with tab4:
         colors_visc = ["#E74C3C" if v >= 13 else "#F39C12" if v >= 10 else "#27AE60" for v in y_visc]
         fig2 = go.Figure()
         fig2.add_trace(go.Bar(x=x_dates, y=y_visc, marker_color=colors_visc,
-                               text=[str(v) for v in y_visc], textposition="outside"))
+                               text=[str(v) for v in y_visc], textposition="outside",
+                               cliponaxis=False, textfont=dict(size=11)))
         fig2.add_hline(y=9, line_dash="dash", line_color="#27AE60", annotation_text="Meta: ≤ 9", annotation_position="right")
+        _vmax = max(y_visc) if y_visc else 15
         fig2.update_layout(
-            height=260, title="Gordura Visceral (escala 1–20)", plot_bgcolor="white", paper_bgcolor="white",
-            margin=dict(l=40, r=95, t=40, b=75), showlegend=False,
+            height=290, title="Gordura Visceral (escala 1–20)", plot_bgcolor="white", paper_bgcolor="white",
+            margin=dict(l=40, r=105, t=45, b=75), showlegend=False,
             xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-40, tickfont=dict(size=11), automargin=True),
-            yaxis=dict(showgrid=True, gridcolor="#eee")
+            yaxis=dict(showgrid=True, gridcolor="#eee", range=[0, _vmax * 1.35])
         )
         st.plotly_chart(fig2, use_container_width=True)
 
@@ -374,9 +382,22 @@ with img_col:
 # ── Formulário (pré-preenchido com valores extraídos ou última medição) ────────
 ext = st.session_state.get("bio_ext", {})
 
+_RANGES = {
+    "peso_kg": (40.0, 200.0), "imc": (15.0, 50.0),
+    "percentual_gordura": (1.0, 60.0), "massa_gordura_kg": (1.0, 100.0),
+    "musculo_esqueletico_kg": (10.0, 80.0), "percentual_musculo": (10.0, 80.0),
+    "percentual_agua": (20.0, 80.0), "massa_ossea_kg": (1.0, 6.0),
+    "tmb_kcal": (1000, 4000), "gordura_visceral": (1, 30),
+    "idade_corporal": (20, 90), "percentual_proteina": (5.0, 30.0),
+}
+
 def _val(key, default, cast=float):
     try:
-        return cast(ext.get(key, default))
+        v = cast(ext.get(key, default))
+        lo, hi = _RANGES.get(key, (None, None))
+        if lo is not None and not (lo <= v <= hi):
+            return cast(default)
+        return v
     except Exception:
         try:
             return cast(default)

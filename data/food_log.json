@@ -1,3 +1,24 @@
 {
-  "logs": []
+  "logs": [
+    {
+      "id": 1,
+      "date": "2026-06-30",
+      "time": "09:30:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Pão integral",
+        "Ovo mexido (2 ovos)",
+        "Café preto sem açúcar",
+        "Fruta (banana ou maçã)"
+      ],
+      "kcal_total": 350,
+      "prot_g": 19.1,
+      "carb_g": 44.5,
+      "fat_g": 12.2,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": ""
+    }
+  ]
 }

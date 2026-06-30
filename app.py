@@ -141,21 +141,59 @@ if bio_list:
             <div class='metric-sub'>Idade Corporal: {latest.get('idade_corporal','—')} anos</div>
         </div>""", unsafe_allow_html=True)
 
-    # Mini gráfico de peso
+    # Gráfico de peso — configurações
+    MESES_PT = {1:"Jan",2:"Fev",3:"Mar",4:"Abr",5:"Mai",6:"Jun",
+                7:"Jul",8:"Ago",9:"Set",10:"Out",11:"Nov",12:"Dez"}
+
     df = pd.DataFrame(bio_list_sorted)
     df["date"] = pd.to_datetime(df["date"])
+
+    col_ctrl1, col_ctrl2 = st.columns(2)
+    with col_ctrl1:
+        periodo = st.radio("Período:", ["2026 — acompanhamento atual", "Todo o histórico"],
+                           horizontal=True, key="periodo_dash")
+    with col_ctrl2:
+        visao = st.radio("Visualização:", ["Semanal", "Mensal"],
+                         horizontal=True, key="visao_dash")
+
+    DATA_INICIO_2026 = pd.Timestamp("2026-03-25")
+    df_chart = df[df["date"] >= DATA_INICIO_2026].copy() if "2026" in periodo else df.copy()
+
+    if visao == "Mensal":
+        df_chart["ym"] = df_chart["date"].dt.to_period("M")
+        df_agg = df_chart.groupby("ym").agg(
+            peso_kg=("peso_kg", "last"), date=("date", "last")
+        ).reset_index()
+        x_vals = df_agg["date"].tolist()
+        y_vals = df_agg["peso_kg"].tolist()
+        tick_labels = [f"{MESES_PT[d.month]}/{d.year}" for d in df_agg["date"]]
+    else:
+        x_vals = df_chart["date"].tolist()
+        y_vals = df_chart["peso_kg"].tolist()
+        tick_labels = [f"{d.day:02d}/{MESES_PT[d.month]}" for d in df_chart["date"]]
+
     fig = go.Figure()
     fig.add_trace(go.Scatter(
-        x=df["date"], y=df["peso_kg"],
-        mode="lines+markers", name="Peso",
+        x=x_vals, y=y_vals,
+        mode="lines+markers+text",
+        text=[f"{v:.1f}" for v in y_vals],
+        textposition="top center",
+        name="Peso (kg)",
         line=dict(color="#1E8449", width=3),
-        marker=dict(size=6, color="#1E8449"),
-        fill="tozeroy", fillcolor="rgba(30,132,73,0.08)"
+        marker=dict(size=8, color="#1E8449"),
+        fill="tozeroy", fillcolor="rgba(30,132,73,0.08)",
+        hovertemplate="%{text} kg<extra></extra>"
     ))
+    fig.add_hline(y=82, line_dash="dash", line_color="#F39C12",
+                  annotation_text="Meta: 82 kg", annotation_position="right")
+    y_min = min(y_vals) - 2 if y_vals else 80
+    y_max = max(y_vals) + 3 if y_vals else 100
     fig.update_layout(
-        height=200, margin=dict(l=0, r=0, t=10, b=0),
-        xaxis=dict(showgrid=False, title=""),
-        yaxis=dict(showgrid=True, gridcolor="#eee", title="kg"),
+        height=300, margin=dict(l=0, r=70, t=20, b=40),
+        xaxis=dict(showgrid=False, title="", tickvals=x_vals,
+                   ticktext=tick_labels, tickangle=-35, tickfont=dict(size=11)),
+        yaxis=dict(showgrid=True, gridcolor="#eee", title="kg",
+                   range=[y_min, y_max]),
         plot_bgcolor="white", paper_bgcolor="white",
         showlegend=False
     )

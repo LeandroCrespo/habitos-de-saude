@@ -18,6 +18,20 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# ── Autenticação por senha ────────────────────────────────────────────────────
+_APP_PWD = st.secrets.get("APP_PASSWORD", "")
+if _APP_PWD:
+    if not st.session_state.get("_auth"):
+        st.markdown("## 🔒 Acesso restrito")
+        _pwd = st.text_input("Senha:", type="password", key="_pwd_input")
+        if st.button("Entrar", type="primary"):
+            if _pwd == _APP_PWD:
+                st.session_state["_auth"] = True
+                st.rerun()
+            else:
+                st.error("Senha incorreta.")
+        st.stop()
+
 # ── CSS global ──────────────────────────────────────────────────────────────
 st.markdown("""
 <style>

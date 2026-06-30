@@ -158,8 +158,10 @@ def trend_chart(exam_name, unit, ref_min, ref_max, color, height=280):
         fig.add_hline(y=ref_min, line_dash="dash", line_color="#27AE60",
                       annotation_text=f"Limite inf: {ref_min} {unit}", annotation_position="right")
     fig.update_layout(height=height, title=f"{exam_name} ({unit})", plot_bgcolor="white",
-        paper_bgcolor="white", xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#eee"),
-        showlegend=False, margin=dict(l=10,r=80,t=40,b=10))
+        paper_bgcolor="white",
+        xaxis=dict(showgrid=False, automargin=True),
+        yaxis=dict(showgrid=True, gridcolor="#eee", automargin=True),
+        showlegend=False, margin=dict(l=50, r=175, t=50, b=50))
     st.plotly_chart(fig, use_container_width=True)
 
 with tabs[0]:

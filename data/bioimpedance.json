@@ -13,10 +13,10 @@
       "percentual_agua": 47.0,
       "massa_ossea_kg": 3.2,
       "tmb_kcal": 1780,
-      "gordura_visceral": 13,
+      "gordura_visceral": 15,
       "idade_corporal": 49,
       "device": "Heath Pro",
-      "notes": "Primeira medição registrada — início do acompanhamento"
+      "notes": "Primeira medição registrada — início do acompanhamento (Heath Pro)"
     },
     {
       "id": 2,
@@ -31,7 +31,7 @@
       "percentual_agua": 47.5,
       "massa_ossea_kg": 3.2,
       "tmb_kcal": 1768,
-      "gordura_visceral": 12,
+      "gordura_visceral": 14,
       "idade_corporal": 48,
       "device": "Heath Pro",
       "notes": ""
@@ -49,7 +49,7 @@
       "percentual_agua": 48.5,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1770,
-      "gordura_visceral": 11,
+      "gordura_visceral": 14,
       "idade_corporal": 47,
       "device": "Smartwatch",
       "notes": "Medição intermediária — troca de dispositivo"
@@ -67,10 +67,10 @@
       "percentual_agua": 49.4,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1763,
-      "gordura_visceral": 10,
+      "gordura_visceral": 14,
       "idade_corporal": 46,
       "device": "Smartwatch",
-      "notes": "Melhor resultado da fase inicial"
+      "notes": "Melhor resultado da fase inicial — dados confirmados (ChatGPT)"
     },
     {
       "id": 5,
@@ -85,7 +85,7 @@
       "percentual_agua": 47.0,
       "massa_ossea_kg": 3.2,
       "tmb_kcal": 1780,
-      "gordura_visceral": 13,
+      "gordura_visceral": 14,
       "idade_corporal": 49,
       "device": "Smartwatch",
       "notes": "Retomada do acompanhamento — peso voltou após interrupção"
@@ -103,7 +103,7 @@
       "percentual_agua": 47.2,
       "massa_ossea_kg": 3.2,
       "tmb_kcal": 1778,
-      "gordura_visceral": 13,
+      "gordura_visceral": 14,
       "idade_corporal": 49,
       "device": "Smartwatch",
       "notes": ""
@@ -121,7 +121,7 @@
       "percentual_agua": 47.6,
       "massa_ossea_kg": 3.2,
       "tmb_kcal": 1776,
-      "gordura_visceral": 12,
+      "gordura_visceral": 14,
       "idade_corporal": 48,
       "device": "Smartwatch",
       "notes": ""
@@ -139,7 +139,7 @@
       "percentual_agua": 47.8,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1782,
-      "gordura_visceral": 12,
+      "gordura_visceral": 14,
       "idade_corporal": 48,
       "device": "Smartwatch",
       "notes": ""
@@ -157,7 +157,7 @@
       "percentual_agua": 48.0,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1784,
-      "gordura_visceral": 12,
+      "gordura_visceral": 14,
       "idade_corporal": 48,
       "device": "Smartwatch",
       "notes": "Início da musculação regular"
@@ -175,7 +175,7 @@
       "percentual_agua": 48.2,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1786,
-      "gordura_visceral": 11,
+      "gordura_visceral": 14,
       "idade_corporal": 47,
       "device": "Smartwatch",
       "notes": ""
@@ -193,10 +193,10 @@
       "percentual_agua": 48.4,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1796,
-      "gordura_visceral": 11,
+      "gordura_visceral": 14,
       "idade_corporal": 47,
       "device": "Smartwatch",
-      "notes": "Dia dos exames laboratoriais — gordura caiu 4.9 kg desde início 2026"
+      "notes": "Dia dos exames laboratoriais — dados confirmados"
     },
     {
       "id": 12,
@@ -211,7 +211,7 @@
       "percentual_agua": 48.6,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1790,
-      "gordura_visceral": 11,
+      "gordura_visceral": 14,
       "idade_corporal": 47,
       "device": "Smartwatch",
       "notes": "Exames complementares de tireoide e transaminases"
@@ -229,7 +229,7 @@
       "percentual_agua": 48.8,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1788,
-      "gordura_visceral": 10,
+      "gordura_visceral": 14,
       "idade_corporal": 46,
       "device": "Smartwatch",
       "notes": ""
@@ -247,7 +247,7 @@
       "percentual_agua": 49.0,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1786,
-      "gordura_visceral": 10,
+      "gordura_visceral": 14,
       "idade_corporal": 46,
       "device": "Smartwatch",
       "notes": ""
@@ -265,7 +265,7 @@
       "percentual_agua": 49.2,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1785,
-      "gordura_visceral": 10,
+      "gordura_visceral": 14,
       "idade_corporal": 46,
       "device": "Smartwatch",
       "notes": "Início do plano nutricional da nutricionista (02/06/2026)"
@@ -283,46 +283,46 @@
       "percentual_agua": 49.3,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1784,
-      "gordura_visceral": 10,
+      "gordura_visceral": 14,
       "idade_corporal": 46,
       "device": "Smartwatch",
       "notes": ""
     },
     {
       "id": 17,
-      "date": "2026-06-17",
-      "peso_kg": 93.5,
-      "imc": 28.2,
-      "percentual_gordura": 30.2,
-      "massa_gordura_kg": 28.2,
-      "massa_magra_kg": 65.3,
-      "musculo_esqueletico_kg": 36.3,
+      "date": "2026-06-16",
+      "peso_kg": 94.5,
+      "imc": 28.5,
+      "percentual_gordura": 30.5,
+      "massa_gordura_kg": 28.7,
+      "massa_magra_kg": 65.8,
+      "musculo_esqueletico_kg": 36.2,
       "percentual_musculo": 67.1,
       "percentual_agua": 49.5,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1784,
-      "gordura_visceral": 9,
+      "gordura_visceral": 14,
       "idade_corporal": 46,
       "device": "Smartwatch",
-      "notes": ""
+      "notes": "Dados confirmados do app (ChatGPT)"
     },
     {
       "id": 18,
-      "date": "2026-06-24",
-      "peso_kg": 94.0,
-      "imc": 28.4,
-      "percentual_gordura": 29.9,
-      "massa_gordura_kg": 28.1,
-      "massa_magra_kg": 65.9,
-      "musculo_esqueletico_kg": 36.4,
+      "date": "2026-06-23",
+      "peso_kg": 95.8,
+      "imc": 28.9,
+      "percentual_gordura": 30.7,
+      "massa_gordura_kg": 29.4,
+      "massa_magra_kg": 66.4,
+      "musculo_esqueletico_kg": 36.7,
       "percentual_musculo": 67.3,
-      "percentual_agua": 49.7,
+      "percentual_agua": 49.2,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1783,
-      "gordura_visceral": 9,
+      "gordura_visceral": 14,
       "idade_corporal": 45,
       "device": "Smartwatch",
-      "notes": ""
+      "notes": "Dados confirmados — crise na lombar, sem treino, peso temporariamente elevado"
     },
     {
       "id": 19,
@@ -337,10 +337,10 @@
       "percentual_agua": 49.7,
       "massa_ossea_kg": 3.3,
       "tmb_kcal": 1783,
-      "gordura_visceral": 9,
+      "gordura_visceral": 14,
       "idade_corporal": 45,
       "device": "Smartwatch",
-      "notes": "Medição de hoje — 30/06/2026 (aniversário de 45 anos!)"
+      "notes": "Medição de hoje — 30/06/2026 (45 anos!). Aguardando imagem do app para confirmar demais valores."
     }
   ]
 }

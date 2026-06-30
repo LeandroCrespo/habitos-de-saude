@@ -106,7 +106,7 @@ if sw_submit:
         },
         title={"text": "Passos (meta: 7.000)"}
     ))
-    fig_gauge.update_layout(height=250, margin=dict(l=10,r=10,t=40,b=10))
+    fig_gauge.update_layout(height=280, margin=dict(l=20,r=20,t=60,b=20))
     st.plotly_chart(fig_gauge, use_container_width=True)
 
     if sw_steps < 3000:
@@ -165,8 +165,10 @@ if exercises:
             x=df_ex["date"].sort_values(), y=df_ex.sort_values("date")["calories_burned"],
             marker_color="#1E8449", name="Calorias queimadas"
         ))
-        fig.update_layout(height=240, title="Calorias por Treino", plot_bgcolor="white", paper_bgcolor="white",
-            xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#eee", title="kcal"), showlegend=False)
+        fig.update_layout(height=280, title="Calorias por Treino", plot_bgcolor="white", paper_bgcolor="white",
+            xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
+            yaxis=dict(showgrid=True, gridcolor="#eee", title="kcal", automargin=True),
+            showlegend=False, margin=dict(l=50,r=20,t=50,b=60))
         st.plotly_chart(fig, use_container_width=True)
 
     with col_g2:
@@ -177,9 +179,10 @@ if exercises:
         fig2.add_trace(go.Bar(x=df_sorted["date"], y=df_sorted["sleep_score"],
             marker_color=colors_sleep, name="Sleep Score"))
         fig2.add_hline(y=75, line_dash="dash", line_color="#27AE60", annotation_text="Meta: 75")
-        fig2.update_layout(height=240, title="Pontuação do Sono", plot_bgcolor="white", paper_bgcolor="white",
-            xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#eee", title="Score 0-100"),
-            showlegend=False)
+        fig2.update_layout(height=280, title="Pontuação do Sono", plot_bgcolor="white", paper_bgcolor="white",
+            xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
+            yaxis=dict(showgrid=True, gridcolor="#eee", title="Score 0-100", automargin=True),
+            showlegend=False, margin=dict(l=50,r=100,t=50,b=60))
         st.plotly_chart(fig2, use_container_width=True)
 
     # Passos
@@ -191,8 +194,10 @@ if exercises:
         marker_color=step_colors, name="Passos"))
     fig3.add_hline(y=7000, line_dash="dash", line_color="#27AE60", annotation_text="Meta: 7.000 passos")
     fig3.add_hline(y=3000, line_dash="dot", line_color="#E74C3C", annotation_text="Mínimo recomendado")
-    fig3.update_layout(height=250, title="Passos Diários", plot_bgcolor="white", paper_bgcolor="white",
-        xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#eee", title="passos"), showlegend=False)
+    fig3.update_layout(height=300, title="Passos Diários", plot_bgcolor="white", paper_bgcolor="white",
+        xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
+        yaxis=dict(showgrid=True, gridcolor="#eee", title="passos", automargin=True),
+        showlegend=False, margin=dict(l=50, r=160, t=50, b=60))
     st.plotly_chart(fig3, use_container_width=True)
 
     # Tabela

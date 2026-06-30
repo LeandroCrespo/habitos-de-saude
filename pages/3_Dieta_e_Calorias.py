@@ -195,8 +195,8 @@ if today_logs:
             marker_colors=["#2980B9","#F39C12","#E74C3C"],
             hole=0.4
         )])
-        fig_pie.update_layout(height=260, margin=dict(l=0,r=0,t=20,b=0),
-            legend=dict(orientation="h", yanchor="bottom", y=-0.2))
+        fig_pie.update_layout(height=300, margin=dict(l=20,r=20,t=30,b=80),
+            legend=dict(orientation="h", yanchor="bottom", y=-0.25))
         st.plotly_chart(fig_pie, use_container_width=True)
 
 # ── Plano nutricional ──────────────────────────────────────────────────────────
@@ -241,7 +241,8 @@ if food_logs:
                   annotation_text=f"TDEE estimado: {tdee_hoje} kcal")
     fig.add_hline(y=kcal_plano, line_dash="dot", line_color="#F39C12",
                   annotation_text=f"Plano: {kcal_plano} kcal")
-    fig.update_layout(height=280, title="Calorias Diárias", plot_bgcolor="white", paper_bgcolor="white",
-        xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#eee", title="kcal"),
-        showlegend=False, margin=dict(l=0,r=80,t=40,b=10))
+    fig.update_layout(height=300, title="Calorias Diárias", plot_bgcolor="white", paper_bgcolor="white",
+        xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
+        yaxis=dict(showgrid=True, gridcolor="#eee", title="kcal", automargin=True),
+        showlegend=False, margin=dict(l=50, r=180, t=50, b=60))
     st.plotly_chart(fig, use_container_width=True)

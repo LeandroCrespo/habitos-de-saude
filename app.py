@@ -238,19 +238,17 @@ exams_data = load_exams()
 results = exams_data.get("results", [])
 sessions = {s["id"]: s for s in exams_data.get("sessions", [])}
 
-# Pegar resultados da sessão mais recente
-latest_session_id = "s003"
-alerts = [r for r in results if r["session_id"] == latest_session_id and r["status"] in ("alta", "baixa")]
-alerts_all = sorted(
-    [r for r in results if r["status"] in ("alta", "baixa")],
-    key=lambda x: x["session_id"], reverse=True
-)
+# Para cada exame, pegar o resultado mais recente (qualquer status),
+# depois mostrar apenas os que ainda estão fora do normal.
+_sess_order = {s["id"]: s["date"] for s in exams_data.get("sessions", [])}
+_latest_by_exam = {}
+for r in results:
+    exam = r["exam"]
+    if (exam not in _latest_by_exam or
+            _sess_order.get(r["session_id"], "") > _sess_order.get(_latest_by_exam[exam]["session_id"], "")):
+        _latest_by_exam[exam] = r
 
-# Deduplica por exame mostrando mais recente
-seen = {}
-for r in alerts_all:
-    if r["exam"] not in seen:
-        seen[r["exam"]] = r
+seen = {exam: r for exam, r in _latest_by_exam.items() if r["status"] in ("alta", "baixa")}
 
 ca, cb = st.columns(2)
 items = list(seen.values())

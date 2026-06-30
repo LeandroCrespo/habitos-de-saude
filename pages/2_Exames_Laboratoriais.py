@@ -1,12 +1,210 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from datetime import datetime
-import sys
+from datetime import datetime, date
+import sys, re, base64, json
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from utils.data_manager import load_exams, status_color, status_emoji
+from utils.data_manager import load_exams, save_exams, status_color, status_emoji
+
+try:
+    import requests as _req
+    _REQ_OK = True
+except ImportError:
+    _REQ_OK = False
+
+# ── OCR de PDF via Google Vision API ─────────────────────────────────────────
+def _vision_pdf_ocr(pdf_bytes: bytes, api_key: str) -> str:
+    if not _REQ_OK:
+        return ""
+    url = f"https://vision.googleapis.com/v1/files:annotate?key={api_key}"
+    payload = {"requests": [{"inputConfig": {
+        "content": base64.b64encode(pdf_bytes).decode(),
+        "mimeType": "application/pdf"},
+        "features": [{"type": "DOCUMENT_TEXT_DETECTION"}],
+        "pages": list(range(1, 6))}]}
+    try:
+        r = _req.post(url, json=payload, timeout=30)
+        r.raise_for_status()
+        texts = []
+        for resp in r.json().get("responses", [{}]):
+            for page in resp.get("responses", []):
+                t = page.get("fullTextAnnotation", {}).get("text", "")
+                if t:
+                    texts.append(t)
+        return "\n".join(texts)
+    except Exception:
+        return ""
+
+# ── Parser de laudos laboratoriais ───────────────────────────────────────────
+# Mapeamento: alias (minúsculas) → nome canônico
+_ALIAS = {
+    "eritrócitos": "Eritrócitos", "eritrocitos": "Eritrócitos",
+    "hemoglobina": "Hemoglobina",
+    "hematócrito": "Hematócrito", "hematocrito": "Hematócrito",
+    "vcm": "VCM", "hcm": "HCM", "chcm": "CHCM", "rdw": "RDW",
+    "leucócitos": "Leucócitos", "leucocitos": "Leucócitos",
+    "neutrófilos": "Neutrófilos", "neutrofilos": "Neutrófilos",
+    "linfócitos": "Linfócitos", "linfocitos": "Linfócitos",
+    "monócitos": "Monócitos", "monocitos": "Monócitos",
+    "eosinófilos": "Eosinófilos", "eosinofilos": "Eosinófilos",
+    "basófilos": "Basófilos", "basofilos": "Basófilos",
+    "plaquetas": "Plaquetas",
+    "creatinina": "Creatinina",
+    "tfg estimada": "TFG estimada (eGFR)", "egfr": "TFG estimada (eGFR)",
+    "tfg": "TFG estimada (eGFR)", "taxa de filtração glomerular": "TFG estimada (eGFR)",
+    "ureia": "Ureia",
+    "albumina urinária": "Albumina Urinária", "albumina urinaria": "Albumina Urinária",
+    "potássio": "Potássio", "potassio": "Potássio",
+    "sódio": "Sódio", "sodio": "Sódio",
+    "homocisteína": "Homocisteína", "homocisteina": "Homocisteína",
+    "pcr": "PCR", "proteína c reativa": "PCR", "proteina c reativa": "PCR",
+    "glicose": "Glicose",
+    "hba1c": "HbA1c", "hemoglobina glicada": "HbA1c", "glicohemoglobina": "HbA1c",
+    "colesterol total": "Colesterol Total",
+    "hdl colesterol": "HDL", "hdl-colesterol": "HDL", "hdl": "HDL",
+    "ldl colesterol": "LDL", "ldl-colesterol": "LDL", "ldl": "LDL",
+    "vldl": "VLDL",
+    "triglicérides": "Triglicérides", "triglicerides": "Triglicérides",
+    "triglicerídeos": "Triglicérides", "triacilgliceróis": "Triglicérides",
+    "tgo (ast)": "TGO (AST)", "tgo": "TGO (AST)", "ast": "TGO (AST)",
+    "aspartato aminotransferase": "TGO (AST)",
+    "tgp (alt)": "TGP (ALT)", "tgp": "TGP (ALT)", "alt": "TGP (ALT)",
+    "alanina aminotransferase": "TGP (ALT)",
+    "ggt": "GGT", "gamaglutamiltransferase": "GGT",
+    "bilirrubina total": "Bilirrubina Total",
+    "fosfatase alcalina": "Fosfatase Alcalina",
+    "tsh": "TSH",
+    "t4 livre": "T4 Livre",
+    "anti-tireoglobulina (anti-tg)": "Anti-tireoglobulina (anti-TG)",
+    "anti-tireoglobulina": "Anti-tireoglobulina (anti-TG)",
+    "anti-tg": "Anti-tireoglobulina (anti-TG)",
+    "anti-tpo (antiperoxidase)": "Anti-TPO (Antiperoxidase)",
+    "anti-tpo": "Anti-TPO (Antiperoxidase)", "antiperoxidase": "Anti-TPO (Antiperoxidase)",
+    "ferritina": "Ferritina",
+    "ferro sérico": "Ferro", "ferro serico": "Ferro", "ferro": "Ferro",
+    "vitamina d": "Vitamina D", "25-oh vitamina d": "Vitamina D",
+    "vitamina b12": "Vitamina B12", "cobalamina": "Vitamina B12",
+    "ácido fólico": "Ácido Fólico", "acido folico": "Ácido Fólico",
+    "ácido úrico": "Ácido Úrico", "acido urico": "Ácido Úrico",
+    "albumina": "Albumina",
+    "proteínas totais": "Proteínas Totais", "proteinas totais": "Proteínas Totais",
+    "anti-hiv": "Anti-HIV",
+    "hbsag": "HBsAg (Hepatite B)", "hbsag (hepatite b)": "HBsAg (Hepatite B)",
+    "anti-hbs": "Anti-HBs (Imunidade Hep B)",
+    "anti-hbc total": "Anti-HBc Total", "anti-hbc": "Anti-HBc Total",
+    "anti-hcv": "Anti-HCV (Hepatite C)", "anti-hcv (hepatite c)": "Anti-HCV (Hepatite C)",
+    "hemácias (sedimento)": "Hemácias (sedimento)", "hemacias": "Hemácias (sedimento)",
+    "leucócitos (sedimento)": "Leucócitos (sedimento)",
+}
+
+_EXAM_CAT = {
+    "Eritrócitos": "Hemograma", "Hemoglobina": "Hemograma", "Hematócrito": "Hemograma",
+    "VCM": "Hemograma", "HCM": "Hemograma", "CHCM": "Hemograma", "RDW": "Hemograma",
+    "Leucócitos": "Hemograma", "Neutrófilos": "Hemograma", "Linfócitos": "Hemograma",
+    "Monócitos": "Hemograma", "Eosinófilos": "Hemograma", "Basófilos": "Hemograma",
+    "Plaquetas": "Hemograma",
+    "Creatinina": "Função Renal", "TFG estimada (eGFR)": "Função Renal",
+    "Ureia": "Função Renal", "Albumina Urinária": "Urina Tipo I",
+    "Hemácias (sedimento)": "Urina Tipo I", "Leucócitos (sedimento)": "Urina Tipo I",
+    "Potássio": "Eletrólitos", "Sódio": "Eletrólitos",
+    "Homocisteína": "Metabolismo Cardiovascular", "PCR": "Inflamação",
+    "Glicose": "Metabolismo Glicídico", "HbA1c": "Metabolismo Glicídico",
+    "Colesterol Total": "Perfil Lipídico", "HDL": "Perfil Lipídico",
+    "LDL": "Perfil Lipídico", "VLDL": "Perfil Lipídico", "Triglicérides": "Perfil Lipídico",
+    "TGO (AST)": "Função Hepática", "TGP (ALT)": "Função Hepática",
+    "GGT": "Função Hepática", "Bilirrubina Total": "Função Hepática",
+    "Fosfatase Alcalina": "Função Hepática",
+    "TSH": "Tireoide", "T4 Livre": "Tireoide",
+    "Anti-tireoglobulina (anti-TG)": "Tireoide", "Anti-TPO (Antiperoxidase)": "Tireoide",
+    "Ferritina": "Metabolismo do Ferro", "Ferro": "Metabolismo do Ferro",
+    "Vitamina D": "Vitaminas", "Vitamina B12": "Vitaminas", "Ácido Fólico": "Vitaminas",
+    "Ácido Úrico": "Outros", "Albumina": "Outros", "Proteínas Totais": "Outros",
+    "Anti-HIV": "Sorologias", "HBsAg (Hepatite B)": "Sorologias",
+    "Anti-HBs (Imunidade Hep B)": "Sorologias",
+    "Anti-HBc Total": "Sorologias", "Anti-HCV (Hepatite C)": "Sorologias",
+}
+
+def _parse_lab_text(text: str) -> list[dict]:
+    """Extrai exames do texto OCR de um laudo laboratorial."""
+    rows = []
+    seen = set()
+    lines = text.replace("\r", "\n").split("\n")
+    # Regex para capturar: valor numérico e possível referência na mesma linha
+    num_pat  = re.compile(r"(\d+[,.]?\d*)")
+    ref_pat  = re.compile(
+        r"(?:VR|Ref\.?|Valor de refer[eê]ncia)?[:\s]*"
+        r"(?:(?:(\d+[,.]\d+)\s*[–\-]\s*(\d+[,.]\d+))"   # min – max
+        r"|(?:[<≤]\s*(\d+[,.]\d+))"                       # < max
+        r"|(?:[>≥]\s*(\d+[,.]\d+)))",                     # > min
+        re.IGNORECASE
+    )
+    for i, line in enumerate(lines):
+        line_l = line.strip().lower()
+        if not line_l:
+            continue
+        # Tenta identificar nome do exame no início da linha
+        canonical = None
+        # Ordena aliases do mais longo para o mais curto (evita match parcial)
+        for alias in sorted(_ALIAS.keys(), key=len, reverse=True):
+            if line_l.startswith(alias) or f" {alias}" in line_l:
+                canonical = _ALIAS[alias]
+                break
+        if not canonical or canonical in seen:
+            continue
+        # Extrai valor numérico
+        nums = num_pat.findall(line)
+        if not nums:
+            # Tenta linha seguinte
+            next_line = lines[i+1].strip() if i+1 < len(lines) else ""
+            nums = num_pat.findall(next_line)
+            combined = line + " " + next_line
+        else:
+            combined = line
+        if not nums:
+            continue
+        try:
+            value = float(nums[0].replace(",", "."))
+        except ValueError:
+            continue
+        # Extrai referência
+        ref_min = ref_max = None
+        ref_text = ""
+        m = ref_pat.search(combined)
+        if m:
+            if m.group(1) and m.group(2):
+                ref_min = float(m.group(1).replace(",", "."))
+                ref_max = float(m.group(2).replace(",", "."))
+                ref_text = f"{m.group(1)} – {m.group(2)}"
+            elif m.group(3):
+                ref_max = float(m.group(3).replace(",", "."))
+                ref_text = f"< {m.group(3)}"
+            elif m.group(4):
+                ref_min = float(m.group(4).replace(",", "."))
+                ref_text = f"> {m.group(4)}"
+        # Status
+        if ref_min is not None and value < ref_min:
+            status = "baixa"
+        elif ref_max is not None and value > ref_max:
+            status = "alta"
+        elif ref_min is not None or ref_max is not None:
+            status = "normal"
+        else:
+            status = "info"
+        rows.append({
+            "exam": canonical,
+            "category": _EXAM_CAT.get(canonical, "Outros"),
+            "value": value,
+            "unit": "",
+            "ref_min": ref_min,
+            "ref_max": ref_max,
+            "ref_text": ref_text,
+            "status": status,
+            "notes": "",
+        })
+        seen.add(canonical)
+    return rows
 
 st.set_page_config(page_title="Exames Laboratoriais", page_icon="🧪", layout="wide")
 
@@ -26,6 +224,98 @@ st.markdown("## 🧪 Exames Laboratoriais")
 exams_data = load_exams()
 sessions = {s["id"]: s for s in exams_data.get("sessions", [])}
 results = exams_data.get("results", [])
+
+# ── Importar novo laudo (PDF) ─────────────────────────────────────────────────
+with st.expander("📤 Importar novo laudo (PDF)", expanded=False):
+    api_key = st.secrets.get("GOOGLE_VISION_API_KEY", "")
+
+    col_a, col_b = st.columns([2, 1])
+    with col_a:
+        uploaded_pdf = st.file_uploader("Selecione o PDF do laudo (Lavoisier, Delboni…):",
+                                        type=["pdf"], key="pdf_upload")
+    with col_b:
+        lab_name  = st.text_input("Laboratório:", value="Lavoisier")
+        exam_date = st.date_input("Data do exame:", value=date.today())
+        doctor    = st.text_input("Médica solicitante:", value="Dra. Celina Prado de Lima Souza")
+        exam_notes = st.text_input("Observações da coleta (opcional):")
+
+    if uploaded_pdf:
+        pdf_key = f"{uploaded_pdf.name}_{uploaded_pdf.size}"
+        if st.session_state.get("_pdf_key") != pdf_key:
+            st.session_state["_pdf_key"] = pdf_key
+            st.session_state["_pdf_rows"] = None
+            st.session_state["_pdf_text"] = None
+
+        if st.session_state.get("_pdf_rows") is None:
+            if not api_key:
+                st.warning("GOOGLE_VISION_API_KEY não configurada nos secrets.")
+            else:
+                with st.spinner("Lendo PDF com OCR…"):
+                    raw_text = _vision_pdf_ocr(uploaded_pdf.read(), api_key)
+                    st.session_state["_pdf_text"] = raw_text
+                    st.session_state["_pdf_rows"] = _parse_lab_text(raw_text)
+
+        rows = st.session_state.get("_pdf_rows", [])
+        raw_text = st.session_state.get("_pdf_text", "")
+
+        if rows:
+            st.success(f"**{len(rows)} exame(s) identificado(s).** Revise abaixo antes de salvar.")
+            df_edit = pd.DataFrame(rows)[["exam","category","value","unit","ref_min","ref_max","ref_text","status","notes"]]
+            df_edit.columns = ["Exame","Categoria","Valor","Unidade","Ref Mín","Ref Máx","Ref Texto","Status","Notas"]
+            edited = st.data_editor(
+                df_edit,
+                use_container_width=True,
+                num_rows="dynamic",
+                column_config={
+                    "Status": st.column_config.SelectboxColumn(options=["normal","alta","baixa","info"]),
+                },
+                key="exam_editor"
+            )
+            if st.button("💾 Salvar laudo", type="primary"):
+                new_sid = f"s{len(exams_data.get('sessions',[]))+1:03d}"
+                exams_data.setdefault("sessions", []).append({
+                    "id": new_sid,
+                    "date": str(exam_date),
+                    "lab": lab_name,
+                    "doctor": doctor,
+                    "notes": exam_notes or f"Importado via OCR — {len(rows)} exames"
+                })
+                for _, row in edited.iterrows():
+                    try:
+                        v = float(str(row["Valor"]).replace(",", "."))
+                    except Exception:
+                        v = None
+                    try:
+                        rmin = float(str(row["Ref Mín"]).replace(",", ".")) if pd.notna(row["Ref Mín"]) else None
+                    except Exception:
+                        rmin = None
+                    try:
+                        rmax = float(str(row["Ref Máx"]).replace(",", ".")) if pd.notna(row["Ref Máx"]) else None
+                    except Exception:
+                        rmax = None
+                    exams_data.setdefault("results", []).append({
+                        "session_id": new_sid,
+                        "category": row["Categoria"],
+                        "exam": row["Exame"],
+                        "value": v,
+                        "unit": row["Unidade"] or "",
+                        "ref_min": rmin,
+                        "ref_max": rmax,
+                        "ref_text": row["Ref Texto"] or "",
+                        "status": row["Status"],
+                        "notes": row["Notas"] or "",
+                    })
+                save_exams(exams_data)
+                st.session_state["_pdf_key"] = None
+                st.session_state["_pdf_rows"] = None
+                st.success(f"✅ Laudo de {exam_date.strftime('%d/%m/%Y')} salvo com {len(edited)} exame(s)!")
+                st.rerun()
+        else:
+            st.warning("Nenhum exame reconhecido automaticamente. Verifique o texto abaixo.")
+
+        if raw_text:
+            with st.expander("Texto extraído pelo OCR (para conferência)"):
+                st.text(raw_text[:3000])
 
 if not results:
     st.warning("Nenhum exame registrado.")
@@ -229,6 +519,9 @@ def trend_chart(exam_name, unit, ref_min, ref_max, color, height=280, tab_key=""
         showlegend=False, margin=dict(l=50, r=185, t=55, b=55))
     safe_key = exam_name.replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
     st.plotly_chart(fig, use_container_width=True, key=f"tc_{tab_key}_{safe_key}")
+    desc = EXAM_DESC.get(exam_name, "")
+    if desc:
+        st.caption(f"ℹ️ {desc}")
 
 with tabs[0]:
     st.caption("Exames que apresentam alteração nas últimas coletas")

@@ -8,7 +8,8 @@
   "nutricionista": "Maria Eduarda Tardin",
   "nutricionista_crn": "23101875",
   "medicamentos": [
-    {"nome": "Mounjaro (Tirzepatida)", "inicio": "2026-01-01", "obs": "GLP-1/GIP agonista — controle glicêmico e emagrecimento"}
+    {"nome": "Puran T4 (Levotiroxina)", "inicio": "2026-06-01", "obs": "Hormônio tireoidiano — tratamento de hipotireoidismo de Hashimoto"},
+    {"nome": "Psyllium", "inicio": "2026-06-01", "obs": "Fibra solúvel — saúde intestinal e controle glicêmico pré-prandial"}
   ],
   "condicoes": [
     "Sobrepeso (IMC > 28)",

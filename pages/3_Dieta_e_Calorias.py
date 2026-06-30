@@ -109,122 +109,147 @@ st.markdown("<div class='section-header'>🍽️ Registrar o que comi</div>", un
 meals_options = {m["id"]: f"{m['name']} (~{m['kcal_estimated']} kcal)" for m in diet.get("meals",[])}
 meals_by_id = {m["id"]: m for m in diet.get("meals",[])}
 
-# Itens pré-selecionados por refeição (None = todos; lista = apenas esses)
+# Itens habituais pré-selecionados por refeição (None = todos; lista = apenas esses; [] = nenhum)
 _DEFAULTS = {
-    "cafe":   None,                                          # todos pré-marcados
+    "cafe":   None,
     "almoco": ["Arroz integral", "Feijão / lentilha"],
-    "lanche": None,                                          # todos pré-marcados
+    "lanche": None,
     "jantar": ["Arroz integral", "Feijão / lentilha"],
-    "cha":    [],                                            # nenhum pré-marcado
+    "cha":    [],
 }
 
-# Seletor de refeição FORA do form para atualizar os itens ao mudar
+# Seletor FORA do form — muda opções ao trocar refeição
 meal_id = st.selectbox("Refeição:", list(meals_options.keys()),
                        format_func=lambda x: meals_options[x])
-sel_meal   = meals_by_id.get(meal_id, {})
-all_foods  = sel_meal.get("foods", [])
-_def_ids   = _DEFAULTS.get(meal_id, None)
+sel_meal  = meals_by_id.get(meal_id, {})
+all_foods = sel_meal.get("foods", [])
+
+def _food_lbl(f):
+    return f"{f['item']} — {f['qty']} ({f['kcal']} kcal · P:{f.get('prot_g',0)}g · C:{f.get('carb_g',0)}g · G:{f.get('fat_g',0)}g)"
+
+label_to_food = {_food_lbl(f): f for f in all_foods}
+all_labels    = [_food_lbl(f) for f in all_foods]
+
+_def_ids = _DEFAULTS.get(meal_id, None)
 if _def_ids is None:
     _def_ids = [f["item"] for f in all_foods]
-default_foods  = [f for f in all_foods if f["item"] in _def_ids]
-optional_foods = [f for f in all_foods if f["item"] not in _def_ids]
+default_labels = [_food_lbl(f) for f in all_foods if f["item"] in _def_ids]
 
-with st.form("log_refeicao", clear_on_submit=True):
+# Chave incremental garante que data_editor resete após salvar
+if "diet_form_key" not in st.session_state:
+    st.session_state.diet_form_key = 0
+
+_empty_custom = pd.DataFrame({
+    "Alimento": pd.Series(dtype="str"),
+    "Kcal":     pd.Series(dtype="float"),
+    "Prot (g)": pd.Series(dtype="float"),
+    "Carb (g)": pd.Series(dtype="float"),
+    "Gord (g)": pd.Series(dtype="float"),
+})
+
+with st.form(f"log_{st.session_state.diet_form_key}", clear_on_submit=True):
     col_a, col_b = st.columns([2, 1])
     with col_a:
-        selected_foods = []
+        selected_labels = st.multiselect(
+            "Alimentos do plano desta refeição:",
+            options=all_labels,
+            default=default_labels,
+            help="Selecione os alimentos que consumiu. Itens habituais já vêm pré-selecionados.",
+        )
+        selected_foods = [label_to_food[l] for l in selected_labels if l in label_to_food]
 
-        # ── Itens habituais (pré-marcados) ───────────────────────────────────
-        if default_foods:
-            st.caption("✅ **Habitual desta refeição** — desmarque o que não comeu:")
-            for food in default_foods:
-                if st.checkbox(
-                    f"{food['item']} — {food['qty']} · {food['kcal']} kcal · {food['prot_g']}g prot",
-                    value=True, key=f"d_{meal_id}_{food['item']}"
-                ):
-                    selected_foods.append(food)
-
-        # ── Outros alimentos do plano (desmarcados) ───────────────────────────
-        if optional_foods:
-            st.caption("➕ **Outros do plano** — marque o que comeu:")
-            for food in optional_foods:
-                if st.checkbox(
-                    f"{food['item']} — {food['qty']} · {food['kcal']} kcal · {food['prot_g']}g prot",
-                    value=False, key=f"o_{meal_id}_{food['item']}"
-                ):
-                    selected_foods.append(food)
-
-        # ── Alimento extra (não previsto no plano) ────────────────────────────
-        st.caption("🆕 **Alimento extra** — não previsto no plano:")
-        c1e, c2e = st.columns([3, 1])
-        with c1e:
-            extra_item = st.text_input("Nome do alimento extra:")
-        with c2e:
-            extra_kcal = st.number_input("Kcal:", 0, 3000, 0, step=5)
-        c3e, c4e, c5e = st.columns(3)
-        with c3e:
-            extra_prot = st.number_input("Proteína (g):", 0.0, 200.0, 0.0, step=0.5)
-        with c4e:
-            extra_carb = st.number_input("Carb (g):", 0.0, 300.0, 0.0, step=0.5)
-        with c5e:
-            extra_fat  = st.number_input("Gordura (g):", 0.0, 100.0, 0.0, step=0.5)
+        st.caption("**Alimentos fora do plano** — clique em ＋ para adicionar linhas:")
+        custom_df = st.data_editor(
+            _empty_custom,
+            num_rows="dynamic",
+            use_container_width=True,
+            column_config={
+                "Alimento": st.column_config.TextColumn("Alimento", width="large"),
+                "Kcal":     st.column_config.NumberColumn("Kcal", min_value=0, max_value=2000, step=5),
+                "Prot (g)": st.column_config.NumberColumn("Prot (g)", min_value=0, max_value=200, step=0.5),
+                "Carb (g)": st.column_config.NumberColumn("Carb (g)", min_value=0, max_value=300, step=0.5),
+                "Gord (g)": st.column_config.NumberColumn("Gord (g)", min_value=0, max_value=200, step=0.5),
+            },
+            key=f"custom_ed_{st.session_state.diet_form_key}",
+        )
 
     with col_b:
         data_ref = st.date_input("Data:", value=date.today())
         hora_ref = st.time_input("Hora:")
         obs_ref  = st.text_input("Observações:")
 
-        kcal_sel = sum(f["kcal"] for f in selected_foods) + extra_kcal
-        prot_sel = sum(f.get("prot_g", 0) for f in selected_foods) + extra_prot
-        carb_sel = sum(f.get("carb_g", 0) for f in selected_foods) + extra_carb
-        fat_sel  = sum(f.get("fat_g",  0) for f in selected_foods) + extra_fat
+        kcal_plan = sum(f["kcal"] for f in selected_foods)
+        prot_plan = sum(f.get("prot_g", 0) for f in selected_foods)
+        carb_plan = sum(f.get("carb_g", 0) for f in selected_foods)
+        fat_plan  = sum(f.get("fat_g",  0) for f in selected_foods)
 
         st.markdown(f"""
-        **Resumo desta refeição:**
-        - 🔥 Calorias: **{kcal_sel:.0f} kcal**
-        - 💪 Proteínas: {prot_sel:.1f} g
-        - 🍞 Carboidratos: {carb_sel:.1f} g
-        - 🧈 Gorduras: {fat_sel:.1f} g
+        **Resumo (itens do plano):**
+        - 🔥 {kcal_plan:.0f} kcal
+        - 💪 {prot_plan:.1f}g prot
+        - 🍞 {carb_plan:.1f}g carb
+        - 🧈 {fat_plan:.1f}g gord
         """)
+        st.caption("*(+ extras ao salvar)*")
 
     submitted_log = st.form_submit_button("💾 Registrar Refeição", type="primary")
 
 if submitted_log:
-    foods_list = [f["item"] for f in selected_foods]
-    if extra_item:
-        foods_list.append(extra_item)
+    extra_kcal_tot = extra_prot_tot = extra_carb_tot = extra_fat_tot = 0.0
+    extra_items = []
+    for _, row in custom_df.iterrows():
+        name = str(row.get("Alimento") or "").strip()
+        if not name:
+            continue
+        extra_items.append(name)
+        extra_kcal_tot += float(row["Kcal"])     if pd.notna(row.get("Kcal"))     else 0.0
+        extra_prot_tot += float(row["Prot (g)"]) if pd.notna(row.get("Prot (g)")) else 0.0
+        extra_carb_tot += float(row["Carb (g)"]) if pd.notna(row.get("Carb (g)")) else 0.0
+        extra_fat_tot  += float(row["Gord (g)"]) if pd.notna(row.get("Gord (g)")) else 0.0
+
+    foods_list = [f["item"] for f in selected_foods] + extra_items
+    total_kcal = kcal_plan + extra_kcal_tot
+    total_prot = prot_plan + extra_prot_tot
+    total_carb = carb_plan + extra_carb_tot
+    total_fat  = fat_plan  + extra_fat_tot
+
     new_log = {
-        "id":        max([l.get("id", 0) for l in food_logs], default=0) + 1,
-        "date":      str(data_ref),
-        "time":      str(hora_ref),
-        "meal_id":   meal_id,
-        "meal_name": sel_meal.get("name", ""),
-        "foods":     foods_list,
-        "kcal_total": round(kcal_sel, 0),
-        "prot_g":    round(prot_sel, 1),
-        "carb_g":    round(carb_sel, 1),
-        "fat_g":     round(fat_sel,  1),
-        "extra_desc": extra_item,
-        "extra_kcal": extra_kcal,
-        "obs":       obs_ref,
+        "id":         max([l.get("id", 0) for l in food_logs], default=0) + 1,
+        "date":       str(data_ref),
+        "time":       str(hora_ref),
+        "meal_id":    meal_id,
+        "meal_name":  sel_meal.get("name", ""),
+        "foods":      foods_list,
+        "kcal_total": round(total_kcal, 0),
+        "prot_g":     round(total_prot, 1),
+        "carb_g":     round(total_carb, 1),
+        "fat_g":      round(total_fat,  1),
+        "extra_desc": ", ".join(extra_items),
+        "extra_kcal": round(extra_kcal_tot, 0),
+        "obs":        obs_ref,
     }
     food_logs.append(new_log)
     save_food_log(food_logs)
-    st.success(f"✅ {sel_meal.get('name','')} registrado: {kcal_sel:.0f} kcal")
+    st.session_state.diet_form_key += 1
+    st.success(f"✅ {sel_meal.get('name','')} registrado: {total_kcal:.0f} kcal")
     st.rerun()
 
 # ── Histórico alimentar do dia ─────────────────────────────────────────────────
 if today_logs:
     st.markdown("<div class='section-header'>📋 Refeições de Hoje</div>", unsafe_allow_html=True)
     for log in sorted(today_logs, key=lambda x: x.get("time","")):
-        color_bg = "#f0fff4"
-        st.markdown(f"""<div style='background:{color_bg};border:1px solid #c8e6c9;border-radius:10px;padding:12px;margin:6px 0'>
-            <b>🍽️ {log['meal_name']}</b> · {log.get('time','')}<br>
-            <span style='color:#E74C3C;font-weight:700'>{log['kcal_total']} kcal</span> ·
-            Prot: {log.get('prot_g',0)}g · Carb: {log.get('carb_g',0)}g · Gord: {log.get('fat_g',0)}g<br>
-            <span style='font-size:12px;color:#666'>{', '.join(log.get('foods',[]))}</span>
-            {f"<br><span style='font-size:12px;color:#999'>{log['obs']}</span>" if log.get('obs') else ''}
-        </div>""", unsafe_allow_html=True)
+        obs_html = f"<br><span style='font-size:12px;color:#999'>{log['obs']}</span>" if log.get('obs') else ''
+        hora_fmt = str(log.get('time', '')).replace(':00', '', 1) if str(log.get('time', '')).endswith(':00') else log.get('time', '')
+        html_card = (
+            "<div style='background:#f0fff4;border:1px solid #c8e6c9;border-radius:10px;padding:12px;margin:6px 0'>"
+            f"<b>🍽️ {log['meal_name']}</b> · {hora_fmt}<br>"
+            f"<span style='color:#E74C3C;font-weight:700'>{log['kcal_total']:.0f} kcal</span> · "
+            f"Prot: {log.get('prot_g',0)}g · Carb: {log.get('carb_g',0)}g · Gord: {log.get('fat_g',0)}g<br>"
+            f"<span style='font-size:12px;color:#555'>{', '.join(log.get('foods',[]))}</span>"
+            + obs_html
+            + "</div>"
+        )
+        st.markdown(html_card, unsafe_allow_html=True)
 
     # Gráfico de macros do dia
     st.markdown("**Macronutrientes do dia:**")
@@ -270,22 +295,77 @@ for meal in diet.get("meals",[]):
             for sub in meal["substitutions"]:
                 st.markdown(f"- {sub}")
 
-# ── Histórico semanal ─────────────────────────────────────────────────────────
+# ── Histórico das últimas semanas ────────────────────────────────────────────
 if food_logs:
-    st.markdown("<div class='section-header'>📅 Histórico Semanal</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>📅 Histórico Calórico (últimas 4 semanas)</div>", unsafe_allow_html=True)
     df_logs = pd.DataFrame(food_logs)
     df_logs["date"] = pd.to_datetime(df_logs["date"])
-    df_daily = df_logs.groupby("date").agg({"kcal_total":"sum","prot_g":"sum"}).reset_index()
-    df_daily = df_daily.sort_values("date")
+    # Apenas últimos 28 dias
+    cutoff = pd.Timestamp.now() - pd.Timedelta(days=28)
+    df_recente = df_logs[df_logs["date"] >= cutoff]
+    if df_recente.empty:
+        df_recente = df_logs
+
+    df_daily = (
+        df_recente.groupby("date")
+        .agg(kcal=("kcal_total","sum"), prot=("prot_g","sum"),
+             carb=("carb_g","sum"), fat=("fat_g","sum"))
+        .reset_index()
+        .sort_values("date")
+    )
+
+    # Cores das barras: verde se dentro do plano, vermelho se acima
+    bar_colors = [
+        "#27AE60" if k <= kcal_plano * 1.05 else "#E74C3C"
+        for k in df_daily["kcal"]
+    ]
+
+    tdee_fixo = int(tmb * 1.45)  # estimativa conservadora sem precisar de passos
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=df_daily["date"], y=df_daily["kcal_total"], name="Kcal consumidas",
-        marker_color="#1E8449", opacity=0.8))
-    fig.add_hline(y=tdee_hoje, line_dash="dash", line_color="#E74C3C",
-                  annotation_text=f"TDEE estimado: {tdee_hoje} kcal")
-    fig.add_hline(y=kcal_plano, line_dash="dot", line_color="#F39C12",
-                  annotation_text=f"Plano: {kcal_plano} kcal")
-    fig.update_layout(height=300, title="Calorias Diárias", plot_bgcolor="white", paper_bgcolor="white",
-        xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
-        yaxis=dict(showgrid=True, gridcolor="#eee", title="kcal", automargin=True),
-        showlegend=False, margin=dict(l=50, r=180, t=50, b=60))
+    fig.add_trace(go.Bar(
+        x=df_daily["date"],
+        y=df_daily["kcal"],
+        name="Kcal consumidas",
+        marker_color=bar_colors,
+        text=[f"{int(k)}" for k in df_daily["kcal"]],
+        textposition="outside",
+        textfont=dict(size=11),
+        cliponaxis=False,
+    ))
+    fig.add_hline(y=kcal_plano, line_dash="dot", line_color="#F39C12", line_width=2,
+                  annotation_text=f"Plano: {kcal_plano} kcal", annotation_position="right")
+    fig.add_hline(y=tdee_fixo, line_dash="dash", line_color="#3498DB", line_width=1.5,
+                  annotation_text=f"Gasto estimado: {tdee_fixo} kcal", annotation_position="right")
+
+    fig.update_layout(
+        height=340,
+        title="Calorias por dia — verde = dentro do plano | vermelho = acima",
+        plot_bgcolor="white", paper_bgcolor="white",
+        xaxis=dict(
+            showgrid=False, automargin=True, tickangle=-30,
+            tickformat="%d/%m",
+        ),
+        yaxis=dict(
+            showgrid=True, gridcolor="#eee", title="kcal", automargin=True,
+            range=[0, max(df_daily["kcal"].max(), kcal_plano) * 1.25],
+        ),
+        showlegend=False,
+        margin=dict(l=50, r=200, t=60, b=70),
+    )
     st.plotly_chart(fig, use_container_width=True)
+
+    # Resumo textual
+    dias_ok = sum(1 for k in df_daily["kcal"] if k <= kcal_plano * 1.05)
+    total_dias = len(df_daily)
+    media_kcal = int(df_daily["kcal"].mean())
+    deficit_medio = tdee_fixo - media_kcal
+    colunas_res = st.columns(3)
+    with colunas_res[0]:
+        st.metric("Dias dentro do plano", f"{dias_ok}/{total_dias}", help="Dias com calorias ≤ 5% acima do plano")
+    with colunas_res[1]:
+        st.metric("Média diária", f"{media_kcal} kcal", delta=f"Plano: {kcal_plano} kcal",
+                  delta_color="inverse" if media_kcal > kcal_plano else "normal")
+    with colunas_res[2]:
+        cor_def = "normal" if deficit_medio > 0 else "inverse"
+        st.metric("Déficit médio estimado", f"{abs(deficit_medio)} kcal",
+                  delta="déficit" if deficit_medio > 0 else "superávit", delta_color=cor_def)

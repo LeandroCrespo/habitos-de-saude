@@ -162,23 +162,23 @@ Médica: Dra. Celina Prado de Lima Souza
 RESUMO DO CONTEXTO
 ──────────────────
 Paciente em acompanhamento por sobrepeso, pré-diabetes e dislipidemia.
-Em uso de Mounjaro (tirzepatida). Última bioimpedância: {bio_list[-1]['peso_kg'] if bio_list else '—'} kg,
+Em uso de Puran T4 (levotiroxina, iniciado jun/2026) e Psyllium. Última bioimpedância: {bio_list[-1]['peso_kg'] if bio_list else '—'} kg,
 {bio_list[-1]['percentual_gordura'] if bio_list else '—'}% gordura. Pratica musculação regularmente.
 Exames laboratoriais de 06/05/2026 e 13/05/2026 (Lavoisier + Delboni).
 
 🔴 SITUAÇÕES URGENTES A DISCUTIR
 ──────────────────────────────────
 
-1. HIPOTIREOIDISMO / HASHIMOTO
+1. HIPOTIREOIDISMO / HASHIMOTO — EM TRATAMENTO
    TSH: 4,31 (out/25) → 4,50 (mai/06) → 7,48 µUI/mL (mai/13)
    Anti-tireoglobulina: 8,2 UI/mL (ref < 4,5) | Anti-TPO: normal
    T4 Livre: 1,22 ng/dL (normal)
-   Pergunta: Devo iniciar levotiroxina? Solicitar US tireoide?
+   Iniciou Puran T4 em jun/2026. Aguardar controle do TSH em 8–12 semanas.
 
 2. TRANSAMINASES ELEVADAS E PIORAS
    TGO: 22 → 53 → 60 U/L | TGP: 34 → 35 → 61 U/L
    Ultrassonografia abdominal foi solicitada em 12/05/2026 — aguardo resultado.
-   Pergunta: Resultados da ultrassonografia? Devo suspender Mounjaro?
+   Pergunta: Resultados da ultrassonografia? Qual conduta com as transaminases?
 
 3. VACINA HEPATITE B
    Anti-HBs < 2,0 mUI/mL | Anti-HBc negativo (nunca vacinou)

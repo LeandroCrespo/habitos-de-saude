@@ -75,8 +75,8 @@ with tabs[0]:
          "Sugere Tireoidite de Hashimoto. O hipotireoidismo dificulta o emagrecimento, reduz energia, prejudica o controle glicêmico e afeta a recuperação muscular."),
         ("CRÍTICO","#E74C3C","p-critica","🍺 Transaminases elevadas e em alta",
          "TGO: 22 → 53 → 60 U/L. TGP: 34 → 35 → 61 U/L. "
-         "Ultrassonografia abdominal foi pedida (aguardar resultado). Causas prováveis: esteatose hepática (fígado gorduroso), Mounjaro, ou exercício intenso (TGO). "
-         "TGP elevando sugere envolvimento hepático real — não apenas muscular."),
+         "Ultrassonografia abdominal foi pedida (aguardar resultado). Causas prováveis: esteatose hepática (fígado gorduroso), hipotireoidismo, ou exercício intenso (TGO). "
+         "TGP elevando junto com TGO sugere envolvimento hepático real — não apenas muscular."),
         ("ALTA","#F39C12","p-alta","❤️ HDL baixo e piorando",
          "HDL: 41 → 33 mg/dL. Muito abaixo do mínimo (>40). "
          "HDL baixo é fator de risco cardiovascular independente. "
@@ -88,7 +88,7 @@ with tabs[0]:
          "Importante: não foi reavaliada desde outubro/2025."),
         ("MÉDIA","#3498DB","p-media","🍬 Pré-diabetes (HbA1c 5,8–5,9%)",
          "Glicose melhorou (103→96), mas HbA1c subiu levemente (5,8→5,9%). "
-         "O Mounjaro ajuda o controle, mas o hipotireoidismo pode dificultar. "
+         "Com o Puran T4 controlando a tireoide + dieta da nutricionista, a HbA1c deve normalizar. "
          "Meta: HbA1c < 5,7%."),
         ("MÉDIA","#3498DB","p-media","💉 Sem imunidade para Hepatite B",
          "Anti-HBs < 2,0 mUI/mL. Nunca teve contato com o vírus (Anti-HBc negativo). "
@@ -210,8 +210,8 @@ with tabs[2]:
     • Aumenta o colesterol (especialmente LDL e reduz HDL)<br>
     • Causa fadiga, queda de cabelo, constipação, sensação de frio<br>
     • Pode prejudicar a força muscular e a recuperação pós-treino<br>
-    • Mounjaro tem menos efeito quando a tireoide está comprometida<br><br>
-    <b>Tratamento esperado:</b> com TSH > 7 e T4 normal, a maioria dos endocrinologistas inicia levotiroxina (hormônio T4). Discuta com a Dra. Celina com urgência.
+    • Hipotireoidismo dificulta o controle glicêmico e prejudica o metabolismo<br><br>
+    <b>Em tratamento:</b> Puran T4 (levotiroxina) iniciado em jun/2026. Normalização do TSH esperada em 8–12 semanas. Monitorar dose e repetir TSH + T4 Livre em 3 meses.
     </div>
     """, unsafe_allow_html=True)
 
@@ -244,11 +244,11 @@ with tabs[2]:
 
     st.markdown("""
     **Próximos passos para a tireoide:**
-    1. 🏥 Consultar endocrinologista (ou discutir com Dra. Celina)
+    1. ✅ **Puran T4 (levotiroxina) já iniciado** — manter conforme prescrição da Dra. Celina
     2. 📋 Solicitar ultrassonografia de tireoide (para avaliar estrutura — Hashimoto causa ecotextura heterogênea)
-    3. 💊 Discutir início de levotiroxina (TSH 7,48 com anti-TG positivo justifica tratamento)
-    4. 🔄 Repetir TSH, T4 Livre, anti-TG e anti-TPO em 3 meses após início do tratamento
-    5. 📊 Monitorar impacto nos lipídios (tratamento da tireoide tende a melhorar HDL e LDL)
+    3. 🔄 Repetir TSH, T4 Livre em 8–12 semanas para avaliar resposta à dose
+    4. 💊 Ajuste de dose se TSH não normalizar (meta: 1,0–2,5 µUI/mL)
+    5. 📊 Esperar impacto positivo nos lipídios — tratamento da tireoide tende a melhorar HDL e LDL
     """)
 
 with tabs[3]:
@@ -265,9 +265,9 @@ with tabs[3]:
     • Ultrassonografia abdominal foi solicitada (aguardar resultado!)<br><br>
     <b>Causas mais prováveis:</b><br>
     1. Doença hepática gordurosa não alcoólica (NAFLD/esteatose) — comum em sobrepeso<br>
-    2. Efeito adverso do Mounjaro — reportado em alguns pacientes<br>
-    3. Hipotireoidismo — pode causar elevação de transaminases<br>
-    4. Exercício muscular intenso — afeta TGO mas menos TGP<br><br>
+    2. Hipotireoidismo — pode causar elevação de transaminases (mais comum do que se pensa)<br>
+    3. Exercício muscular intenso — afeta TGO mas menos TGP<br>
+    4. Outros medicamentos ou suplementos<br><br>
     <b>⚠️ Se a ultrassonografia confirmar esteatose hepática: ajuste alimentar mais restrito em gordura saturada e frutose.</b>
     </div>
     """, unsafe_allow_html=True)
@@ -301,7 +301,7 @@ with tabs[3]:
     - 🔍 Aguardar resultado da ultrassonografia abdominal (já solicitada)
     - 🚫 Evitar álcool completamente enquanto transaminases estiverem elevadas
     - 🥗 Reduzir gorduras saturadas, frituras e açúcar simples
-    - 💊 Discutir com médica se deve pausar o Mounjaro temporariamente para avaliação
+    - 💊 Com o tratamento do hipotireoidismo (Puran T4), as transaminases tendem a normalizar
     - 📋 Repetir TGO e TGP em 30–60 dias para avaliar tendência
     """)
 
@@ -313,7 +313,7 @@ with tabs[4]:
     HbA1c: 5,8% (out/2025) → 5,9% (mai/2026) · Referência: < 5,7% normal | 5,7–6,4% pré-diabetes<br>
     Glicose jejum: 103 (out/2025) → 96 mg/dL (mai/2026) → normalizou ✅<br><br>
     <b>Análise:</b><br>
-    • Glicose melhorou significativamente (possivelmente Mounjaro + dieta)<br>
+    • Glicose melhorou significativamente (dieta + perda de peso + psyllium)<br>
     • HbA1c subiu levemente (reflete média dos últimos 3 meses)<br>
     • Hipotireoidismo pode prejudicar sensibilidade à insulina<br>
     • Com tratamento da tireoide e continuidade do programa, HbA1c deve normalizar<br><br>
@@ -349,7 +349,8 @@ with tabs[4]:
 
     st.markdown("""
     **Estratégias para controle glicêmico:**
-    - ✅ Manter Mounjaro (controle glicêmico + emagrecimento)
+    - ✅ Tratar hipotireoidismo com Puran T4 — melhora sensibilidade insulínica diretamente
+    - 🌿 Continuar psyllium (reduz pico glicêmico pós-prandial quando tomado antes das refeições)
     - 🚶 Caminhada de 10–15 min após almoço e jantar (reduz pico pós-prandial de glicose)
     - 🥗 Plano nutricional da nutricionista está adequado (rico em fibras, proteínas)
     - 📊 Monitorar com smartwatch ou glicosímetro se disponível
@@ -396,7 +397,7 @@ with tabs[5]:
     st.markdown("""
     **Análise como Médico do Esporte:**
 
-    ✅ **O que está funcionando:** A combinação de musculação + Mounjaro + dieta está preservando a massa muscular enquanto perde gordura. Isso é o cenário ideal para recomposição corporal.
+    ✅ **O que está funcionando:** A combinação de musculação + dieta da nutricionista + Puran T4 está preservando a massa muscular enquanto perde gordura. Isso é o cenário ideal para recomposição corporal.
 
     ⚠️ **O hipotireoidismo está dificultando o progresso.** Com TSH de 7,48, o metabolismo está reduzido. O tratamento com levotiroxina provavelmente vai acelerar a perda de gordura e melhorar a retenção muscular.
 
@@ -415,15 +416,15 @@ with tabs[6]:
     """)
 
     recs = [
-        ("🔴 URGENTE","Discutir início de levotiroxina","TSH 7,48 µUI/mL com anti-TG positivo (8,2 UI/mL) → hipotireoidismo de Hashimoto. TSH > 7 com anticorpos positivos justifica tratamento mesmo com T4 Livre normal. Tratamento pode melhorar: energia, HDL, controle glicêmico, emagrecimento."),
+        ("🟡 IMPORTANTE","Monitorar e ajustar dose de Puran T4","Leandro já iniciou levotiroxina em jun/2026. Repetir TSH + T4 Livre em 8–12 semanas para verificar se a dose está correta. Meta: TSH 1,0–2,5 µUI/mL. Tratamento adequado melhora: energia, HDL, controle glicêmico, composição corporal."),
         ("🔴 URGENTE","Iniciar vacinação contra Hepatite B","Anti-HBs < 2,0 mUI/mL + Anti-HBc negativo = nunca vacinou e sem imunidade. Esquema de 3 doses (0, 1, 6 meses). Reforço necessário."),
-        ("🔴 URGENTE","Verificar resultado da ultrassonografia abdominal","Solicitada em 12/05/2026 por TGP/TGO elevados. Se confirmar esteatose hepática, ajustar dieta e discutir Mounjaro."),
+        ("🔴 URGENTE","Verificar resultado da ultrassonografia abdominal","Solicitada em 12/05/2026 por TGP/TGO elevados. Se confirmar esteatose hepática: ajustar dieta (reduzir gordura saturada e frutose) e repetir exames em 60 dias."),
         ("🟡 IMPORTANTE","Solicitar Testosterona Total e Livre + SHBG + LH + FSH","Homem, 44 anos, sobrepeso, hipotireoidismo → risco alto de deficiência de testosterona. Nunca foi medida. Testosterona baixa impacta: libido, massa muscular, composição corporal, humor, energia."),
         ("🟡 IMPORTANTE","Solicitar Homocisteína (repetir)","Estava 19 µmol/L em out/2025. Não reavaliada. Importante para risco cardiovascular. Se ainda elevada: suplementar B12 + B9 + B6."),
         ("🟡 IMPORTANTE","Solicitar Vitamina B12 e Ácido Fólico","Para investigar causa da homocisteína elevada e deficiência associada ao hipotireoidismo."),
         ("🟡 IMPORTANTE","Solicitar Vitamina D (25-OH) — nova dosagem","Estava borderline (23,93 ng/mL) em out/2025. Ideal: 40–60 ng/mL. D3 tem papel na função tireoidiana e imunidade."),
         ("🟡 IMPORTANTE","Solicitar Ultrassonografia da Tireoide","Para avaliar estrutura glandular (Hashimoto causa ecotextura heterogênea). Complementa o diagnóstico."),
-        ("🟡 IMPORTANTE","Solicitar Insulina de Jejum + HOMA-IR","Avaliar resistência insulínica (HbA1c 5,9% — zona pré-diabetes). Importante para decisões sobre Mounjaro e dieta."),
+        ("🟡 IMPORTANTE","Solicitar Insulina de Jejum + HOMA-IR","Avaliar resistência insulínica (HbA1c 5,9% — zona pré-diabetes). Importante para ajuste da dieta e avaliação do impacto do Puran T4 na sensibilidade insulínica."),
         ("🟢 CONSIDERAR","Ferritina + Ferro Sérico + TIBC","Homem ativo com dieta em déficit calórico — risco de deficiência de ferro (afeta energia e performance). Não foi medido."),
         ("🟢 CONSIDERAR","PCR Ultrassensível (PCR-us)","Marcador inflamatório de baixo grau. Hashimoto + sobrepeso + transaminases elevadas → risco de inflamação crônica de baixo grau."),
         ("🟢 CONSIDERAR","Encaminhamento para Fisioterapia","RM lombo-sacra realizada — supervisão para exercícios é importante. Pode prevenir lesão e otimizar treino."),
@@ -446,7 +447,7 @@ with tabs[7]:
 
     supls = [
         ("Whey Protein","30–40g pós-treino","🟢 RECOMENDADO",
-         "Já no plano da nutricionista (2 medidas de 30g). Essencial para preservar e ganhar massa muscular durante o emagrecimento. Combina bem com o Mounjaro (garante proteína mesmo com apetite reduzido)."),
+         "Já no plano da nutricionista (2 medidas de 30g). Essencial para preservar e ganhar massa muscular durante o emagrecimento. Com déficit calórico, a proteína é o principal aliado para não perder músculo."),
         ("Vitamina D3","4.000 UI/dia","🟡 CONSIDERAR",
          "Vitamina D estava 23,93 ng/mL (borderline). Ideal: 40–60 ng/mL. Importante para: função imune (Hashimoto!), saúde óssea, síntese de testosterona, músculo. Suplementar com refeição (lipossolúvel)."),
         ("Ômega-3 EPA+DHA","2–3g/dia","🟡 CONSIDERAR",

@@ -109,65 +109,108 @@ st.markdown("<div class='section-header'>🍽️ Registrar o que comi</div>", un
 meals_options = {m["id"]: f"{m['name']} (~{m['kcal_estimated']} kcal)" for m in diet.get("meals",[])}
 meals_by_id = {m["id"]: m for m in diet.get("meals",[])}
 
+# Itens pré-selecionados por refeição (None = todos; lista = apenas esses)
+_DEFAULTS = {
+    "cafe":   None,                                          # todos pré-marcados
+    "almoco": ["Arroz integral", "Feijão / lentilha"],
+    "lanche": None,                                          # todos pré-marcados
+    "jantar": ["Arroz integral", "Feijão / lentilha"],
+    "cha":    [],                                            # nenhum pré-marcado
+}
+
+# Seletor de refeição FORA do form para atualizar os itens ao mudar
+meal_id = st.selectbox("Refeição:", list(meals_options.keys()),
+                       format_func=lambda x: meals_options[x])
+sel_meal   = meals_by_id.get(meal_id, {})
+all_foods  = sel_meal.get("foods", [])
+_def_ids   = _DEFAULTS.get(meal_id, None)
+if _def_ids is None:
+    _def_ids = [f["item"] for f in all_foods]
+default_foods  = [f for f in all_foods if f["item"] in _def_ids]
+optional_foods = [f for f in all_foods if f["item"] not in _def_ids]
+
 with st.form("log_refeicao", clear_on_submit=True):
     col_a, col_b = st.columns([2, 1])
     with col_a:
-        meal_id = st.selectbox("Refeição:", list(meals_options.keys()), format_func=lambda x: meals_options[x])
-        sel_meal = meals_by_id.get(meal_id, {})
-        foods_in_meal = sel_meal.get("foods", [])
-
-        # Checkboxes para alimentos consumidos (simplificado — marcar o que comeu)
-        st.caption(f"Alimentos do plano para esta refeição ({sel_meal.get('name','')}):")
         selected_foods = []
-        for food in foods_in_meal:
-            checked = st.checkbox(
-                f"{food['item']} — {food['qty']} ({food['kcal']} kcal, {food['prot_g']}g prot)",
-                value=True, key=f"food_{meal_id}_{food['item']}"
-            )
-            if checked:
-                selected_foods.append(food)
 
-        extra_desc = st.text_input("Outros alimentos não previstos no plano (descreva):")
-        extra_kcal = st.number_input("Calorias extras estimadas (kcal):", 0, 2000, 0, step=10)
+        # ── Itens habituais (pré-marcados) ───────────────────────────────────
+        if default_foods:
+            st.caption("✅ **Habitual desta refeição** — desmarque o que não comeu:")
+            for food in default_foods:
+                if st.checkbox(
+                    f"{food['item']} — {food['qty']} · {food['kcal']} kcal · {food['prot_g']}g prot",
+                    value=True, key=f"d_{meal_id}_{food['item']}"
+                ):
+                    selected_foods.append(food)
+
+        # ── Outros alimentos do plano (desmarcados) ───────────────────────────
+        if optional_foods:
+            st.caption("➕ **Outros do plano** — marque o que comeu:")
+            for food in optional_foods:
+                if st.checkbox(
+                    f"{food['item']} — {food['qty']} · {food['kcal']} kcal · {food['prot_g']}g prot",
+                    value=False, key=f"o_{meal_id}_{food['item']}"
+                ):
+                    selected_foods.append(food)
+
+        # ── Alimento extra (não previsto no plano) ────────────────────────────
+        st.caption("🆕 **Alimento extra** — não previsto no plano:")
+        c1e, c2e = st.columns([3, 1])
+        with c1e:
+            extra_item = st.text_input("Nome do alimento extra:")
+        with c2e:
+            extra_kcal = st.number_input("Kcal:", 0, 3000, 0, step=5)
+        c3e, c4e, c5e = st.columns(3)
+        with c3e:
+            extra_prot = st.number_input("Proteína (g):", 0.0, 200.0, 0.0, step=0.5)
+        with c4e:
+            extra_carb = st.number_input("Carb (g):", 0.0, 300.0, 0.0, step=0.5)
+        with c5e:
+            extra_fat  = st.number_input("Gordura (g):", 0.0, 100.0, 0.0, step=0.5)
+
     with col_b:
         data_ref = st.date_input("Data:", value=date.today())
         hora_ref = st.time_input("Hora:")
-        obs_ref = st.text_input("Observações:")
+        obs_ref  = st.text_input("Observações:")
 
-        kcal_sel = sum(f["kcal"] for f in selected_foods)
-        prot_sel = sum(f.get("prot_g",0) for f in selected_foods)
-        carb_sel = sum(f.get("carb_g",0) for f in selected_foods)
-        fat_sel  = sum(f.get("fat_g",0) for f in selected_foods)
+        kcal_sel = sum(f["kcal"] for f in selected_foods) + extra_kcal
+        prot_sel = sum(f.get("prot_g", 0) for f in selected_foods) + extra_prot
+        carb_sel = sum(f.get("carb_g", 0) for f in selected_foods) + extra_carb
+        fat_sel  = sum(f.get("fat_g",  0) for f in selected_foods) + extra_fat
 
         st.markdown(f"""
         **Resumo desta refeição:**
-        - 🔥 Calorias: **{kcal_sel + extra_kcal} kcal**
-        - 💪 Proteínas: {prot_sel:.0f}g
-        - 🍞 Carboidratos: {carb_sel:.0f}g
-        - 🧈 Gorduras: {fat_sel:.0f}g
+        - 🔥 Calorias: **{kcal_sel:.0f} kcal**
+        - 💪 Proteínas: {prot_sel:.1f} g
+        - 🍞 Carboidratos: {carb_sel:.1f} g
+        - 🧈 Gorduras: {fat_sel:.1f} g
         """)
 
     submitted_log = st.form_submit_button("💾 Registrar Refeição", type="primary")
 
 if submitted_log:
+    foods_list = [f["item"] for f in selected_foods]
+    if extra_item:
+        foods_list.append(extra_item)
     new_log = {
-        "id": max([l.get("id",0) for l in food_logs], default=0) + 1,
-        "date": str(data_ref),
-        "time": str(hora_ref),
-        "meal_id": meal_id,
-        "meal_name": sel_meal.get("name",""),
-        "foods": [f["item"] for f in selected_foods],
-        "kcal_total": kcal_sel + extra_kcal,
-        "prot_g": round(prot_sel, 1),
-        "carb_g": round(carb_sel, 1),
-        "fat_g": round(fat_sel, 1),
-        "extra_desc": extra_desc,
+        "id":        max([l.get("id", 0) for l in food_logs], default=0) + 1,
+        "date":      str(data_ref),
+        "time":      str(hora_ref),
+        "meal_id":   meal_id,
+        "meal_name": sel_meal.get("name", ""),
+        "foods":     foods_list,
+        "kcal_total": round(kcal_sel, 0),
+        "prot_g":    round(prot_sel, 1),
+        "carb_g":    round(carb_sel, 1),
+        "fat_g":     round(fat_sel,  1),
+        "extra_desc": extra_item,
         "extra_kcal": extra_kcal,
-        "obs": obs_ref
+        "obs":       obs_ref,
     }
     food_logs.append(new_log)
     save_food_log(food_logs)
-    st.success(f"✅ {sel_meal.get('name','')} registrado: {kcal_sel + extra_kcal} kcal")
+    st.success(f"✅ {sel_meal.get('name','')} registrado: {kcal_sel:.0f} kcal")
     st.rerun()
 
 # ── Histórico alimentar do dia ─────────────────────────────────────────────────

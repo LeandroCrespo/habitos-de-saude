@@ -323,6 +323,24 @@
       "idade_corporal": 45,
       "device": "Smartwatch",
       "notes": ""
+    },
+    {
+      "id": 19,
+      "date": "2026-06-30",
+      "peso_kg": 94.0,
+      "imc": 28.4,
+      "percentual_gordura": 29.9,
+      "massa_gordura_kg": 28.1,
+      "massa_magra_kg": 65.9,
+      "musculo_esqueletico_kg": 36.4,
+      "percentual_musculo": 67.3,
+      "percentual_agua": 49.7,
+      "massa_ossea_kg": 3.3,
+      "tmb_kcal": 1783,
+      "gordura_visceral": 9,
+      "idade_corporal": 45,
+      "device": "Smartwatch",
+      "notes": "Medição de hoje — 30/06/2026 (aniversário de 45 anos!)"
     }
   ]
 }

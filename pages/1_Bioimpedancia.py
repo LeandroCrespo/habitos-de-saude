@@ -147,9 +147,9 @@ def make_chart(y_col, title, color, ref_line=None, ref_label="", height=300, fil
     y_pad = (max(y) - min(y)) * 0.3 if len(y) > 1 else 2
     fig.update_layout(
         height=height, title=title, plot_bgcolor="white", paper_bgcolor="white",
-        margin=dict(l=0, r=80, t=40, b=50),
+        margin=dict(l=40, r=95, t=40, b=75),
         xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels,
-                   tickangle=-35, tickfont=dict(size=11)),
+                   tickangle=-40, tickfont=dict(size=11), automargin=True),
         yaxis=dict(showgrid=True, gridcolor="#eee",
                    range=[min(y)-y_pad, max(y)+y_pad+1] if y else [0,100]),
         showlegend=False
@@ -177,8 +177,8 @@ with tab1:
     y_pad2 = (max(y_imc) - min(y_imc)) * 0.3 if len(y_imc) > 1 else 1
     fig2.update_layout(
         height=280, title="Índice de Massa Corporal (IMC)", plot_bgcolor="white", paper_bgcolor="white",
-        margin=dict(l=0, r=100, t=40, b=50), showlegend=False,
-        xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-35, tickfont=dict(size=11)),
+        margin=dict(l=40, r=110, t=40, b=75), showlegend=False,
+        xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-40, tickfont=dict(size=11), automargin=True),
         yaxis=dict(showgrid=True, gridcolor="#eee", range=[min(y_imc)-y_pad2, max(y_imc)+y_pad2+0.5])
     )
     st.plotly_chart(fig2, use_container_width=True)
@@ -194,8 +194,8 @@ with tab2:
     fig2.add_trace(go.Bar(x=x_dates, y=y_musc, name="Músculo (kg)", marker_color="#2980B9", opacity=0.8))
     fig2.update_layout(
         height=280, title="Gordura vs. Músculo (kg)", barmode="group",
-        plot_bgcolor="white", paper_bgcolor="white", margin=dict(l=0, r=10, t=40, b=50),
-        xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-35, tickfont=dict(size=11)),
+        plot_bgcolor="white", paper_bgcolor="white", margin=dict(l=40, r=20, t=40, b=75),
+        xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-40, tickfont=dict(size=11), automargin=True),
         yaxis=dict(showgrid=True, gridcolor="#eee", title="kg"),
         legend=dict(orientation="h", yanchor="bottom", y=-0.35)
     )
@@ -217,8 +217,8 @@ with tab4:
         fig2.add_hline(y=9, line_dash="dash", line_color="#27AE60", annotation_text="Meta: ≤ 9", annotation_position="right")
         fig2.update_layout(
             height=260, title="Gordura Visceral (escala 1–20)", plot_bgcolor="white", paper_bgcolor="white",
-            margin=dict(l=0, r=80, t=40, b=50), showlegend=False,
-            xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-35, tickfont=dict(size=11)),
+            margin=dict(l=40, r=95, t=40, b=75), showlegend=False,
+            xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-40, tickfont=dict(size=11), automargin=True),
             yaxis=dict(showgrid=True, gridcolor="#eee")
         )
         st.plotly_chart(fig2, use_container_width=True)

@@ -189,9 +189,10 @@ if bio_list:
     y_min = min(y_vals) - 2 if y_vals else 80
     y_max = max(y_vals) + 3 if y_vals else 100
     fig.update_layout(
-        height=300, margin=dict(l=0, r=70, t=20, b=40),
+        height=340, margin=dict(l=40, r=95, t=25, b=75),
         xaxis=dict(showgrid=False, title="", tickvals=x_vals,
-                   ticktext=tick_labels, tickangle=-35, tickfont=dict(size=11)),
+                   ticktext=tick_labels, tickangle=-40, tickfont=dict(size=11),
+                   automargin=True),
         yaxis=dict(showgrid=True, gridcolor="#eee", title="kg",
                    range=[y_min, y_max]),
         plot_bgcolor="white", paper_bgcolor="white",

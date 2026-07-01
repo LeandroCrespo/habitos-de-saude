@@ -1,3 +1,14 @@
 {
-  "logs": []
+  "logs": [
+    {
+      "id": 1,
+      "date": "2026-07-01",
+      "type": "Musculação",
+      "duration_min": 60,
+      "calories_burned": 350,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Auto-importado Samsung Health"
+    }
+  ]
 }

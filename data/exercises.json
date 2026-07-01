@@ -1899,6 +1899,236 @@
       "sleep_score": 0,
       "notes": "Importado Samsung Health",
       "id": 190
+    },
+    {
+      "date": "2025-09-11",
+      "type": "Caminhada",
+      "duration_min": 30,
+      "calories_burned": 253,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 191
+    },
+    {
+      "date": "2025-09-17",
+      "type": "Caminhada",
+      "duration_min": 30,
+      "calories_burned": 238,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 192
+    },
+    {
+      "date": "2025-09-24",
+      "type": "Caminhada",
+      "duration_min": 30,
+      "calories_burned": 197,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 193
+    },
+    {
+      "date": "2025-10-08",
+      "type": "Caminhada",
+      "duration_min": 30,
+      "calories_burned": 218,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 194
+    },
+    {
+      "date": "2025-10-20",
+      "type": "Caminhada",
+      "duration_min": 30,
+      "calories_burned": 204,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 195
+    },
+    {
+      "date": "2025-10-23",
+      "type": "Caminhada",
+      "duration_min": 30,
+      "calories_burned": 213,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 196
+    },
+    {
+      "date": "2025-10-29",
+      "type": "Caminhada",
+      "duration_min": 30,
+      "calories_burned": 211,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 197
+    },
+    {
+      "date": "2025-10-30",
+      "type": "Caminhada",
+      "duration_min": 6,
+      "calories_burned": 44,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 198
+    },
+    {
+      "date": "2025-11-11",
+      "type": "Caminhada",
+      "duration_min": 0,
+      "calories_burned": 1,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 199
+    },
+    {
+      "date": "2026-05-02",
+      "type": "Caminhada",
+      "duration_min": 31,
+      "calories_burned": 234,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 200
+    },
+    {
+      "date": "2026-05-07",
+      "type": "Caminhada",
+      "duration_min": 30,
+      "calories_burned": 216,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 201
+    },
+    {
+      "date": "2026-05-13",
+      "type": "Caminhada",
+      "duration_min": 10,
+      "calories_burned": 68,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 202
+    },
+    {
+      "date": "2026-05-15",
+      "type": "Caminhada",
+      "duration_min": 17,
+      "calories_burned": 115,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 203
+    },
+    {
+      "date": "2026-05-19",
+      "type": "Caminhada",
+      "duration_min": 15,
+      "calories_burned": 102,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 204
+    },
+    {
+      "date": "2026-05-21",
+      "type": "Caminhada",
+      "duration_min": 18,
+      "calories_burned": 121,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 205
+    },
+    {
+      "date": "2026-05-23",
+      "type": "Caminhada",
+      "duration_min": 11,
+      "calories_burned": 80,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 206
+    },
+    {
+      "date": "2026-05-26",
+      "type": "Caminhada",
+      "duration_min": 13,
+      "calories_burned": 92,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 207
+    },
+    {
+      "date": "2026-05-28",
+      "type": "Caminhada",
+      "duration_min": 12,
+      "calories_burned": 90,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 208
+    },
+    {
+      "date": "2026-06-02",
+      "type": "Caminhada",
+      "duration_min": 15,
+      "calories_burned": 110,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 209
+    },
+    {
+      "date": "2026-06-05",
+      "type": "Caminhada",
+      "duration_min": 12,
+      "calories_burned": 95,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 210
+    },
+    {
+      "date": "2026-06-11",
+      "type": "Caminhada",
+      "duration_min": 10,
+      "calories_burned": 79,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 211
+    },
+    {
+      "date": "2026-06-13",
+      "type": "Caminhada",
+      "duration_min": 10,
+      "calories_burned": 75,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 212
+    },
+    {
+      "date": "2026-06-29",
+      "type": "Caminhada",
+      "duration_min": 11,
+      "calories_burned": 87,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Importado Samsung Health",
+      "id": 213
     }
   ]
 }

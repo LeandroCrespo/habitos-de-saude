@@ -1,14 +1,3 @@
 {
-  "logs": [
-    {
-      "id": 1,
-      "date": "2026-06-23",
-      "type": "Musculação",
-      "duration_min": 60,
-      "calories_burned": 350,
-      "steps": 4200,
-      "sleep_score": 78,
-      "notes": "Peito e tríceps"
-    }
-  ]
+  "logs": []
 }

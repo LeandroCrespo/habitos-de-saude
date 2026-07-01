@@ -6,7 +6,7 @@
       "duration_min": 0,
       "calories_burned": 0,
       "steps": 985,
-      "sleep_score": 0,
+      "sleep_score": 88,
       "notes": "Passos do dia: 985 (sem treino registrado)",
       "id": 1
     },
@@ -696,7 +696,7 @@
       "duration_min": 10,
       "calories_burned": 80,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 91,
       "notes": "Importado Samsung Health",
       "id": 70
     },
@@ -736,7 +736,7 @@
       "duration_min": 15,
       "calories_burned": 115,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 90,
       "notes": "Importado Samsung Health",
       "id": 74
     },
@@ -946,7 +946,7 @@
       "duration_min": 14,
       "calories_burned": 121,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 97,
       "notes": "Importado Samsung Health",
       "id": 95
     },
@@ -976,7 +976,7 @@
       "duration_min": 10,
       "calories_burned": 73,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 82,
       "notes": "Importado Samsung Health",
       "id": 98
     },
@@ -1036,7 +1036,7 @@
       "duration_min": 21,
       "calories_burned": 167,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 89,
       "notes": "Importado Samsung Health",
       "id": 104
     },
@@ -1046,7 +1046,7 @@
       "duration_min": 15,
       "calories_burned": 121,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 89,
       "notes": "Importado Samsung Health",
       "id": 105
     },
@@ -1136,7 +1136,7 @@
       "duration_min": 15,
       "calories_burned": 110,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 74,
       "notes": "Importado Samsung Health",
       "id": 114
     },
@@ -1176,7 +1176,7 @@
       "duration_min": 15,
       "calories_burned": 107,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 91,
       "notes": "Importado Samsung Health",
       "id": 118
     },
@@ -1196,7 +1196,7 @@
       "duration_min": 29,
       "calories_burned": 221,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 86,
       "notes": "Importado Samsung Health",
       "id": 120
     },
@@ -1216,7 +1216,7 @@
       "duration_min": 10,
       "calories_burned": 81,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 92,
       "notes": "Importado Samsung Health",
       "id": 122
     },
@@ -1276,7 +1276,7 @@
       "duration_min": 10,
       "calories_burned": 67,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 92,
       "notes": "Importado Samsung Health",
       "id": 128
     },
@@ -1296,7 +1296,7 @@
       "duration_min": 30,
       "calories_burned": 218,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 97,
       "notes": "Importado Samsung Health",
       "id": 130
     },
@@ -1306,7 +1306,7 @@
       "duration_min": 27,
       "calories_burned": 206,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 97,
       "notes": "Importado Samsung Health",
       "id": 131
     },
@@ -1316,7 +1316,7 @@
       "duration_min": 16,
       "calories_burned": 110,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 98,
       "notes": "Importado Samsung Health",
       "id": 132
     },
@@ -1346,7 +1346,7 @@
       "duration_min": 30,
       "calories_burned": 213,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 79,
       "notes": "Importado Samsung Health",
       "id": 135
     },
@@ -1826,7 +1826,7 @@
       "duration_min": 42,
       "calories_burned": 283,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 89,
       "notes": "Importado Samsung Health",
       "id": 183
     },
@@ -1836,7 +1836,7 @@
       "duration_min": 10,
       "calories_burned": 79,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 89,
       "notes": "Importado Samsung Health",
       "id": 184
     },
@@ -1936,7 +1936,7 @@
       "duration_min": 30,
       "calories_burned": 218,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 97,
       "notes": "Importado Samsung Health",
       "id": 194
     },
@@ -1956,7 +1956,7 @@
       "duration_min": 30,
       "calories_burned": 213,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 79,
       "notes": "Importado Samsung Health",
       "id": 196
     },
@@ -2106,7 +2106,7 @@
       "duration_min": 10,
       "calories_burned": 79,
       "steps": 0,
-      "sleep_score": 0,
+      "sleep_score": 89,
       "notes": "Importado Samsung Health",
       "id": 211
     },

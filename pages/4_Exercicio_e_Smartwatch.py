@@ -366,8 +366,10 @@ with st.form("novo_treino", clear_on_submit=True):
     with tc2:
         duracao = st.number_input("Duração (min):", 5, 300, 60, step=5)
         cal_queimadas = st.number_input("Calorias queimadas (kcal):", 0, 2000, 350, step=10)
+        distancia_km = st.number_input("Distância (km):", 0.0, 100.0, 0.0, step=0.1,
+                                       help="Preencha para caminhada, corrida e bicicleta")
     with tc3:
-        passos_treino = st.number_input("Passos durante o treino:", 0, 30000, 1000, step=100)
+        passos_treino = st.number_input("Passos durante o treino:", 0, 30000, 0, step=100)
         sleep_score = st.number_input("Pontuação do sono (noite anterior):", 0, 100, 75, step=1)
     notas_treino = st.text_input("Grupos musculares / observações:")
     t_submit = st.form_submit_button("💾 Salvar Treino", type="primary")
@@ -379,6 +381,7 @@ if t_submit:
         "type":           tipo,
         "duration_min":   duracao,
         "calories_burned": cal_queimadas,
+        "distance_km":    round(distancia_km, 2),
         "steps":          passos_treino,
         "sleep_score":    sleep_score,
         "notes":          notas_treino,
@@ -463,9 +466,10 @@ if exercises:
         col_info, col_del = st.columns([11, 1])
         with col_info:
             dt_fmt = datetime.strptime(ex["date"], "%Y-%m-%d").strftime("%d/%m/%Y")
+            dist_str = f" · {ex['distance_km']} km" if ex.get("distance_km", 0) > 0 else ""
             st.markdown(
                 f"**{dt_fmt}** · {ex['type']} · {ex['duration_min']} min · "
-                f"{ex['calories_burned']} kcal · {ex['steps']} passos · "
+                f"{ex['calories_burned']} kcal{dist_str} · {ex['steps']} passos · "
                 f"sono: {ex['sleep_score']}" +
                 (f" · _{ex['notes']}_" if ex.get("notes") else "")
             )

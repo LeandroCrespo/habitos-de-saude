@@ -2151,17 +2151,6 @@
       "sleep_score": 0,
       "notes": "Registrado via HealthSync",
       "id": 215
-    },
-    {
-      "date": "2026-07-01",
-      "type": "Caminhada",
-      "start_time": "18:56",
-      "duration_min": 60,
-      "calories_burned": 94,
-      "steps": 0,
-      "sleep_score": 0,
-      "notes": "Registrado via HealthSync",
-      "id": 216
     }
   ]
 }

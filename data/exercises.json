@@ -9,16 +9,6 @@
       "steps": 4200,
       "sleep_score": 78,
       "notes": "Peito e tríceps"
-    },
-    {
-      "id": 2,
-      "date": "2026-06-25",
-      "type": "Musculação",
-      "duration_min": 55,
-      "calories_burned": 320,
-      "steps": 5100,
-      "sleep_score": 82,
-      "notes": "Costas e bíceps"
     }
   ]
 }

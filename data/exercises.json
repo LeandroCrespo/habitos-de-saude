@@ -29,16 +29,6 @@
       "steps": 3800,
       "sleep_score": 75,
       "notes": "Pernas"
-    },
-    {
-      "id": 4,
-      "date": "2026-06-29",
-      "type": "Musculação",
-      "duration_min": 60,
-      "calories_burned": 340,
-      "steps": 6200,
-      "sleep_score": 80,
-      "notes": "Ombros e abdômen"
     }
   ]
 }

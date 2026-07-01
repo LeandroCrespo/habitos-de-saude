@@ -436,9 +436,22 @@ if exercises:
         showlegend=False, margin=dict(l=50, r=160, t=50, b=60))
     st.plotly_chart(fig3, use_container_width=True)
 
-    df_show = df_ex[["date_str", "type", "duration_min", "calories_burned", "steps", "sleep_score", "notes"]].copy()
-    df_show.columns = ["Data", "Tipo", "Duração (min)", "Calorias (kcal)", "Passos", "Sono (score)", "Notas"]
-    st.dataframe(df_show, use_container_width=True, hide_index=True)
+    st.markdown("**Registros:**")
+    for ex in sorted(exercises, key=lambda x: x["date"], reverse=True):
+        col_info, col_del = st.columns([11, 1])
+        with col_info:
+            dt_fmt = datetime.strptime(ex["date"], "%Y-%m-%d").strftime("%d/%m/%Y")
+            st.markdown(
+                f"**{dt_fmt}** · {ex['type']} · {ex['duration_min']} min · "
+                f"{ex['calories_burned']} kcal · {ex['steps']} passos · "
+                f"sono: {ex['sleep_score']}" +
+                (f" · _{ex['notes']}_" if ex.get("notes") else "")
+            )
+        with col_del:
+            if st.button("🗑️", key=f"del_ex_{ex['id']}", help="Excluir treino"):
+                exercises[:] = [e for e in exercises if e.get("id") != ex["id"]]
+                save_exercises(exercises)
+                st.rerun()
 
 # ── Dicas personalizadas ──────────────────────────────────────────────────────
 st.markdown("<div class='section-header'>💡 Dicas de Atividade Física (Perfil de Leandro)</div>", unsafe_allow_html=True)

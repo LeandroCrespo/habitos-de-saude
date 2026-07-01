@@ -49,10 +49,33 @@ pesos    = [b["peso_kg"] for b in bio_recente]
 gorduras = [b.get("percentual_gordura", 0) for b in bio_recente]
 musculos = [b.get("musculo_esqueletico_kg", 0) for b in bio_recente]
 
-# Regressão linear (histórico real = baseline 3x/semana)
+# Regressão linear atual (todos os dados = projeção recalibrada)
 coef_peso = np.polyfit(x_dias, pesos, 1)
 coef_gord = np.polyfit(x_dias, gorduras, 1)
 coef_musc = np.polyfit(x_dias, musculos, 1)
+
+# ── Predição original (baseada apenas nos 3 primeiros registros) ───────────────
+N_BASE = 3
+x_base   = x_dias[:N_BASE]
+coef_peso_orig = np.polyfit(x_base, pesos[:N_BASE], 1)
+coef_gord_orig = np.polyfit(x_base, gorduras[:N_BASE], 1)
+coef_musc_orig = np.polyfit(x_base, musculos[:N_BASE], 1)
+
+# Calcula desvio de cada medição em relação à predição original
+desvios_peso = []
+desvios_gord = []
+desvios_musc = []
+hist_datas_dev = []
+for i, (b, xd) in enumerate(zip(bio_recente, x_dias)):
+    if i < N_BASE:
+        continue
+    pred_p = float(np.polyval(coef_peso_orig, xd))
+    pred_g = float(np.polyval(coef_gord_orig, xd))
+    pred_m = float(np.polyval(coef_musc_orig, xd))
+    desvios_peso.append(b["peso_kg"] - pred_p)
+    desvios_gord.append(b.get("percentual_gordura", 0) - pred_g)
+    desvios_musc.append(b.get("musculo_esqueletico_kg", 0) - pred_m)
+    hist_datas_dev.append(datetime.strptime(b["date"], "%Y-%m-%d"))
 
 peso_atual = bio_recente[-1]["peso_kg"]
 gord_atual = bio_recente[-1].get("percentual_gordura", 0)
@@ -67,10 +90,77 @@ PESO_META = 82.0
 GORD_META = 22.0
 MUSC_META = 40.0
 
-# Ponto projetado hoje (pelo modelo de regressão)
+# Ponto projetado hoje (pelo modelo recalibrado)
 val_hoje_peso = float(np.polyval(coef_peso, TODAY_X))
 val_hoje_gord = float(np.polyval(coef_gord, TODAY_X))
 val_hoje_musc = float(np.polyval(coef_musc, TODAY_X))
+
+# Ponto previsto hoje (pela predição original)
+pred_hoje_peso = float(np.polyval(coef_peso_orig, TODAY_X))
+pred_hoje_gord = float(np.polyval(coef_gord_orig, TODAY_X))
+pred_hoje_musc = float(np.polyval(coef_musc_orig, TODAY_X))
+
+# Status vs predição original
+def _status_desvio(desvio, metrica):
+    """Retorna (emoji, texto, cor) para o desvio em relação à predição."""
+    if metrica == "peso" or metrica == "gord":
+        # Para peso e gordura: negativo é melhor (perdendo mais)
+        if desvio < -0.5:
+            return "🚀", "Superando a predição", "#27AE60"
+        elif desvio < 0.2:
+            return "✅", "No ritmo previsto", "#2980B9"
+        elif desvio < 1.0:
+            return "⚠️", "Levemente atrás", "#F39C12"
+        else:
+            return "🔴", "Abaixo do esperado", "#E74C3C"
+    else:
+        # Para músculo: positivo é melhor (ganhando mais)
+        if desvio > 0.3:
+            return "🚀", "Superando a predição", "#27AE60"
+        elif desvio > -0.1:
+            return "✅", "No ritmo previsto", "#2980B9"
+        elif desvio > -0.5:
+            return "⚠️", "Levemente atrás", "#F39C12"
+        else:
+            return "🔴", "Abaixo do esperado", "#E74C3C"
+
+# ── Painel de Alertas vs Predição ─────────────────────────────────────────────
+if desvios_peso:
+    dev_peso_atual = peso_atual - pred_hoje_peso
+    dev_gord_atual = gord_atual - pred_hoje_gord
+    dev_musc_atual = musc_atual - pred_hoje_musc
+
+    emoji_p, txt_p, cor_p = _status_desvio(dev_peso_atual, "peso")
+    emoji_g, txt_g, cor_g = _status_desvio(dev_gord_atual, "gord")
+    emoji_m, txt_m, cor_m = _status_desvio(dev_musc_atual, "musc")
+
+    st.markdown("<div class='section-header'>📡 Acompanhamento vs Predição Original</div>", unsafe_allow_html=True)
+    a1, a2, a3 = st.columns(3)
+    with a1:
+        sinal = "+" if dev_peso_atual > 0 else ""
+        st.markdown(f"""<div style='background:#f8f8f8;border-left:5px solid {cor_p};border-radius:8px;padding:14px;'>
+<div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Peso — vs Predição</div>
+<div style='font-size:28px;font-weight:700;color:{cor_p}'>{emoji_p} {sinal}{dev_peso_atual:+.1f} kg</div>
+<div style='font-size:13px;color:{cor_p};font-weight:600'>{txt_p}</div>
+<div style='font-size:12px;color:#888;margin-top:4px'>Previsto hoje: {pred_hoje_peso:.1f} kg · Real: {peso_atual:.1f} kg</div>
+</div>""", unsafe_allow_html=True)
+    with a2:
+        sinal = "+" if dev_gord_atual > 0 else ""
+        st.markdown(f"""<div style='background:#f8f8f8;border-left:5px solid {cor_g};border-radius:8px;padding:14px;'>
+<div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Gordura — vs Predição</div>
+<div style='font-size:28px;font-weight:700;color:{cor_g}'>{emoji_g} {dev_gord_atual:+.1f}%</div>
+<div style='font-size:13px;color:{cor_g};font-weight:600'>{txt_g}</div>
+<div style='font-size:12px;color:#888;margin-top:4px'>Previsto hoje: {pred_hoje_gord:.1f}% · Real: {gord_atual:.1f}%</div>
+</div>""", unsafe_allow_html=True)
+    with a3:
+        st.markdown(f"""<div style='background:#f8f8f8;border-left:5px solid {cor_m};border-radius:8px;padding:14px;'>
+<div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Músculo — vs Predição</div>
+<div style='font-size:28px;font-weight:700;color:{cor_m}'>{emoji_m} {dev_musc_atual:+.1f} kg</div>
+<div style='font-size:13px;color:{cor_m};font-weight:600'>{txt_m}</div>
+<div style='font-size:12px;color:#888;margin-top:4px'>Previsto hoje: {pred_hoje_musc:.1f} kg · Real: {musc_atual:.1f} kg</div>
+</div>""", unsafe_allow_html=True)
+    st.caption(f"Predição original calculada com os {N_BASE} primeiros registros. A projeção futura é recalibrada automaticamente com todos os dados.")
+    st.markdown("")
 
 # ── Configurador de Cenário de Treino ─────────────────────────────────────────
 st.markdown("<div class='section-header'>⚙️ Simular Frequência de Treino</div>", unsafe_allow_html=True)
@@ -272,9 +362,16 @@ with tab1:
         fig_peso.add_trace(go.Scatter(
             x=trend_datas,
             y=[float(np.polyval(coef_peso, d)) for d in trend_x],
-            name="Tendência histórica",
+            name="Tendência recalibrada",
             mode="lines",
             line=dict(color="#27AE60", width=1.5, dash="dot"),
+        ))
+        fig_peso.add_trace(go.Scatter(
+            x=trend_datas,
+            y=[float(np.polyval(coef_peso_orig, d)) for d in trend_x],
+            name="Predição original",
+            mode="lines",
+            line=dict(color="#E67E22", width=1.5, dash="dashdot"),
         ))
         fig_peso.add_trace(go.Scatter(
             x=proj_datas, y=proj_pesos, name="Projeção 3x/sem",
@@ -319,6 +416,13 @@ with tab1:
             x=hist_datas, y=gorduras, name="Gordura real (%)",
             mode="lines+markers",
             line=dict(color="#E74C3C", width=2.5), marker=dict(size=7),
+        ))
+        fig_gord.add_trace(go.Scatter(
+            x=trend_datas,
+            y=[float(np.polyval(coef_gord_orig, d)) for d in trend_x],
+            name="Predição original",
+            mode="lines",
+            line=dict(color="#E67E22", width=1.5, dash="dashdot"),
         ))
         fig_gord.add_trace(go.Scatter(
             x=proj_datas, y=proj_gorduras, name="Projeção 3x/sem",
@@ -436,9 +540,16 @@ with tab2:
         fig_musc.add_trace(go.Scatter(
             x=trend_datas,
             y=[float(np.polyval(coef_musc, d)) for d in trend_x],
-            name="Tendência histórica",
+            name="Tendência recalibrada",
             mode="lines",
             line=dict(color="#1ABC9C", width=1.5, dash="dot"),
+        ))
+        fig_musc.add_trace(go.Scatter(
+            x=trend_datas,
+            y=[float(np.polyval(coef_musc_orig, d)) for d in trend_x],
+            name="Predição original",
+            mode="lines",
+            line=dict(color="#E67E22", width=1.5, dash="dashdot"),
         ))
         fig_musc.add_trace(go.Scatter(
             x=proj_datas, y=proj_musculos, name="Projeção 3x/sem",

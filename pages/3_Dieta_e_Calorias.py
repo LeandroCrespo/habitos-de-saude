@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from datetime import date, datetime, time as dt_time
+import json
 import sys
 from pathlib import Path
 
@@ -18,6 +19,19 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("## 🥗 Dieta & Calorias")
+
+# ── Aviso de sync ──────────────────────────────────────────────────────────────
+try:
+    _token_ok = bool(st.secrets.get("GITHUB_TOKEN", "").strip()) and st.secrets.get("GITHUB_TOKEN") != "COLE_SEU_TOKEN_AQUI"
+except Exception:
+    _token_ok = False
+if not _token_ok:
+    st.warning(
+        "⚠️ **Sincronização com GitHub desativada.** "
+        "Configure o `GITHUB_TOKEN` nas Secrets do Streamlit Cloud para que seus dados "
+        "não sejam perdidos ao reiniciar o servidor. "
+        "Use o botão **Backup / Restaurar** no final da página para salvar seus dados manualmente."
+    )
 
 diet      = load_diet()
 food_logs = load_food_log()
@@ -563,3 +577,41 @@ if food_logs:
         st.metric("Déficit médio estimado", f"{abs(deficit_m)} kcal",
                   delta="déficit" if deficit_m > 0 else "superávit",
                   delta_color="normal" if deficit_m > 0 else "inverse")
+
+# ── Backup & Restaurar ────────────────────────────────────────────────────────
+st.markdown("<div class='section-header'>💾 Backup & Restaurar Registros</div>", unsafe_allow_html=True)
+st.caption("Salve seus registros de alimentação localmente e restaure-os se necessário.")
+
+bc1, bc2 = st.columns(2)
+
+with bc1:
+    st.markdown("**⬇️ Baixar backup**")
+    backup_data = json.dumps({"logs": food_logs}, ensure_ascii=False, indent=2)
+    st.download_button(
+        label="📥 Baixar food_log.json",
+        data=backup_data.encode("utf-8"),
+        file_name=f"food_log_backup_{date.today()}.json",
+        mime="application/json",
+        use_container_width=True,
+    )
+    st.caption(f"Contém {len(food_logs)} registro(s) de refeição.")
+
+with bc2:
+    st.markdown("**⬆️ Restaurar backup**")
+    uploaded = st.file_uploader(
+        "Selecione um arquivo food_log_backup*.json:",
+        type=["json"],
+        key="restore_food_log",
+        label_visibility="collapsed",
+    )
+    if uploaded is not None:
+        try:
+            restored = json.loads(uploaded.read().decode("utf-8"))
+            restored_logs = restored.get("logs", [])
+            st.info(f"Arquivo contém **{len(restored_logs)} registro(s)**. Confirme para substituir os dados atuais.")
+            if st.button("✅ Confirmar restauração", type="primary", key="btn_restore_confirm"):
+                save_food_log(restored_logs)
+                st.success(f"✅ {len(restored_logs)} registro(s) restaurado(s) com sucesso!")
+                st.rerun()
+        except Exception as e:
+            st.error(f"Erro ao ler o arquivo: {e}")

@@ -395,11 +395,27 @@ if exercises:
     df_ex["date"] = pd.to_datetime(df_ex["date"])
     df_ex["date_str"] = df_ex["date"].dt.strftime("%d/%m/%Y")
 
+    periodo = st.radio(
+        "Período (treinos e sono):", ["Últimos 30 dias", "Últimos 90 dias", "Tudo"],
+        horizontal=True, index=0
+    )
+    if periodo == "Últimos 30 dias":
+        cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
+    elif periodo == "Últimos 90 dias":
+        cutoff = pd.Timestamp.now() - pd.Timedelta(days=90)
+    else:
+        cutoff = pd.Timestamp("2018-01-01")
+
+    df_all = df_ex.copy()
+    df_period = df_ex[df_ex["date"] >= cutoff]
+
+    # Gráfico 1: Calorias por treino (filtrado por período, só calorias > 0)
     col_g1, col_g2 = st.columns(2)
     with col_g1:
+        df_cal = df_period[df_period["calories_burned"] > 0].sort_values("date")
         fig = go.Figure()
         fig.add_trace(go.Bar(
-            x=df_ex["date"].sort_values(), y=df_ex.sort_values("date")["calories_burned"],
+            x=df_cal["date"], y=df_cal["calories_burned"],
             marker_color="#1E8449", name="Calorias queimadas",
         ))
         fig.update_layout(height=280, title="Calorias por Treino", plot_bgcolor="white", paper_bgcolor="white",
@@ -408,12 +424,13 @@ if exercises:
             showlegend=False, margin=dict(l=50, r=20, t=50, b=60))
         st.plotly_chart(fig, use_container_width=True)
 
+    # Gráfico 2: Pontuação do sono (filtrado por período, só sono > 0)
     with col_g2:
-        fig2 = go.Figure()
-        df_sorted = df_ex.sort_values("date")
+        df_sleep = df_period[df_period["sleep_score"] > 0].sort_values("date")
         colors_sleep = ["#27AE60" if s >= 75 else "#F39C12" if s >= 60 else "#E74C3C"
-                        for s in df_sorted["sleep_score"]]
-        fig2.add_trace(go.Bar(x=df_sorted["date"], y=df_sorted["sleep_score"],
+                        for s in df_sleep["sleep_score"]]
+        fig2 = go.Figure()
+        fig2.add_trace(go.Bar(x=df_sleep["date"], y=df_sleep["sleep_score"],
             marker_color=colors_sleep, name="Sleep Score"))
         fig2.add_hline(y=75, line_dash="dash", line_color="#27AE60", annotation_text="Meta: 75")
         fig2.update_layout(height=280, title="Pontuação do Sono", plot_bgcolor="white", paper_bgcolor="white",
@@ -422,22 +439,27 @@ if exercises:
             showlegend=False, margin=dict(l=50, r=100, t=50, b=60))
         st.plotly_chart(fig2, use_container_width=True)
 
-    fig3 = go.Figure()
-    df_steps = df_ex.sort_values("date")
-    step_colors = ["#27AE60" if s >= 7000 else "#F39C12" if s >= 4000 else "#E74C3C"
-                   for s in df_steps["steps"]]
-    fig3.add_trace(go.Bar(x=df_steps["date"], y=df_steps["steps"],
-        marker_color=step_colors, name="Passos"))
-    fig3.add_hline(y=7000, line_dash="dash", line_color="#27AE60", annotation_text="Meta: 7.000 passos")
-    fig3.add_hline(y=3000, line_dash="dot", line_color="#E74C3C", annotation_text="Mínimo recomendado")
-    fig3.update_layout(height=300, title="Passos Diários", plot_bgcolor="white", paper_bgcolor="white",
-        xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
-        yaxis=dict(showgrid=True, gridcolor="#eee", title="passos", automargin=True),
-        showlegend=False, margin=dict(l=50, r=160, t=50, b=60))
-    st.plotly_chart(fig3, use_container_width=True)
+    # Gráfico 3: Passos — apenas registros com passos > 0 (dados do HealthSync)
+    df_steps_real = df_all[df_all["steps"] > 0].sort_values("date")
+    if not df_steps_real.empty:
+        step_colors = ["#27AE60" if s >= 7000 else "#F39C12" if s >= 4000 else "#E74C3C"
+                       for s in df_steps_real["steps"]]
+        fig3 = go.Figure()
+        fig3.add_trace(go.Bar(x=df_steps_real["date"], y=df_steps_real["steps"],
+            marker_color=step_colors, name="Passos"))
+        fig3.add_hline(y=7000, line_dash="dash", line_color="#27AE60", annotation_text="Meta: 7.000 passos")
+        fig3.add_hline(y=3000, line_dash="dot", line_color="#E74C3C", annotation_text="Mínimo recomendado")
+        fig3.update_layout(height=300, title="Passos Diários (sincronizados pelo HealthSync)", plot_bgcolor="white", paper_bgcolor="white",
+            xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
+            yaxis=dict(showgrid=True, gridcolor="#eee", title="passos", automargin=True),
+            showlegend=False, margin=dict(l=50, r=160, t=50, b=60))
+        st.plotly_chart(fig3, use_container_width=True)
+    else:
+        st.info("Passos serão exibidos aqui após a primeira sincronização automática às 23h30.")
 
     st.markdown("**Registros:**")
-    for ex in sorted(exercises, key=lambda x: x["date"], reverse=True):
+    ex_filtered = [e for e in exercises if pd.Timestamp(e["date"]) >= cutoff]
+    for ex in sorted(ex_filtered, key=lambda x: x["date"], reverse=True):
         col_info, col_del = st.columns([11, 1])
         with col_info:
             dt_fmt = datetime.strptime(ex["date"], "%Y-%m-%d").strftime("%d/%m/%Y")

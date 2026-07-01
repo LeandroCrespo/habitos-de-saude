@@ -1202,7 +1202,7 @@
     },
     {
       "date": "2025-08-16",
-      "type": "Outro (0)",
+      "type": "Musculação",
       "duration_min": 13,
       "calories_burned": 74,
       "steps": 0,
@@ -1232,7 +1232,7 @@
     },
     {
       "date": "2025-09-09",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 4,
       "calories_burned": 33,
       "steps": 0,
@@ -1242,7 +1242,7 @@
     },
     {
       "date": "2025-09-11",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 30,
       "calories_burned": 253,
       "steps": 0,
@@ -1252,7 +1252,7 @@
     },
     {
       "date": "2025-09-17",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 30,
       "calories_burned": 238,
       "steps": 0,
@@ -1262,7 +1262,7 @@
     },
     {
       "date": "2025-09-24",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 30,
       "calories_burned": 197,
       "steps": 0,
@@ -1292,7 +1292,7 @@
     },
     {
       "date": "2025-10-08",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 30,
       "calories_burned": 218,
       "steps": 0,
@@ -1302,7 +1302,7 @@
     },
     {
       "date": "2025-10-08",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 27,
       "calories_burned": 206,
       "steps": 0,
@@ -1322,7 +1322,7 @@
     },
     {
       "date": "2025-10-20",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 30,
       "calories_burned": 218,
       "steps": 0,
@@ -1332,7 +1332,7 @@
     },
     {
       "date": "2025-10-20",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 30,
       "calories_burned": 204,
       "steps": 0,
@@ -1342,7 +1342,7 @@
     },
     {
       "date": "2025-10-23",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 30,
       "calories_burned": 213,
       "steps": 0,
@@ -1352,7 +1352,7 @@
     },
     {
       "date": "2025-10-29",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 27,
       "calories_burned": 182,
       "steps": 0,
@@ -1362,7 +1362,7 @@
     },
     {
       "date": "2025-10-29",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 30,
       "calories_burned": 211,
       "steps": 0,
@@ -1372,7 +1372,7 @@
     },
     {
       "date": "2025-10-30",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 27,
       "calories_burned": 196,
       "steps": 0,
@@ -1382,7 +1382,7 @@
     },
     {
       "date": "2025-10-30",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 6,
       "calories_burned": 44,
       "steps": 0,
@@ -1392,7 +1392,7 @@
     },
     {
       "date": "2025-11-11",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 0,
       "calories_burned": 1,
       "steps": 0,
@@ -1502,7 +1502,7 @@
     },
     {
       "date": "2026-04-21",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 29,
       "calories_burned": 218,
       "steps": 0,
@@ -1512,7 +1512,7 @@
     },
     {
       "date": "2026-04-23",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 34,
       "calories_burned": 249,
       "steps": 0,
@@ -1522,7 +1522,7 @@
     },
     {
       "date": "2026-04-30",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 24,
       "calories_burned": 155,
       "steps": 0,
@@ -1532,7 +1532,7 @@
     },
     {
       "date": "2026-05-02",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 32,
       "calories_burned": 220,
       "steps": 0,
@@ -1542,7 +1542,7 @@
     },
     {
       "date": "2026-05-02",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 31,
       "calories_burned": 234,
       "steps": 0,
@@ -1552,7 +1552,7 @@
     },
     {
       "date": "2026-05-04",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 40,
       "calories_burned": 288,
       "steps": 0,
@@ -1562,7 +1562,7 @@
     },
     {
       "date": "2026-05-04",
-      "type": "Outro (15003)",
+      "type": "Musculação",
       "duration_min": 5,
       "calories_burned": 36,
       "steps": 0,
@@ -1572,7 +1572,7 @@
     },
     {
       "date": "2026-05-07",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 36,
       "calories_burned": 261,
       "steps": 0,
@@ -1582,7 +1582,7 @@
     },
     {
       "date": "2026-05-07",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 30,
       "calories_burned": 216,
       "steps": 0,
@@ -1592,7 +1592,7 @@
     },
     {
       "date": "2026-05-09",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 21,
       "calories_burned": 149,
       "steps": 0,
@@ -1602,7 +1602,7 @@
     },
     {
       "date": "2026-05-13",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 31,
       "calories_burned": 237,
       "steps": 0,
@@ -1612,7 +1612,7 @@
     },
     {
       "date": "2026-05-13",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 10,
       "calories_burned": 68,
       "steps": 0,
@@ -1622,7 +1622,7 @@
     },
     {
       "date": "2026-05-15",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 40,
       "calories_burned": 291,
       "steps": 0,
@@ -1632,7 +1632,7 @@
     },
     {
       "date": "2026-05-15",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 17,
       "calories_burned": 115,
       "steps": 0,
@@ -1642,7 +1642,7 @@
     },
     {
       "date": "2026-05-19",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 50,
       "calories_burned": 362,
       "steps": 0,
@@ -1652,7 +1652,7 @@
     },
     {
       "date": "2026-05-19",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 15,
       "calories_burned": 102,
       "steps": 0,
@@ -1662,7 +1662,7 @@
     },
     {
       "date": "2026-05-21",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 39,
       "calories_burned": 272,
       "steps": 0,
@@ -1672,7 +1672,7 @@
     },
     {
       "date": "2026-05-21",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 18,
       "calories_burned": 121,
       "steps": 0,
@@ -1682,7 +1682,7 @@
     },
     {
       "date": "2026-05-23",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 45,
       "calories_burned": 333,
       "steps": 0,
@@ -1692,7 +1692,7 @@
     },
     {
       "date": "2026-05-23",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 11,
       "calories_burned": 80,
       "steps": 0,
@@ -1702,7 +1702,7 @@
     },
     {
       "date": "2026-05-26",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 34,
       "calories_burned": 244,
       "steps": 0,
@@ -1712,7 +1712,7 @@
     },
     {
       "date": "2026-05-26",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 13,
       "calories_burned": 92,
       "steps": 0,
@@ -1722,7 +1722,7 @@
     },
     {
       "date": "2026-05-28",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 34,
       "calories_burned": 247,
       "steps": 0,
@@ -1732,7 +1732,7 @@
     },
     {
       "date": "2026-05-28",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 12,
       "calories_burned": 90,
       "steps": 0,
@@ -1742,7 +1742,7 @@
     },
     {
       "date": "2026-05-30",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 37,
       "calories_burned": 270,
       "steps": 0,
@@ -1752,7 +1752,7 @@
     },
     {
       "date": "2026-05-30",
-      "type": "Outro (15003)",
+      "type": "Musculação",
       "duration_min": 10,
       "calories_burned": 78,
       "steps": 0,
@@ -1762,7 +1762,7 @@
     },
     {
       "date": "2026-06-02",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 38,
       "calories_burned": 277,
       "steps": 0,
@@ -1772,7 +1772,7 @@
     },
     {
       "date": "2026-06-02",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 15,
       "calories_burned": 110,
       "steps": 0,
@@ -1782,7 +1782,7 @@
     },
     {
       "date": "2026-06-05",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 35,
       "calories_burned": 256,
       "steps": 0,
@@ -1792,7 +1792,7 @@
     },
     {
       "date": "2026-06-05",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 12,
       "calories_burned": 95,
       "steps": 0,
@@ -1802,7 +1802,7 @@
     },
     {
       "date": "2026-06-09",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 33,
       "calories_burned": 227,
       "steps": 0,
@@ -1812,7 +1812,7 @@
     },
     {
       "date": "2026-06-09",
-      "type": "Outro (15003)",
+      "type": "Musculação",
       "duration_min": 10,
       "calories_burned": 72,
       "steps": 0,
@@ -1822,7 +1822,7 @@
     },
     {
       "date": "2026-06-11",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 42,
       "calories_burned": 283,
       "steps": 0,
@@ -1832,7 +1832,7 @@
     },
     {
       "date": "2026-06-11",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 10,
       "calories_burned": 79,
       "steps": 0,
@@ -1842,7 +1842,7 @@
     },
     {
       "date": "2026-06-13",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 22,
       "calories_burned": 166,
       "steps": 0,
@@ -1852,7 +1852,7 @@
     },
     {
       "date": "2026-06-13",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 10,
       "calories_burned": 75,
       "steps": 0,
@@ -1882,7 +1882,7 @@
     },
     {
       "date": "2026-06-29",
-      "type": "Outro (15002)",
+      "type": "Musculação",
       "duration_min": 24,
       "calories_burned": 181,
       "steps": 0,
@@ -1892,7 +1892,7 @@
     },
     {
       "date": "2026-06-29",
-      "type": "Outro (15005)",
+      "type": "Bicicleta",
       "duration_min": 11,
       "calories_burned": 87,
       "steps": 0,

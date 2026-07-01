@@ -60,6 +60,26 @@
       "extra_desc": "",
       "extra_kcal": 0.0,
       "obs": ""
+    },
+    {
+      "id": 4,
+      "date": "2026-07-01",
+      "time": "20:53:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Pão Francês",
+        "Requeijão light",
+        "Café sem açúcar",
+        "leite"
+      ],
+      "kcal_total": 215.0,
+      "prot_g": 8.8,
+      "carb_g": 32.5,
+      "fat_g": 3.0,
+      "extra_desc": "leite",
+      "extra_kcal": 50.0,
+      "obs": ""
     }
   ]
 }

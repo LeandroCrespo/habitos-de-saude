@@ -19,16 +19,6 @@
       "steps": 5100,
       "sleep_score": 82,
       "notes": "Costas e bíceps"
-    },
-    {
-      "id": 3,
-      "date": "2026-06-27",
-      "type": "Musculação",
-      "duration_min": 50,
-      "calories_burned": 300,
-      "steps": 3800,
-      "sleep_score": 75,
-      "notes": "Pernas"
     }
   ]
 }

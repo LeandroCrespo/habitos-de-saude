@@ -1,3 +1,14 @@
 {
-  "logs": []
+  "logs": [
+    {
+      "date": "2026-07-01",
+      "type": "Caminhada",
+      "duration_min": 0,
+      "calories_burned": 0,
+      "steps": 985,
+      "sleep_score": 0,
+      "notes": "Passos do dia: 985 (sem treino registrado)",
+      "id": 1
+    }
+  ]
 }

@@ -2140,6 +2140,17 @@
       "sleep_score": 0,
       "notes": "Registrado via HealthSync",
       "id": 214
+    },
+    {
+      "date": "2026-07-01",
+      "type": "Musculação",
+      "start_time": "18:38",
+      "duration_min": 30,
+      "calories_burned": 202,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Registrado via HealthSync",
+      "id": 215
     }
   ]
 }

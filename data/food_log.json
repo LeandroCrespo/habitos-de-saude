@@ -313,6 +313,300 @@
       "extra_desc": "",
       "extra_kcal": 0,
       "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 17,
+      "date": "2026-06-26",
+      "time": "07:00:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 380,
+      "prot_g": 17.9,
+      "carb_g": 55.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 18,
+      "date": "2026-06-26",
+      "time": "12:00:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz integral cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 19,
+      "date": "2026-06-26",
+      "time": "15:30:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Pão Francês",
+        "Ovo cozido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 365,
+      "prot_g": 17.4,
+      "carb_g": 51.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 20,
+      "date": "2026-06-26",
+      "time": "19:00:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz integral cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 21,
+      "date": "2026-06-26",
+      "time": "21:00:00",
+      "meal_id": "cha",
+      "meal_name": "Hora do Chá",
+      "foods": [
+        "Chá de manjericão com limão"
+      ],
+      "kcal_total": 5,
+      "prot_g": 0.0,
+      "carb_g": 1.0,
+      "fat_g": 0.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 22,
+      "date": "2026-06-27",
+      "time": "07:00:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 380,
+      "prot_g": 17.9,
+      "carb_g": 55.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 23,
+      "date": "2026-06-27",
+      "time": "12:00:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz integral cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 24,
+      "date": "2026-06-27",
+      "time": "15:30:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Pão Francês",
+        "Ovo cozido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 365,
+      "prot_g": 17.4,
+      "carb_g": 51.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 25,
+      "date": "2026-06-27",
+      "time": "19:00:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz integral cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 26,
+      "date": "2026-06-27",
+      "time": "21:00:00",
+      "meal_id": "cha",
+      "meal_name": "Hora do Chá",
+      "foods": [
+        "Chá de manjericão com limão"
+      ],
+      "kcal_total": 5,
+      "prot_g": 0.0,
+      "carb_g": 1.0,
+      "fat_g": 0.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 27,
+      "date": "2026-06-28",
+      "time": "07:00:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 380,
+      "prot_g": 17.9,
+      "carb_g": 55.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 28,
+      "date": "2026-06-28",
+      "time": "12:00:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz integral cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 29,
+      "date": "2026-06-28",
+      "time": "15:30:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Pão Francês",
+        "Ovo cozido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 365,
+      "prot_g": 17.4,
+      "carb_g": 51.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 30,
+      "date": "2026-06-28",
+      "time": "19:00:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz integral cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 31,
+      "date": "2026-06-28",
+      "time": "21:00:00",
+      "meal_id": "cha",
+      "meal_name": "Hora do Chá",
+      "foods": [
+        "Chá de manjericão com limão"
+      ],
+      "kcal_total": 5,
+      "prot_g": 0.0,
+      "carb_g": 1.0,
+      "fat_g": 0.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrao inserido retroativamente"
     }
   ]
 }

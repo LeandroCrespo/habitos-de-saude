@@ -146,45 +146,96 @@ def _tdee_para_dia(date_str, exercises_list, tmb_val):
     dur   = sum(e.get("duration_min", 0) for e in ex)
     return calc_tdee(tmb_val, steps, dur)
 
-# ── Resumo da semana ──────────────────────────────────────────────────────────
-st.markdown("<div class='section-header'>📊 Resumo da Semana (últimos 7 dias)</div>", unsafe_allow_html=True)
+# ── Resumo calórico ────────────────────────────────────────────────────────────
+st.markdown("<div class='section-header'>📊 Resumo Calórico</div>", unsafe_allow_html=True)
 
 _hoje_dt  = datetime.now(BRASILIA).date()
 _DIAS_PT  = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
+_MESES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+              "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"]
+
+# Todas as datas com registro (+ hoje)
+_all_log_dates = sorted({
+    datetime.strptime(l["date"], "%Y-%m-%d").date()
+    for l in food_logs if l.get("date")
+} | {_hoje_dt})
+
+# ── Filtro de período
+_per_tipo = st.radio(
+    "Filtrar por:", ["Semana", "Mês", "Ano", "Tudo"],
+    horizontal=True, index=0, key="per_tipo_res"
+)
+
+if _per_tipo == "Semana":
+    _seg_dates  = sorted({d - timedelta(days=d.weekday()) for d in _all_log_dates}, reverse=True)
+    _seg_atual  = _hoje_dt - timedelta(days=_hoje_dt.weekday())
+    _seg_labels = [
+        f"Semana de {s.strftime('%d/%m')} a {(s + timedelta(days=6)).strftime('%d/%m/%Y')}"
+        for s in _seg_dates
+    ]
+    _def_idx = next((i for i, s in enumerate(_seg_dates) if s == _seg_atual), 0)
+    _seg_lbl  = st.selectbox("Semana:", _seg_labels, index=_def_idx, key="sem_sel_res")
+    _seg_sel  = _seg_dates[_seg_labels.index(_seg_lbl)]
+    _dias_filtro   = [_seg_sel + timedelta(days=i) for i in range(7)]
+    _periodo_label = _seg_lbl
+
+elif _per_tipo == "Mês":
+    _meses      = sorted({(d.year, d.month) for d in _all_log_dates}, reverse=True)
+    _mes_labels = [f"{_MESES_PT[m-1]} {y}" for y, m in _meses]
+    _def_idx    = next((i for i,(y,m) in enumerate(_meses) if (y,m)==(_hoje_dt.year,_hoje_dt.month)), 0)
+    _mes_lbl    = st.selectbox("Mês:", _mes_labels, index=_def_idx, key="mes_sel_res")
+    _yr, _mo    = _meses[_mes_labels.index(_mes_lbl)]
+    _prox_mes   = date(_yr + (_mo // 12), (_mo % 12) + 1, 1)
+    _ult_dia    = (_prox_mes - timedelta(days=1)).day
+    _dias_filtro   = [date(_yr, _mo, d) for d in range(1, _ult_dia + 1)]
+    _periodo_label = _mes_lbl
+
+elif _per_tipo == "Ano":
+    _anos       = sorted({d.year for d in _all_log_dates}, reverse=True)
+    _ano_labels = [str(y) for y in _anos]
+    _def_idx    = next((i for i, y in enumerate(_anos) if y == _hoje_dt.year), 0)
+    _ano_lbl    = st.selectbox("Ano:", _ano_labels, index=_def_idx, key="ano_sel_res")
+    _ano_sel    = _anos[_ano_labels.index(_ano_lbl)]
+    _dias_filtro   = [d for d in _all_log_dates if d.year == _ano_sel]
+    _periodo_label = _ano_lbl
+
+else:  # Tudo
+    _dias_filtro   = list(_all_log_dates)
+    _periodo_label = "Histórico completo"
+
+# ── Monta linhas da tabela
 _sem_rows = []
-for _i in range(6, -1, -1):
-    _d     = _hoje_dt - timedelta(days=_i)
+for _d in sorted(_dias_filtro):
     _d_str = str(_d)
     _ls    = [l for l in food_logs if l.get("date") == _d_str]
     _cons  = sum(l.get("kcal_total", 0) for l in _ls)
     _td    = _tdee_para_dia(_d_str, exercises, tmb)
     _def   = int(_td - _cons) if _cons > 0 else None
     _sem_rows.append({
-        "Dia":          f"{_DIAS_PT[_d.weekday()]} {_d.strftime('%d/%m')}",
-        "Consumido":    int(_cons) if _cons > 0 else "—",
-        "TDEE est.":    _td,
-        "Déficit":      _def if _def is not None else "—",
-        "✔":            "✅" if isinstance(_def, int) and _def >= 0 else ("⚠️" if isinstance(_def, int) else "—"),
+        "Dia":       f"{_DIAS_PT[_d.weekday()]} {_d.strftime('%d/%m')}",
+        "Consumido": int(_cons) if _cons > 0 else "—",
+        "TDEE est.": _td,
+        "Déficit":   _def if _def is not None else "—",
+        "✔":         "✅" if isinstance(_def, int) and _def >= 0 else ("⚠️" if isinstance(_def, int) else "—"),
     })
 
-_com_reg  = [r for r in _sem_rows if isinstance(r["Déficit"], int)]
-_def_tot  = sum(r["Déficit"] for r in _com_reg)
-_kg_est   = _def_tot / 7700
+_com_reg = [r for r in _sem_rows if isinstance(r["Déficit"], int)]
+_def_tot = sum(r["Déficit"] for r in _com_reg)
+_kg_est  = _def_tot / 7700
 
 _sw1, _sw2, _sw3 = st.columns(3)
 _bg_d = "#f0fff4" if _def_tot >= 0 else "#fff5f5"
 _c_d  = "#27AE60" if _def_tot >= 0 else "#E74C3C"
 with _sw1:
-    _lbl_wk = "Déficit semanal" if _def_tot >= 0 else "Superávit semanal"
+    _lbl_tipo = "Déficit" if _def_tot >= 0 else "Superávit"
     st.markdown(f"""<div style='text-align:center;background:{_bg_d};border-radius:10px;padding:14px'>
-        <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>{_lbl_wk}</div>
+        <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>{_lbl_tipo} — {_periodo_label}</div>
         <div style='font-size:26px;font-weight:700;color:{_c_d}'>{abs(_def_tot):,}</div>
         <div style='font-size:12px;color:#888'>kcal — {len(_com_reg)} dias com registro</div></div>""",
         unsafe_allow_html=True)
 with _sw2:
     _med_d = int(_def_tot / len(_com_reg)) if _com_reg else 0
-    _bg_m  = "#fffbf0"
-    st.markdown(f"""<div style='text-align:center;background:{_bg_m};border-radius:10px;padding:14px'>
+    st.markdown(f"""<div style='text-align:center;background:#fffbf0;border-radius:10px;padding:14px'>
         <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Média diária</div>
         <div style='font-size:26px;font-weight:700;color:#E67E22'>{_med_d:,}</div>
         <div style='font-size:12px;color:#888'>kcal de déficit/dia</div></div>""",

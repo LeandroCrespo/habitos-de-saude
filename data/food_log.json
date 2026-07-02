@@ -648,6 +648,27 @@
       "extra_desc": "",
       "extra_kcal": 0.0,
       "obs": ""
+    },
+    {
+      "id": 34,
+      "date": "2026-07-02",
+      "time": "23:53:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Sobrecoxa de frango assada",
+        "Arroz integral cozido",
+        "Feijão carioca cozido",
+        "Maçã"
+      ],
+      "kcal_total": 515.0,
+      "prot_g": 34.3,
+      "carb_g": 70.0,
+      "fat_g": 11.2,
+      "extra_desc": "",
+      "extra_kcal": 0.0,
+      "obs": ""
     }
   ]
 }

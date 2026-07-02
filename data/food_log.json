@@ -627,6 +627,27 @@
       "extra_desc": "",
       "extra_kcal": 0.0,
       "obs": ""
+    },
+    {
+      "id": 33,
+      "date": "2026-07-02",
+      "time": "20:09:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Maçã",
+        "Pão Francês",
+        "Requeijão light",
+        "Café sem açúcar",
+        "Iogurte natural desnatado"
+      ],
+      "kcal_total": 315.0,
+      "prot_g": 16.1,
+      "carb_g": 55.0,
+      "fat_g": 3.7,
+      "extra_desc": "",
+      "extra_kcal": 0.0,
+      "obs": ""
     }
   ]
 }

@@ -44,6 +44,7 @@ today_str = datetime.now(BRASILIA).strftime("%Y-%m-%d")
 # ── Session state ──────────────────────────────────────────────────────────────
 if "diet_form_key"   not in st.session_state: st.session_state.diet_form_key   = 0
 if "editing_log_id"  not in st.session_state: st.session_state.editing_log_id  = None
+if "reg_target_date" not in st.session_state: st.session_state.reg_target_date = None
 
 # ── Balanço calórico hoje ──────────────────────────────────────────────────────
 st.markdown("<div class='section-header'>⚖️ Balanço Calórico de Hoje</div>", unsafe_allow_html=True)
@@ -422,6 +423,11 @@ with st.expander("📅 Ver ou editar um dia anterior", expanded=False):
     _dia_str = str(_dia_sel)
     _logs_h  = [l for l in food_logs if l.get("date") == _dia_str]
 
+    if st.button("➕ Registrar nova refeição neste dia", key="btn_reg_dia_ant"):
+        st.session_state.reg_target_date = _dia_str
+        st.session_state.diet_form_key  += 1
+        st.rerun()
+
     if not _logs_h:
         st.info(f"Nenhuma refeição registrada em {_dia_sel.strftime('%d/%m/%Y')}.")
     else:
@@ -470,7 +476,17 @@ with st.expander("📅 Ver ou editar um dia anterior", expanded=False):
                     st.rerun()
 
 # ── Registrar nova refeição ────────────────────────────────────────────────────
-st.markdown("<div class='section-header'>🍽️ Registrar o que comi</div>", unsafe_allow_html=True)
+_reg_date_default = datetime.now(BRASILIA).date()
+if st.session_state.reg_target_date:
+    try:
+        _reg_date_default = datetime.strptime(st.session_state.reg_target_date, "%Y-%m-%d").date()
+    except Exception:
+        pass
+
+_reg_label = f"🍽️ Registrar o que comi" + (
+    f" — {_reg_date_default.strftime('%d/%m/%Y')}" if _reg_date_default != datetime.now(BRASILIA).date() else ""
+)
+st.markdown(f"<div class='section-header'>{_reg_label}</div>", unsafe_allow_html=True)
 
 meal_id  = st.selectbox("Refeição:", list(meals_options.keys()), format_func=lambda x: meals_options[x])
 sel_meal = meals_by_id.get(meal_id, {})
@@ -542,7 +558,7 @@ with st.form(f"log_{fk}", clear_on_submit=True):
         )
 
     with col_b:
-        data_ref = st.date_input("Data:", value=datetime.now(BRASILIA).date())
+        data_ref = st.date_input("Data:", value=_reg_date_default)
         hora_ref = st.time_input("Hora:")
         obs_ref  = st.text_input("Observações:")
 
@@ -604,7 +620,8 @@ if submitted_log:
     }
     food_logs.append(new_log)
     save_food_log(food_logs)
-    st.session_state.diet_form_key += 1
+    st.session_state.diet_form_key  += 1
+    st.session_state.reg_target_date = None
     st.success(f"✅ {sel_meal.get('name', '')} registrado: {total_kcal:.0f} kcal")
     st.rerun()
 

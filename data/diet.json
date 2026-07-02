@@ -161,6 +161,22 @@
             {"item": "Grão-de-bico cozido", "qty": "1 col. sopa (30g)", "kcal": 50, "prot_g": 2.5, "carb_g": 8.0, "fat_g": 1.0},
             {"item": "Ervilha cozida", "qty": "2 col. sopa (60g)", "kcal": 50, "prot_g": 3.5, "carb_g": 9.0, "fat_g": 0.2}
           ]
+        },
+        {
+          "id": "fruta",
+          "name": "Fruta",
+          "emoji": "🍎",
+          "instruction": "1 porção (opcional)",
+          "items": [
+            {"item": "Banana", "qty": "1 unidade média", "kcal": 90, "prot_g": 1.1, "carb_g": 23, "fat_g": 0.3},
+            {"item": "Maçã", "qty": "1 unidade pequena", "kcal": 55, "prot_g": 0.3, "carb_g": 14, "fat_g": 0.2},
+            {"item": "Mamão papaia", "qty": "½ unidade", "kcal": 45, "prot_g": 0.6, "carb_g": 11, "fat_g": 0.1},
+            {"item": "Melão", "qty": "1 fatia", "kcal": 30, "prot_g": 0.5, "carb_g": 7, "fat_g": 0.1},
+            {"item": "Abacaxi", "qty": "1 fatia", "kcal": 45, "prot_g": 0.4, "carb_g": 11, "fat_g": 0.1},
+            {"item": "Morango", "qty": "1 xícara", "kcal": 50, "prot_g": 1.0, "carb_g": 12, "fat_g": 0.5},
+            {"item": "Ameixa vermelha", "qty": "2 unidades", "kcal": 35, "prot_g": 0.5, "carb_g": 9, "fat_g": 0.1},
+            {"item": "Pêra", "qty": "1 unidade pequena", "kcal": 60, "prot_g": 0.4, "carb_g": 15, "fat_g": 0.1}
+          ]
         }
       ],
       "preparations": []
@@ -322,6 +338,22 @@
             {"item": "Lentilha cozida", "qty": "2 col. sopa (60g)", "kcal": 70, "prot_g": 5.0, "carb_g": 12.0, "fat_g": 0.3},
             {"item": "Grão-de-bico cozido", "qty": "1 col. sopa (30g)", "kcal": 50, "prot_g": 2.5, "carb_g": 8.0, "fat_g": 1.0},
             {"item": "Ervilha cozida", "qty": "2 col. sopa (60g)", "kcal": 50, "prot_g": 3.5, "carb_g": 9.0, "fat_g": 0.2}
+          ]
+        },
+        {
+          "id": "fruta",
+          "name": "Fruta",
+          "emoji": "🍎",
+          "instruction": "1 porção (opcional)",
+          "items": [
+            {"item": "Banana", "qty": "1 unidade média", "kcal": 90, "prot_g": 1.1, "carb_g": 23, "fat_g": 0.3},
+            {"item": "Maçã", "qty": "1 unidade pequena", "kcal": 55, "prot_g": 0.3, "carb_g": 14, "fat_g": 0.2},
+            {"item": "Mamão papaia", "qty": "½ unidade", "kcal": 45, "prot_g": 0.6, "carb_g": 11, "fat_g": 0.1},
+            {"item": "Melão", "qty": "1 fatia", "kcal": 30, "prot_g": 0.5, "carb_g": 7, "fat_g": 0.1},
+            {"item": "Abacaxi", "qty": "1 fatia", "kcal": 45, "prot_g": 0.4, "carb_g": 11, "fat_g": 0.1},
+            {"item": "Morango", "qty": "1 xícara", "kcal": 50, "prot_g": 1.0, "carb_g": 12, "fat_g": 0.5},
+            {"item": "Ameixa vermelha", "qty": "2 unidades", "kcal": 35, "prot_g": 0.5, "carb_g": 9, "fat_g": 0.1},
+            {"item": "Pêra", "qty": "1 unidade pequena", "kcal": 60, "prot_g": 0.4, "carb_g": 15, "fat_g": 0.1}
           ]
         }
       ],

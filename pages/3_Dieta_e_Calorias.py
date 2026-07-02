@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from datetime import date, datetime, time as dt_time
+from datetime import date, datetime, time as dt_time, timezone, timedelta
 import json
 import sys
 from pathlib import Path
@@ -38,7 +38,8 @@ food_logs = load_food_log()
 bio_list  = load_bioimpedance()
 exercises = load_exercises()
 
-today_str = str(date.today())
+BRASILIA  = timezone(timedelta(hours=-3))
+today_str = datetime.now(BRASILIA).strftime("%Y-%m-%d")
 
 # ── Session state ──────────────────────────────────────────────────────────────
 if "diet_form_key"   not in st.session_state: st.session_state.diet_form_key   = 0
@@ -137,6 +138,66 @@ def _parse_time(t_str):
         return dt_time(int(parts[0]), int(parts[1]), int(parts[2]) if len(parts) > 2 else 0)
     except Exception:
         return dt_time(12, 0)
+
+def _tdee_para_dia(date_str, exercises_list, tmb_val):
+    ex = [e for e in exercises_list if e.get("date") == date_str]
+    steps = max((e.get("steps", 0) for e in ex), default=0) if ex else 3000
+    dur   = sum(e.get("duration_min", 0) for e in ex)
+    return calc_tdee(tmb_val, steps, dur)
+
+# ── Resumo da semana ──────────────────────────────────────────────────────────
+st.markdown("<div class='section-header'>📊 Resumo da Semana (últimos 7 dias)</div>", unsafe_allow_html=True)
+
+_hoje_dt  = datetime.now(BRASILIA).date()
+_DIAS_PT  = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
+_sem_rows = []
+for _i in range(6, -1, -1):
+    _d     = _hoje_dt - timedelta(days=_i)
+    _d_str = str(_d)
+    _ls    = [l for l in food_logs if l.get("date") == _d_str]
+    _cons  = sum(l.get("kcal_total", 0) for l in _ls)
+    _td    = _tdee_para_dia(_d_str, exercises, tmb)
+    _def   = int(_td - _cons) if _cons > 0 else None
+    _sem_rows.append({
+        "Dia":          f"{_DIAS_PT[_d.weekday()]} {_d.strftime('%d/%m')}",
+        "Consumido":    int(_cons) if _cons > 0 else "—",
+        "TDEE est.":    _td,
+        "Déficit":      _def if _def is not None else "—",
+        "✔":            "✅" if isinstance(_def, int) and _def >= 0 else ("⚠️" if isinstance(_def, int) else "—"),
+    })
+
+_com_reg  = [r for r in _sem_rows if isinstance(r["Déficit"], int)]
+_def_tot  = sum(r["Déficit"] for r in _com_reg)
+_kg_est   = _def_tot / 7700
+
+_sw1, _sw2, _sw3 = st.columns(3)
+_bg_d = "#f0fff4" if _def_tot >= 0 else "#fff5f5"
+_c_d  = "#27AE60" if _def_tot >= 0 else "#E74C3C"
+with _sw1:
+    _lbl_wk = "Déficit semanal" if _def_tot >= 0 else "Superávit semanal"
+    st.markdown(f"""<div style='text-align:center;background:{_bg_d};border-radius:10px;padding:14px'>
+        <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>{_lbl_wk}</div>
+        <div style='font-size:26px;font-weight:700;color:{_c_d}'>{abs(_def_tot):,}</div>
+        <div style='font-size:12px;color:#888'>kcal — {len(_com_reg)} dias com registro</div></div>""",
+        unsafe_allow_html=True)
+with _sw2:
+    _med_d = int(_def_tot / len(_com_reg)) if _com_reg else 0
+    _bg_m  = "#fffbf0"
+    st.markdown(f"""<div style='text-align:center;background:{_bg_m};border-radius:10px;padding:14px'>
+        <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Média diária</div>
+        <div style='font-size:26px;font-weight:700;color:#E67E22'>{_med_d:,}</div>
+        <div style='font-size:12px;color:#888'>kcal de déficit/dia</div></div>""",
+        unsafe_allow_html=True)
+with _sw3:
+    _bg_kg = "#f0fff4" if _kg_est > 0 else "#fff5f5"
+    _c_kg  = "#27AE60" if _kg_est > 0 else "#E74C3C"
+    st.markdown(f"""<div style='text-align:center;background:{_bg_kg};border-radius:10px;padding:14px'>
+        <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Perda estimada</div>
+        <div style='font-size:26px;font-weight:700;color:{_c_kg}'>{abs(_kg_est):.3f}</div>
+        <div style='font-size:12px;color:#888'>kg (7.700 kcal = 1 kg)</div></div>""",
+        unsafe_allow_html=True)
+
+st.dataframe(pd.DataFrame(_sem_rows), use_container_width=True, hide_index=True)
 
 # ── Refeições de Hoje ──────────────────────────────────────────────────────────
 if today_logs:
@@ -354,6 +415,60 @@ if editing_log:
         st.success("✅ Refeição atualizada!")
         st.rerun()
 
+# ── Ver / Editar dia fechado ───────────────────────────────────────────────────
+with st.expander("📅 Ver ou editar um dia anterior", expanded=False):
+    _dia_max = datetime.now(BRASILIA).date() - timedelta(days=1)
+    _dia_sel = st.date_input("Dia:", value=_dia_max, max_value=_dia_max, key="hist_dia_sel")
+    _dia_str = str(_dia_sel)
+    _logs_h  = [l for l in food_logs if l.get("date") == _dia_str]
+
+    if not _logs_h:
+        st.info(f"Nenhuma refeição registrada em {_dia_sel.strftime('%d/%m/%Y')}.")
+    else:
+        _cons_h = sum(l.get("kcal_total", 0) for l in _logs_h)
+        _tdee_h = _tdee_para_dia(_dia_str, exercises, tmb)
+        _def_h  = int(_tdee_h - _cons_h)
+
+        _hc1, _hc2, _hc3 = st.columns(3)
+        with _hc1:
+            st.metric("Consumido", f"{int(_cons_h):,} kcal")
+        with _hc2:
+            st.metric("TDEE estimado", f"{_tdee_h:,} kcal")
+        with _hc3:
+            _lbl_h = "Déficit" if _def_h >= 0 else "Superávit"
+            _delta_h = "✅ dentro do plano" if _def_h >= 0 else "⚠️ acima do gasto"
+            _dc_h = "normal" if _def_h >= 0 else "inverse"
+            st.metric(_lbl_h, f"{abs(_def_h):,} kcal", delta=_delta_h, delta_color=_dc_h)
+
+        for _log_h in sorted(_logs_h, key=lambda x: x.get("time", "")):
+            _hr  = str(_log_h.get("time", ""))
+            _hrf = _hr[:-3] if _hr.endswith(":00") and len(_hr) > 5 else _hr
+            _obs_h_txt = f"<br><span style='font-size:12px;color:#999'>{_log_h['obs']}</span>" if _log_h.get("obs") else ""
+            _card_h = (
+                "<div style='background:#f0f4ff;border:1px solid #c5d5f5;"
+                "border-radius:10px;padding:12px;margin:2px 0'>"
+                f"<b>🍽️ {_log_h['meal_name']}</b> · {_hrf}<br>"
+                f"<span style='color:#E74C3C;font-weight:700'>{_log_h['kcal_total']:.0f} kcal</span> · "
+                f"P:{_log_h.get('prot_g',0)}g · C:{_log_h.get('carb_g',0)}g · G:{_log_h.get('fat_g',0)}g<br>"
+                f"<span style='font-size:12px;color:#555'>{', '.join(_log_h.get('foods', []))}</span>"
+                + _obs_h_txt + "</div>"
+            )
+            _cc_h, _ce_h, _cd_h = st.columns([10, 1, 1])
+            with _cc_h:
+                st.markdown(_card_h, unsafe_allow_html=True)
+            with _ce_h:
+                if st.button("✏️", key=f"hedit_{_log_h['id']}", help="Editar"):
+                    st.session_state.editing_log_id = _log_h["id"]
+                    st.session_state.diet_form_key += 1
+                    st.rerun()
+            with _cd_h:
+                if st.button("🗑️", key=f"hdel_{_log_h['id']}", help="Excluir"):
+                    food_logs[:] = [l for l in food_logs if l.get("id") != _log_h["id"]]
+                    save_food_log(food_logs)
+                    if st.session_state.editing_log_id == _log_h["id"]:
+                        st.session_state.editing_log_id = None
+                    st.rerun()
+
 # ── Registrar nova refeição ────────────────────────────────────────────────────
 st.markdown("<div class='section-header'>🍽️ Registrar o que comi</div>", unsafe_allow_html=True)
 
@@ -427,7 +542,7 @@ with st.form(f"log_{fk}", clear_on_submit=True):
         )
 
     with col_b:
-        data_ref = st.date_input("Data:", value=date.today())
+        data_ref = st.date_input("Data:", value=datetime.now(BRASILIA).date())
         hora_ref = st.time_input("Hora:")
         obs_ref  = st.text_input("Observações:")
 

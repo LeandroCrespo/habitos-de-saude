@@ -1,16 +1,6 @@
 {
   "logs": [
     {
-      "date": "2026-07-01",
-      "type": "Caminhada",
-      "duration_min": 0,
-      "calories_burned": 0,
-      "steps": 985,
-      "sleep_score": 88,
-      "notes": "Passos do dia: 985 (sem treino registrado)",
-      "id": 1
-    },
-    {
       "date": "2020-01-18",
       "type": "Caminhada",
       "duration_min": 16,

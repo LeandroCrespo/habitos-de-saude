@@ -607,6 +607,26 @@
       "extra_desc": "",
       "extra_kcal": 0,
       "obs": "Padrao inserido retroativamente"
+    },
+    {
+      "id": 32,
+      "date": "2026-07-02",
+      "time": "20:09:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Sobrecoxa de frango assada",
+        "Arroz integral cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 460.0,
+      "prot_g": 34.0,
+      "carb_g": 56.0,
+      "fat_g": 11.0,
+      "extra_desc": "",
+      "extra_kcal": 0.0,
+      "obs": ""
     }
   ]
 }

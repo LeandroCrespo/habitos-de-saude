@@ -2163,6 +2163,17 @@
       "sleep_score": 0,
       "notes": "Passos do dia: 4054",
       "id": 217
+    },
+    {
+      "id": 218,
+      "date": "2026-07-02",
+      "type": "Caminhada",
+      "duration_min": 20,
+      "calories_burned": 97,
+      "distance_km": 1.42,
+      "steps": 1854,
+      "sleep_score": 75,
+      "notes": ""
     }
   ]
 }

@@ -854,7 +854,7 @@
     },
     {
       "id": 44,
-      "date": "2026-07-07",
+      "date": "2026-07-06",
       "time": "12:00:00",
       "meal_id": "jantar",
       "meal_name": "Jantar",
@@ -862,12 +862,13 @@
         "Salada / legumes variados",
         "Carne moída magra",
         "Arroz branco cozido",
-        "Feijão carioca cozido"
+        "Feijão carioca cozido",
+        "Maçã"
       ],
-      "kcal_total": 470.0,
-      "prot_g": 37.0,
-      "carb_g": 53.0,
-      "fat_g": 11.3,
+      "kcal_total": 525.0,
+      "prot_g": 37.3,
+      "carb_g": 67.0,
+      "fat_g": 11.5,
       "extra_desc": "",
       "extra_kcal": 0.0,
       "obs": ""

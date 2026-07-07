@@ -831,6 +831,26 @@
       "extra_desc": "",
       "extra_kcal": 0.0,
       "obs": ""
+    },
+    {
+      "id": 43,
+      "date": "2026-07-06",
+      "time": "11:59:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Carne bovina magra grelhada",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 440.0,
+      "prot_g": 35.0,
+      "carb_g": 53.0,
+      "fat_g": 9.3,
+      "extra_desc": "",
+      "extra_kcal": 0.0,
+      "obs": ""
     }
   ]
 }

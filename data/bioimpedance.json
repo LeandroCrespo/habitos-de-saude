@@ -372,6 +372,25 @@
           "musculo_kg": 11.3
         }
       }
+    },
+    {
+      "id": 20,
+      "date": "2026-07-07",
+      "peso_kg": 93.7,
+      "imc": 28.2,
+      "percentual_gordura": 30.1,
+      "massa_gordura_kg": 28.2,
+      "massa_magra_kg": 65.5,
+      "musculo_esqueletico_kg": 36.1,
+      "percentual_musculo": 66.3,
+      "percentual_agua": 49.8,
+      "massa_ossea_kg": 3.3,
+      "tmb_kcal": 1739,
+      "gordura_visceral": 14,
+      "idade_corporal": 47,
+      "percentual_proteina": 13.4,
+      "device": "Smartwatch AiLink",
+      "notes": ""
     }
   ]
 }

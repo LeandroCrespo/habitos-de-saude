@@ -2228,6 +2228,16 @@
       "sleep_score": 0,
       "notes": "Passos do dia: 667",
       "id": 223
+    },
+    {
+      "date": "2026-07-08",
+      "type": "Caminhada",
+      "duration_min": 0,
+      "calories_burned": 0,
+      "steps": 307,
+      "sleep_score": 0,
+      "notes": "Passos do dia: 307",
+      "id": 224
     }
   ]
 }

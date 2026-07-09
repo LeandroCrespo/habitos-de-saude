@@ -934,6 +934,26 @@
       "extra_desc": "",
       "extra_kcal": 0.0,
       "obs": ""
+    },
+    {
+      "id": 48,
+      "date": "2026-07-08",
+      "time": "20:47:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Pão Francês",
+        "Ovo cozido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 365.0,
+      "prot_g": 17.4,
+      "carb_g": 51.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0.0,
+      "obs": ""
     }
   ]
 }

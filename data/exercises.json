@@ -2256,7 +2256,7 @@
       "type": "Musculação",
       "duration_min": 30,
       "calories_burned": 0,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": "Triceps e Peito"
@@ -2278,10 +2278,20 @@
       "type": "Musculação",
       "duration_min": 44,
       "calories_burned": 298,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 83,
       "notes": "Costas e biceps"
+    },
+    {
+      "date": "2026-07-09",
+      "type": "Caminhada",
+      "duration_min": 0,
+      "calories_burned": 0,
+      "steps": 3940,
+      "sleep_score": 0,
+      "notes": "Passos do dia: 3940",
+      "id": 229
     }
   ]
 }

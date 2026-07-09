@@ -2282,6 +2282,17 @@
       "steps": 0,
       "sleep_score": 83,
       "notes": "Costas e biceps"
+    },
+    {
+      "id": 229,
+      "date": "2026-07-09",
+      "type": "Caminhada",
+      "duration_min": 78,
+      "calories_burned": 298,
+      "distance_km": 2.78,
+      "steps": 3691,
+      "sleep_score": 81,
+      "notes": ""
     }
   ]
 }

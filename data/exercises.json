@@ -2271,6 +2271,17 @@
       "steps": 0,
       "sleep_score": 75,
       "notes": "1813"
+    },
+    {
+      "id": 228,
+      "date": "2026-07-09",
+      "type": "Musculação",
+      "duration_min": 44,
+      "calories_burned": 298,
+      "distance_km": 0.0,
+      "steps": 0,
+      "sleep_score": 83,
+      "notes": "Costas e biceps"
     }
   ]
 }

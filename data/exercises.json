@@ -2260,6 +2260,17 @@
       "steps": 0,
       "sleep_score": 75,
       "notes": "Triceps e Peito"
+    },
+    {
+      "id": 227,
+      "date": "2026-07-08",
+      "type": "Caminhada",
+      "duration_min": 19,
+      "calories_burned": 96,
+      "distance_km": 1.4,
+      "steps": 0,
+      "sleep_score": 75,
+      "notes": "1813"
     }
   ]
 }

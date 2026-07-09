@@ -1014,6 +1014,26 @@
       "extra_desc": "",
       "extra_kcal": 0.0,
       "obs": ""
+    },
+    {
+      "id": 52,
+      "date": "2026-07-07",
+      "time": "20:49:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz integral cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485.0,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0.0,
+      "obs": ""
     }
   ]
 }

@@ -1115,6 +1115,27 @@
       "extra_desc": "",
       "extra_kcal": 0.0,
       "obs": ""
+    },
+    {
+      "id": 57,
+      "date": "2026-07-10",
+      "time": "17:28:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 380.0,
+      "prot_g": 17.9,
+      "carb_g": 55.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0.0,
+      "obs": ""
     }
   ]
 }

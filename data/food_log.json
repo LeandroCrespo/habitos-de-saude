@@ -1094,6 +1094,27 @@
       "extra_desc": "",
       "extra_kcal": 0.0,
       "obs": ""
+    },
+    {
+      "id": 56,
+      "date": "2026-07-09",
+      "time": "17:27:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Carne bovina magra grelhada",
+        "Arroz branco cozido",
+        "Feijão carioca cozido",
+        "Maçã"
+      ],
+      "kcal_total": 495.0,
+      "prot_g": 35.3,
+      "carb_g": 67.0,
+      "fat_g": 9.5,
+      "extra_desc": "",
+      "extra_kcal": 0.0,
+      "obs": ""
     }
   ]
 }

@@ -211,7 +211,7 @@ if uploaded_zip is not None:
                     st.success(f"**{len(novos)} sessão(ões) nova(s)** prontas para importar:")
                     df_show = novos[["data_br", "type", "duration_min", "calories_burned", "steps", "heart_rate"]].copy()
                     df_show.columns = ["Data", "Tipo", "Duração (min)", "Calorias", "Passos", "FC média (bpm)"]
-                    st.dataframe(df_show, use_container_width=True, hide_index=True)
+                    st.dataframe(df_show, width='stretch', hide_index=True)
 
                     if st.button("💾 Importar sessões de exercício", type="primary", key="btn_import_ex"):
                         next_id = max([e.get("id", 0) for e in exercises], default=0)
@@ -237,7 +237,7 @@ if uploaded_zip is not None:
                     with st.expander(f"⚠️ {len(duplicados)} registro(s) já existente(s) — clique para ver"):
                         df_dup = duplicados[["data_br", "type", "duration_min", "calories_burned"]].copy()
                         df_dup.columns = ["Data", "Tipo", "Duração (min)", "Calorias"]
-                        st.dataframe(df_dup, use_container_width=True, hide_index=True)
+                        st.dataframe(df_dup, width='stretch', hide_index=True)
             else:
                 st.info("Nenhuma sessão de exercício encontrada no arquivo.")
 
@@ -252,7 +252,7 @@ if uploaded_zip is not None:
                 )
                 df_st_show = df_st_imp[["data_br", "steps", "calories"]].copy()
                 df_st_show.columns = ["Data", "Passos", "Calorias estimadas"]
-                st.dataframe(df_st_show, use_container_width=True, hide_index=True)
+                st.dataframe(df_st_show, width='stretch', hide_index=True)
             else:
                 st.info("Nenhum dado de passos encontrado no arquivo.")
 
@@ -345,7 +345,7 @@ if sw_submit:
         title={"text": "Passos (meta: 7.000)"},
     ))
     fig_gauge.update_layout(height=280, margin=dict(l=20, r=20, t=60, b=20))
-    st.plotly_chart(fig_gauge, use_container_width=True)
+    st.plotly_chart(fig_gauge, width='stretch')
 
     if sw_steps < 3000:
         st.error("🚨 Nível de atividade muito baixo! Caminhadas curtas ao longo do dia ajudam muito no HDL e no controle glicêmico.")
@@ -425,7 +425,7 @@ if exercises:
             xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
             yaxis=dict(showgrid=True, gridcolor="#eee", title="kcal", automargin=True),
             showlegend=False, margin=dict(l=50, r=20, t=50, b=60))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     # Gráfico 2: Pontuação do sono (filtrado por período, só sono > 0)
     with col_g2:
@@ -440,7 +440,7 @@ if exercises:
             xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
             yaxis=dict(showgrid=True, gridcolor="#eee", title="Score 0-100", automargin=True),
             showlegend=False, margin=dict(l=50, r=100, t=50, b=60))
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width='stretch')
 
     # Gráfico 3: Passos — apenas registros com passos > 0 (dados do HealthSync)
     df_steps_real = df_all[df_all["steps"] > 0].sort_values("date")
@@ -456,7 +456,7 @@ if exercises:
             xaxis=dict(showgrid=False, automargin=True, tickangle=-30),
             yaxis=dict(showgrid=True, gridcolor="#eee", title="passos", automargin=True),
             showlegend=False, margin=dict(l=50, r=160, t=50, b=60))
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, width='stretch')
     else:
         st.info("Passos serão exibidos aqui após a primeira sincronização automática às 23h30.")
 

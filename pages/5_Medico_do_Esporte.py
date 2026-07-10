@@ -175,7 +175,7 @@ with tabs[1]:
         yaxis=dict(showgrid=True, gridcolor="#eee", title="mg/dL", automargin=True),
         legend=dict(orientation="h", yanchor="bottom", y=-0.22),
         margin=dict(l=60, r=40, t=60, b=90))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     st.markdown("""
     **Risco cardiovascular atual (Framingham simplificado):**
@@ -240,7 +240,7 @@ with tabs[2]:
         yaxis=dict(showgrid=True, gridcolor="#eee", title="TSH µUI/mL", automargin=True,
                    range=[0, max(_tsh_vals) + _tsh_pad * 1.5] if _tsh_vals else None),
         showlegend=False, margin=dict(l=60, r=170, t=60, b=55))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     st.markdown("""
     **Próximos passos para a tireoide:**
@@ -294,7 +294,7 @@ with tabs[3]:
         yaxis=dict(showgrid=True, gridcolor="#eee", title="U/L", automargin=True),
         legend=dict(orientation="h", yanchor="bottom", y=-0.22),
         margin=dict(l=60, r=170, t=60, b=90))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     st.markdown("""
     **Ações imediatas:**
@@ -345,7 +345,7 @@ with tabs[4]:
         yaxis2=dict(title="HbA1c (%)", overlaying="y", side="right", automargin=True),
         legend=dict(orientation="h", yanchor="bottom", y=-0.22),
         margin=dict(l=60, r=90, t=60, b=90))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     st.markdown("""
     **Estratégias para controle glicêmico:**
@@ -392,7 +392,7 @@ with tabs[5]:
         fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0,100])),
             height=350, title="Progresso em direção às metas (100% = meta atingida)",
             paper_bgcolor="white")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     st.markdown("""
     **Análise como Médico do Esporte:**

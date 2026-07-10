@@ -408,7 +408,7 @@ with tab1:
             legend=dict(orientation="h", yanchor="bottom", y=-0.32),
             margin=dict(l=50, r=150, t=60, b=80),
         )
-        st.plotly_chart(fig_peso, use_container_width=True, key="pred_peso")
+        st.plotly_chart(fig_peso, width='stretch', key="pred_peso")
 
         # Gráfico de gordura
         fig_gord = go.Figure()
@@ -458,7 +458,7 @@ with tab1:
             legend=dict(orientation="h", yanchor="bottom", y=-0.36),
             margin=dict(l=50, r=150, t=50, b=80),
         )
-        st.plotly_chart(fig_gord, use_container_width=True, key="pred_gord")
+        st.plotly_chart(fig_gord, width='stretch', key="pred_gord")
 
     with col_r:
         st.markdown("**📋 Projeções**")
@@ -586,7 +586,7 @@ with tab2:
             legend=dict(orientation="h", yanchor="bottom", y=-0.32),
             margin=dict(l=50, r=150, t=60, b=80),
         )
-        st.plotly_chart(fig_musc, use_container_width=True, key="pred_musc")
+        st.plotly_chart(fig_musc, width='stretch', key="pred_musc")
 
         musc_pct   = (musc_atual / peso_atual * 100) if peso_atual > 0 else 0
         ganho_total = musc_atual - bio_recente[0].get("musculo_esqueletico_kg", musc_atual)
@@ -711,7 +711,7 @@ with tab3:
             "Status":      "✅ Normal" if ok else "🔴 Alterado",
         })
 
-    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(rows), width='stretch', hide_index=True)
 
     # Projeções individuais
     st.markdown("### 🎯 Projeção de Normalização por Exame")

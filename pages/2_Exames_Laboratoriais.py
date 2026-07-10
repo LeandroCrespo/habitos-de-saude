@@ -264,7 +264,7 @@ with st.expander("📤 Importar novo laudo (PDF)", expanded=False):
             df_edit.columns = ["Exame","Categoria","Valor","Unidade","Ref Mín","Ref Máx","Ref Texto","Status","Notas"]
             edited = st.data_editor(
                 df_edit,
-                use_container_width=True,
+                width='stretch',
                 num_rows="dynamic",
                 column_config={
                     "Status": st.column_config.SelectboxColumn(options=["normal","alta","baixa","info"]),
@@ -518,7 +518,7 @@ def trend_chart(exam_name, unit, ref_min, ref_max, color, height=280, tab_key=""
                    range=[min(values) - _ypad * 0.3, max(values) + _ypad * 1.8] if values else None),
         showlegend=False, margin=dict(l=50, r=185, t=55, b=55))
     safe_key = exam_name.replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
-    st.plotly_chart(fig, use_container_width=True, key=f"tc_{tab_key}_{safe_key}")
+    st.plotly_chart(fig, width='stretch', key=f"tc_{tab_key}_{safe_key}")
     desc = EXAM_DESC.get(exam_name, "")
     if desc:
         st.caption(f"ℹ️ {desc}")

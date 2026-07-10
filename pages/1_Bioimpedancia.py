@@ -240,7 +240,7 @@ def make_chart(y_col, title, color, ref_line=None, ref_label="", height=300, fil
 tab1, tab2, tab3, tab4 = st.tabs(["⚖️ Peso & IMC", "🔥 Composição Corporal", "💪 Músculo & Água", "🫀 TMB & Visceral"])
 
 with tab1:
-    st.plotly_chart(make_chart("peso_kg", "Peso Corporal (kg)", "#1E8449", 82, "Meta: 82 kg"), use_container_width=True)
+    st.plotly_chart(make_chart("peso_kg", "Peso Corporal (kg)", "#1E8449", 82, "Meta: 82 kg"), width='stretch')
 
     # IMC com zonas coloridas
     y_imc = df["imc"].tolist()
@@ -262,10 +262,10 @@ with tab1:
         xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-40, tickfont=dict(size=11), automargin=True),
         yaxis=dict(showgrid=True, gridcolor="#eee", range=[min(y_imc)-y_pad2*0.3, max(y_imc)+y_pad2*1.5])
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
 
 with tab2:
-    st.plotly_chart(make_chart("percentual_gordura", "Percentual de Gordura Corporal (%)", "#E74C3C", 20, "Meta: 20%"), use_container_width=True)
+    st.plotly_chart(make_chart("percentual_gordura", "Percentual de Gordura Corporal (%)", "#E74C3C", 20, "Meta: 20%"), width='stretch')
 
     # Barras gordura vs músculo
     y_gord = df["massa_gordura_kg"].tolist()
@@ -280,14 +280,14 @@ with tab2:
         yaxis=dict(showgrid=True, gridcolor="#eee", title="kg"),
         legend=dict(orientation="h", yanchor="bottom", y=-0.35)
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
 
 with tab3:
-    st.plotly_chart(make_chart("musculo_esqueletico_kg", "Massa Muscular Esquelética (kg)", "#2980B9", 40, "Meta: 40 kg"), use_container_width=True)
-    st.plotly_chart(make_chart("percentual_agua", "Percentual de Água Corporal (%)", "#16A085", 55, "Ref mín.: 55%"), use_container_width=True)
+    st.plotly_chart(make_chart("musculo_esqueletico_kg", "Massa Muscular Esquelética (kg)", "#2980B9", 40, "Meta: 40 kg"), width='stretch')
+    st.plotly_chart(make_chart("percentual_agua", "Percentual de Água Corporal (%)", "#16A085", 55, "Ref mín.: 55%"), width='stretch')
 
 with tab4:
-    st.plotly_chart(make_chart("tmb_kcal", "Taxa Metabólica Basal — TMB (kcal)", "#E67E22"), use_container_width=True)
+    st.plotly_chart(make_chart("tmb_kcal", "Taxa Metabólica Basal — TMB (kcal)", "#E67E22"), width='stretch')
 
     if "gordura_visceral" in df.columns:
         y_visc = df["gordura_visceral"].tolist()
@@ -304,7 +304,7 @@ with tab4:
             xaxis=dict(showgrid=False, tickvals=x_dates, ticktext=tick_labels, tickangle=-40, tickfont=dict(size=11), automargin=True),
             yaxis=dict(showgrid=True, gridcolor="#eee", range=[0, _vmax * 1.35])
         )
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width='stretch')
 
 # ── Tabela histórica ─────────────────────────────────────────────────────────
 st.markdown("<div class='section-header'>📋 Histórico Completo</div>", unsafe_allow_html=True)
@@ -313,7 +313,7 @@ df_show = df_full[["date_str","peso_kg","imc","percentual_gordura","massa_gordur
 df_show.columns = ["Data","Peso (kg)","IMC","Gordura (%)","Gordura (kg)",
                    "Músculo (kg)","Água (%)","TMB (kcal)","G. Visceral","Dispositivo"]
 df_show = df_show.sort_values("Data", ascending=False)
-st.dataframe(df_show, use_container_width=True, hide_index=True)
+st.dataframe(df_show, width='stretch', hide_index=True)
 
 # ── Upload + Nova Medição (Google Vision API) ─────────────────────────────────
 st.markdown("<div class='section-header'>📷 Registrar Nova Medição — App AiLink</div>", unsafe_allow_html=True)
@@ -341,7 +341,7 @@ with img_col:
     if uploaded:
         img_bytes = uploaded.read()
         img_key   = f"{uploaded.name}_{len(img_bytes)}"
-        st.image(img_bytes, use_container_width=True)
+        st.image(img_bytes, width='stretch')
 
         if _gv_key and _REQ_OK:
             if img_key != st.session_state["bio_img_key"]:
@@ -431,7 +431,7 @@ with form_col:
             idade_corp   = st.number_input("Idade do Corpo",             20,     90,  _val("idade_corporal",       latest.get("idade_corporal", 47),  int),  1)
             pct_proteina = st.number_input("Taxa de Proteína (%)",      5.0,   30.0, _val("percentual_proteina",  latest.get("percentual_proteina", 13.5)), 0.1)
         notas = st.text_input("Observações (opcional)")
-        submitted = st.form_submit_button("💾 Salvar Medição", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("💾 Salvar Medição", type="primary", width='stretch')
 
 if submitted:
     new_id = max([b.get("id", 0) for b in bio_list], default=0) + 1

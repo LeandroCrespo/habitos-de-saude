@@ -249,7 +249,7 @@ with _sw3:
         <div style='font-size:12px;color:#888'>kg (7.700 kcal = 1 kg)</div></div>""",
         unsafe_allow_html=True)
 
-st.dataframe(pd.DataFrame(_sem_rows), use_container_width=True, hide_index=True)
+st.dataframe(pd.DataFrame(_sem_rows), width='stretch', hide_index=True)
 
 # ── Refeições de Hoje ──────────────────────────────────────────────────────────
 if today_logs:
@@ -293,7 +293,7 @@ if today_logs:
         )])
         fig_pie.update_layout(height=260, margin=dict(l=20, r=20, t=20, b=70),
                                legend=dict(orientation="h", yanchor="bottom", y=-0.3))
-        st.plotly_chart(fig_pie, use_container_width=True)
+        st.plotly_chart(fig_pie, width='stretch')
 
 # ── Formulário de edição ───────────────────────────────────────────────────────
 editing_id  = st.session_state.editing_log_id
@@ -384,7 +384,7 @@ if editing_log:
             edit_custom_df = st.data_editor(
                 unmatched_df,
                 num_rows="dynamic",
-                use_container_width=True,
+                width='stretch',
                 column_config=_col_cfg,
                 key=f"edit_custom_{efk}",
             )
@@ -603,7 +603,7 @@ with st.form(f"log_{fk}", clear_on_submit=True):
         custom_df = st.data_editor(
             _empty_custom,
             num_rows="dynamic",
-            use_container_width=True,
+            width='stretch',
             column_config=_col_cfg,
             key=f"custom_ed_{fk}",
         )
@@ -698,7 +698,7 @@ for meal in diet.get("meals", []):
                      "Quantidade": f["qty"], "Kcal": f["kcal"],
                      "Prot(g)": f.get("prot_g", 0), "Carb(g)": f.get("carb_g", 0), "Gord(g)": f.get("fat_g", 0)}
                     for f in items]
-            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(rows), width='stretch', hide_index=True)
         if meal.get("preparations"):
             st.markdown("---")
             st.markdown("**🍳 Preparações alternativas**")
@@ -744,7 +744,7 @@ if food_logs:
                    range=[0, max(df_daily["kcal"].max(), kcal_plano) * 1.25]),
         showlegend=False, margin=dict(l=50, r=200, t=60, b=70),
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     dias_ok    = sum(1 for k in df_daily["kcal"] if k <= kcal_plano * 1.05)
     media_kcal = int(df_daily["kcal"].mean())
@@ -775,7 +775,7 @@ with bc1:
         data=backup_data.encode("utf-8"),
         file_name=f"food_log_backup_{date.today()}.json",
         mime="application/json",
-        use_container_width=True,
+        width='stretch',
     )
     st.caption(f"Contém {len(food_logs)} registro(s) de refeição.")
 

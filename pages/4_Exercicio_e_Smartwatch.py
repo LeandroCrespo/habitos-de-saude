@@ -144,6 +144,9 @@ st.markdown("## 💪 Exercício & Smartwatch Ultra")
 exercises = load_exercises()
 bio_list = load_bioimpedance()
 
+if "edit_ex_id" not in st.session_state:
+    st.session_state.edit_ex_id = None
+
 tmb = 1783
 if bio_list:
     tmb = sorted(bio_list, key=lambda x: x["date"])[-1].get("tmb_kcal", 1783)
@@ -460,10 +463,13 @@ if exercises:
     else:
         st.info("Passos serão exibidos aqui após a primeira sincronização automática às 23h30.")
 
+    _TIPOS = ["Musculação", "Caminhada", "Corrida", "HIIT", "Natação",
+              "Bicicleta", "Yoga/Pilates", "Fisioterapia", "Outro"]
+
     st.markdown("**Registros:**")
     ex_filtered = [e for e in exercises if pd.Timestamp(e["date"]) >= cutoff]
     for ex in sorted(ex_filtered, key=lambda x: x["date"], reverse=True):
-        col_info, col_del = st.columns([11, 1])
+        col_info, col_edit, col_del = st.columns([10, 1, 1])
         with col_info:
             dt_fmt = datetime.strptime(ex["date"], "%Y-%m-%d").strftime("%d/%m/%Y")
             dist_str = f" · {ex['distance_km']} km" if ex.get("distance_km", 0) > 0 else ""
@@ -473,10 +479,56 @@ if exercises:
                 f"sono: {ex['sleep_score']}" +
                 (f" · _{ex['notes']}_" if ex.get("notes") else "")
             )
+        with col_edit:
+            if st.button("✏️", key=f"edit_ex_{ex['id']}", help="Editar treino"):
+                st.session_state.edit_ex_id = ex["id"] if st.session_state.edit_ex_id != ex["id"] else None
+                st.rerun()
         with col_del:
             if st.button("🗑️", key=f"del_ex_{ex['id']}", help="Excluir treino"):
                 exercises[:] = [e for e in exercises if e.get("id") != ex["id"]]
                 save_exercises(exercises)
+                st.rerun()
+
+        if st.session_state.edit_ex_id == ex["id"]:
+            with st.form(f"form_edit_ex_{ex['id']}"):
+                ec1, ec2, ec3 = st.columns(3)
+                with ec1:
+                    e_data = st.date_input("Data:", value=datetime.strptime(ex["date"], "%Y-%m-%d").date())
+                    tipo_idx = _TIPOS.index(ex["type"]) if ex["type"] in _TIPOS else len(_TIPOS) - 1
+                    e_tipo = st.selectbox("Tipo:", _TIPOS, index=tipo_idx)
+                with ec2:
+                    e_dur = st.number_input("Duração (min):", 5, 300, int(ex.get("duration_min", 60)), step=5)
+                    e_cal = st.number_input("Calorias (kcal):", 0, 2000, int(ex.get("calories_burned", 0)), step=10)
+                    e_dist = st.number_input("Distância (km):", 0.0, 100.0, float(ex.get("distance_km", 0.0)), step=0.1)
+                with ec3:
+                    e_passos = st.number_input("Passos:", 0, 30000, int(ex.get("steps", 0)), step=100)
+                    e_sono = st.number_input("Sono (0-100):", 0, 100, int(ex.get("sleep_score", 75)), step=1)
+                e_notas = st.text_input("Observações:", value=ex.get("notes", ""))
+                col_s, col_c = st.columns(2)
+                with col_s:
+                    e_submit = st.form_submit_button("💾 Salvar alterações", type="primary")
+                with col_c:
+                    e_cancel = st.form_submit_button("Cancelar")
+
+            if e_submit:
+                for i, e in enumerate(exercises):
+                    if e.get("id") == ex["id"]:
+                        exercises[i].update({
+                            "date": str(e_data),
+                            "type": e_tipo,
+                            "duration_min": e_dur,
+                            "calories_burned": e_cal,
+                            "distance_km": round(e_dist, 2),
+                            "steps": e_passos,
+                            "sleep_score": e_sono,
+                            "notes": e_notas,
+                        })
+                        break
+                save_exercises(exercises)
+                st.session_state.edit_ex_id = None
+                st.rerun()
+            elif e_cancel:
+                st.session_state.edit_ex_id = None
                 st.rerun()
 
 # ── Dicas personalizadas ──────────────────────────────────────────────────────

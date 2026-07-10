@@ -213,7 +213,7 @@ if bio_list:
         plot_bgcolor="white", paper_bgcolor="white",
         showlegend=False
     )
-    st.plotly_chart(fig, width='stretch')
+    st.plotly_chart(fig, use_container_width=True)
 
     # Evolução desde o início
     primeiro = bio_list_sorted[0]

@@ -389,13 +389,13 @@ with tab1:
                            annotation_text="Meta: 82 kg", annotation_position="right")
         if dt_peso:
             fig_peso.add_vline(
-                x=datetime.combine(dt_peso, datetime.min.time()),
+                x=dt_peso.strftime("%Y-%m-%d"),
                 line_dash="dot", line_color="#9B59B6", line_width=1,
                 annotation_text=f"3x: {dt_peso.strftime('%m/%Y')}", annotation_position="top right",
             )
         if usar_aj and dt_peso_aj:
             fig_peso.add_vline(
-                x=datetime.combine(dt_peso_aj, datetime.min.time()),
+                x=dt_peso_aj.strftime("%Y-%m-%d"),
                 line_dash="dot", line_color="#27AE60", line_width=1.5,
                 annotation_text=f"{freq_treino}x: {dt_peso_aj.strftime('%m/%Y')}", annotation_position="top left",
             )
@@ -440,13 +440,13 @@ with tab1:
                            annotation_text=f"Meta: {GORD_META}%", annotation_position="right")
         if dt_gord:
             fig_gord.add_vline(
-                x=datetime.combine(dt_gord, datetime.min.time()),
+                x=dt_gord.strftime("%Y-%m-%d"),
                 line_dash="dot", line_color="#9B59B6", line_width=1,
                 annotation_text=f"3x: {dt_gord.strftime('%m/%Y')}", annotation_position="top right",
             )
         if usar_aj and dt_gord_aj:
             fig_gord.add_vline(
-                x=datetime.combine(dt_gord_aj, datetime.min.time()),
+                x=dt_gord_aj.strftime("%Y-%m-%d"),
                 line_dash="dot", line_color="#27AE60", line_width=1.5,
                 annotation_text=f"{freq_treino}x: {dt_gord_aj.strftime('%m/%Y')}", annotation_position="top left",
             )
@@ -567,13 +567,13 @@ with tab2:
                            annotation_text=f"Meta: {MUSC_META} kg", annotation_position="right")
         if dt_musc:
             fig_musc.add_vline(
-                x=datetime.combine(dt_musc, datetime.min.time()),
+                x=dt_musc.strftime("%Y-%m-%d"),
                 line_dash="dot", line_color="#9B59B6", line_width=1,
                 annotation_text=f"3x: {dt_musc.strftime('%m/%Y')}", annotation_position="top right",
             )
         if usar_aj and dt_musc_aj:
             fig_musc.add_vline(
-                x=datetime.combine(dt_musc_aj, datetime.min.time()),
+                x=dt_musc_aj.strftime("%Y-%m-%d"),
                 line_dash="dot", line_color="#F39C12", line_width=1.5,
                 annotation_text=f"{freq_treino}x: {dt_musc_aj.strftime('%m/%Y')}", annotation_position="top left",
             )

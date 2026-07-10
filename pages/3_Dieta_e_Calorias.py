@@ -213,9 +213,9 @@ for _d in sorted(_dias_filtro):
     _def   = int(_td - _cons) if _cons > 0 else None
     _sem_rows.append({
         "Dia":       f"{_DIAS_PT[_d.weekday()]} {_d.strftime('%d/%m')}",
-        "Consumido": int(_cons) if _cons > 0 else "—",
-        "TDEE est.": _td,
-        "Déficit":   _def if _def is not None else "—",
+        "Consumido": f"{int(_cons):,}" if _cons > 0 else "—",
+        "TDEE est.": str(_td),
+        "Déficit":   f"{_def:,}" if _def is not None else "—",
         "✔":         "✅" if isinstance(_def, int) and _def >= 0 else ("⚠️" if isinstance(_def, int) else "—"),
     })
 
@@ -710,7 +710,7 @@ if food_logs:
     st.markdown("<div class='section-header'>📅 Histórico Calórico (últimas 4 semanas)</div>", unsafe_allow_html=True)
     df_logs = pd.DataFrame(food_logs)
     df_logs["date"] = pd.to_datetime(df_logs["date"])
-    cutoff = pd.Timestamp.now() - pd.Timedelta(days=28)
+    cutoff = pd.Timestamp.now() - pd.Timedelta("28D")
     df_rec = df_logs[df_logs["date"] >= cutoff]
     if df_rec.empty:
         df_rec = df_logs

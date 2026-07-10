@@ -406,9 +406,9 @@ if exercises:
         horizontal=True, index=0
     )
     if periodo == "Últimos 30 dias":
-        cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
+        cutoff = pd.Timestamp.now() - pd.Timedelta("30D")
     elif periodo == "Últimos 90 dias":
-        cutoff = pd.Timestamp.now() - pd.Timedelta(days=90)
+        cutoff = pd.Timestamp.now() - pd.Timedelta("90D")
     else:
         cutoff = pd.Timestamp("2018-01-01")
 

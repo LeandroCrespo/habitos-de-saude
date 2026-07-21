@@ -227,9 +227,8 @@ with c_s3:
         extra_kg_mes = extra_peso_sem * 4.3
         st.markdown(f"""<div class='scenario-box'>
 <b>✅ Cenário: {freq_treino}x/semana</b><br>
-+{extra_sessoes} treino(s)/sem = <b>+{extra_kcal_sem:.0f} kcal/sem</b> gastas<br>
-→ <b>~{extra_kg_mes:.1f} kg a mais</b> de perda por mês<br>
-→ <b>~{extra_peso_sem * 4.3:.1f} kg</b> extras em relação ao ritmo atual
+{extra_sessoes:+.1f} treino(s)/sem = <b>{extra_kcal_sem:+.0f} kcal/sem</b> gastas<br>
+→ <b>~{extra_kg_mes:+.2f} kg</b> de perda por mês em relação ao ritmo atual
 </div>""", unsafe_allow_html=True)
 
 # Dados para gráficos

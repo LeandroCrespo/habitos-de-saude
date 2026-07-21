@@ -181,6 +181,190 @@ if desvios_peso:
 <div style='font-size:12px;color:#888;margin-top:4px'>Previsto hoje: {pred_hoje_musc:.1f} kg · Real: {musc_atual:.1f} kg</div>
 </div>""", unsafe_allow_html=True)
     st.caption(f"Predição original calculada com os {N_BASE} primeiros registros do acompanhamento semanal (mar/2026). A projeção é recalibrada com todos os dados desde então, incluindo o período pós-Puran T4.")
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # PARECER MÉDICO-ESPORTIVO — gerado a cada medição de bioimpedância
+    # ═══════════════════════════════════════════════════════════════════════════
+    _puran_inicio_dt  = datetime(2026, 6, 1)
+    _tracking_inicio_dt = datetime.strptime(TRACKING_START, "%Y-%m-%d")
+    _semanas_puran  = (TODAY - _puran_inicio_dt).days / 7
+    _semanas_track  = (TODAY - _tracking_inicio_dt).days / 7
+    _data_ultima_med = datetime.strptime(bio_recente[-1]["date"], "%Y-%m-%d").strftime("%d/%m/%Y")
+    _total_perdido  = bio_recente[0]["peso_kg"] - peso_atual
+    _gv_atual_med   = bio_recente[-1].get("gordura_visceral", 0)
+
+    # Fase do tratamento com Puran T4
+    if _semanas_puran < 6:
+        _fase_puran, _fase_cor = "Fase inicial", "#E74C3C"
+        _fase_puran_desc = "metabolismo ainda em ajuste hormonal — flutuações são esperadas"
+    elif _semanas_puran < 12:
+        _fase_puran, _fase_cor = "Fase de transição", "#F39C12"
+        _fase_puran_desc = "levotiroxina em consolidação — metabolismo progressivamente mais responsivo"
+    elif _semanas_puran < 24:
+        _fase_puran, _fase_cor = "Fase de consolidação", "#27AE60"
+        _fase_puran_desc = "hormônio tireoidiano normalizado — metabolismo responsivo ao déficit e ao treino"
+    else:
+        _fase_puran, _fase_cor = "Tratamento estabelecido", "#27AE60"
+        _fase_puran_desc = "tratamento totalmente estabelecido — projeções mais precisas"
+
+    # Ritmo semanal de perda de peso (regressão recalibrada)
+    _taxa_sem_real = taxa_peso_sem  # negativo = perdendo
+    if _taxa_sem_real < -0.8:
+        _ritmo_label, _ritmo_cor = "ACELERADO", "#E74C3C"
+        _ritmo_desc = f"{abs(_taxa_sem_real):.2f} kg/sem — acima de 800g/sem; risco de perda muscular e fadiga."
+    elif _taxa_sem_real < -0.3:
+        _ritmo_label, _ritmo_cor = "IDEAL", "#27AE60"
+        _ritmo_desc = f"{abs(_taxa_sem_real):.2f} kg/sem — faixa ótima para emagrecimento com preservação muscular."
+    elif _taxa_sem_real < 0:
+        _ritmo_label, _ritmo_cor = "MODERADO", "#F39C12"
+        _ritmo_desc = f"{abs(_taxa_sem_real):.2f} kg/sem — abaixo de 300g/sem; pode indicar adaptação metabólica ou escapes alimentares."
+    else:
+        _ritmo_label, _ritmo_cor = "ESTAGNADO", "#E74C3C"
+        _ritmo_desc = "sem tendência de queda — revisar aderência ao déficit calórico."
+
+    # Análise clínica do peso
+    if abs(dev_peso_atual) < 0.5:
+        _peso_analise = "O peso está exatamente no ritmo previsto. Continue o plano atual."
+    elif dev_peso_atual < 0:
+        _peso_analise = f"O peso está {abs(dev_peso_atual):.1f} kg abaixo do previsto — você está superando as projeções. Mantenha o ritmo."
+    elif dev_peso_atual < 1.5:
+        _peso_analise = (
+            f"O peso está {dev_peso_atual:.1f} kg acima do previsto. Desvio compatível com a fase de adaptação metabólica: "
+            "variações de até 2 kg nas primeiras semanas refletem ajuste de glicogênio e água, não falha no plano."
+        )
+    elif dev_peso_atual < 3.0:
+        _peso_analise = (
+            f"O peso está {dev_peso_atual:.1f} kg acima do previsto. Recomendo revisar o déficit calórico diário: "
+            "verifique porções, frequência de saídas alimentares e consumo de ultraprocessados."
+        )
+    else:
+        _peso_analise = (
+            f"O peso está {dev_peso_atual:.1f} kg acima do previsto — desvio significativo. "
+            "Indicado reavaliação do plano alimentar com a nutricionista e verificar se o Puran T4 está na dose correta."
+        )
+
+    # Análise clínica da gordura
+    if dev_gord_atual > 3:
+        _gord_analise = (
+            f"O percentual ({gord_atual:.1f}%) está {dev_gord_atual:.1f}% acima do previsto. "
+            "Este é o desvio mais esperado: nas primeiras semanas, a bioimpedância em estado de menor hidratação subestima a gordura real. "
+            "Com a rehidratação corporal — intensificada pelo Puran T4 — os valores se normalizam. "
+            "O que importa é a tendência: compare com os valores de 4, 8 e 12 semanas atrás."
+        )
+    elif dev_gord_atual > 1:
+        _gord_analise = (
+            f"Gordura {dev_gord_atual:.1f}% acima do previsto — desvio moderado. "
+            "Garanta que a bioimpedância seja sempre feita nas mesmas condições: manhã, jejum ≥8h, após urinar, sem atividade física prévia. "
+            "Variações de protocolo podem explicar grande parte deste desvio."
+        )
+    elif dev_gord_atual < -1:
+        _gord_analise = f"O percentual de gordura está {abs(dev_gord_atual):.1f}% abaixo do previsto. O déficit calórico está funcionando acima da expectativa."
+    else:
+        _gord_analise = "Percentual de gordura dentro do esperado para esta fase do tratamento."
+
+    # Análise clínica do músculo
+    if dev_musc_atual < -1.0:
+        _musc_analise = (
+            f"Massa muscular {abs(dev_musc_atual):.1f} kg abaixo do previsto. "
+            "Parte desta diferença é perda de glicogênio muscular e água intracelular — normal em déficit calórico. "
+            "Para proteger a massa magra real: consuma 1,8–2,2g de proteína por kg/dia e priorize treino resistido intenso."
+        )
+    elif dev_musc_atual < -0.2:
+        _musc_analise = (
+            f"Massa muscular levemente abaixo do previsto ({dev_musc_atual:.1f} kg). "
+            "Em déficit calórico, manter — não ganhar — já é um resultado positivo. "
+            "Proteína pós-treino e progressão de carga são os principais aliados aqui."
+        )
+    elif dev_musc_atual > 0.3:
+        _musc_analise = f"Ganho muscular acima do previsto (+{dev_musc_atual:.1f} kg) — excelente resposta ao treino resistido com o Puran T4 regulando o anabolismo."
+    else:
+        _musc_analise = "Massa muscular mantida conforme esperado. Equilíbrio adequado entre déficit calórico e estímulo de treino."
+
+    # Orientações práticas (dinâmicas)
+    _ori_items = []
+    _ori_items.append(
+        "🕐 <b>Padronize a bioimpedância:</b> sempre pela manhã, em jejum ≥8h, após urinar, sem exercício prévio e sem alterações de hidratação (evite álcool na véspera). Qualquer variação de protocolo distorce a comparação entre medições."
+    )
+    if freq_real < 3.0:
+        _ori_items.append(
+            f"🏋️ <b>Aumente a frequência de treino:</b> você está em {freq_real:.1f} sessões/semana nos últimos 60 dias. "
+            "O mínimo para preservar massa muscular em déficit calórico é 3x/semana de resistência."
+        )
+    elif freq_real < 4.5:
+        _ori_items.append(
+            f"🏋️ <b>Frequência de treino ({freq_real:.1f}x/sem):</b> está dentro do mínimo adequado. "
+            "Adicionar 1 sessão de cardio moderado (30–40 min, zona 2) entre os treinos de resistência acelera a perda de gordura visceral sem comprometer a recuperação."
+        )
+    else:
+        _ori_items.append(
+            f"🏋️ <b>Frequência de treino ótima ({freq_real:.1f}x/sem):</b> consistência excelente. "
+            "Foque na progressão de carga e na qualidade das sessões."
+        )
+    if _taxa_sem_real > -0.3:
+        _ori_items.append(
+            "🍽️ <b>Revise o déficit calórico:</b> o ritmo atual de perda está abaixo de 300g/semana. "
+            "Fatores comuns: porções subestimadas, saídas alimentares frequentes, lanches noturnos ou consumo excessivo de carboidratos simples. "
+            "Considere um diário alimentar por 1 semana para identificar o escape."
+        )
+    if _gv_atual_med and _gv_atual_med > 9:
+        _ori_items.append(
+            f"🫀 <b>Gordura visceral (índice {_gv_atual_med}):</b> acima da zona segura (≤9). "
+            "Responde especificamente a exercícios aeróbicos: 30–45 min de caminhada rápida, bicicleta ou natação, 3x/semana, têm efeito direto na gordura visceral — independente do treino de resistência."
+        )
+    if _semanas_puran < 12:
+        _ori_items.append(
+            f"💊 <b>Puran T4 — semana {_semanas_puran:.0f}:</b> o metabolismo ainda está se ajustando. "
+            "Os efeitos plenos da levotiroxina na taxa metabólica basal levam de 8 a 12 semanas. "
+            "Não avalie o plano como falho com base nesta fase — o ritmo tende a se estabilizar após a normalização do TSH."
+        )
+    if dev_musc_atual < -0.5:
+        _ori_items.append(
+            "🥩 <b>Ingestão proteica:</b> com a massa muscular abaixo do previsto, priorize a meta de 1,8–2,2g de proteína por kg de peso por dia. "
+            "Distribua em pelo menos 4 refeições com ≥25g de proteína cada — especialmente no pós-treino (janela de 30–60 min)."
+        )
+
+    _ori_html = "".join(
+        f"<div style='font-size:13px;color:#444;padding:6px 0;border-bottom:1px solid #F39C1230'>{_item}</div>"
+        for _item in _ori_items
+    )
+
+    st.markdown("<div class='section-header'>🩺 Parecer Médico-Esportivo</div>", unsafe_allow_html=True)
+
+    _med_col1, _med_col2 = st.columns([3, 1])
+    with _med_col2:
+        st.markdown(f"""<div style='background:#f8f8f8;border:1px solid #DDD;border-radius:10px;padding:14px;font-size:12px;color:#555;line-height:1.7'>
+<div style='font-weight:700;color:#333;margin-bottom:6px'>📋 Dados da avaliação</div>
+<b>Última medição:</b> {_data_ultima_med}<br>
+<b>Acompanhamento:</b> {_semanas_track:.0f} semanas<br>
+<b>Puran T4:</b> semana {_semanas_puran:.0f}<br>
+<span style='color:{_fase_cor};font-weight:600'>{_fase_puran}</span><br>
+<div style='font-size:11px;color:#888;margin-top:2px'>{_fase_puran_desc}</div>
+<hr style='border:none;border-top:1px solid #EEE;margin:8px 0'>
+<b>Perda total (início):</b> {_total_perdido:.1f} kg<br>
+<b>Treino (60d):</b> {freq_real:.1f}x/sem · {kcal_real} kcal/sessão<br>
+<b>Gordura visceral:</b> {'índice ' + str(int(_gv_atual_med)) if _gv_atual_med else 'sem dado'}<br>
+<hr style='border:none;border-top:1px solid #EEE;margin:8px 0'>
+<span style='font-size:10px;color:#AAA'>Atualizado automaticamente a cada nova medição. Não substitui avaliação médica presencial.</span>
+</div>""", unsafe_allow_html=True)
+
+    with _med_col1:
+        st.markdown(f"""<div style='background:#f8f8f8;border-left:5px solid {_ritmo_cor};border-radius:0 10px 10px 0;padding:12px 16px;margin-bottom:12px'>
+<div style='font-size:10px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:1px'>Ritmo atual de emagrecimento</div>
+<div style='font-size:24px;font-weight:700;color:{_ritmo_cor}'>{_ritmo_label}</div>
+<div style='font-size:13px;color:#555;margin-top:2px'>{_ritmo_desc}</div>
+</div>""", unsafe_allow_html=True)
+
+        st.markdown(f"""<div style='background:#FAFAFA;border:1px solid #E8E8E8;border-radius:10px;padding:16px;line-height:1.7'>
+<p style='margin:0 0 10px;font-size:13px;color:#333'><b>⚖️ Peso:</b> {_peso_analise}</p>
+<p style='margin:0 0 10px;font-size:13px;color:#333'><b>📊 Gordura corporal:</b> {_gord_analise}</p>
+<p style='margin:0;font-size:13px;color:#333'><b>💪 Massa muscular:</b> {_musc_analise}</p>
+</div>""", unsafe_allow_html=True)
+
+    st.markdown(f"""<div style='background:#FFF8E1;border:1px solid #F39C12;border-radius:10px;padding:16px;margin-top:12px'>
+<div style='font-size:14px;font-weight:700;color:#E67E22;margin-bottom:10px'>📋 O que ajustar no seu processo</div>
+{_ori_html}
+</div>""", unsafe_allow_html=True)
+
     st.markdown("")
 
 # ── Configurador de Cenário de Treino ─────────────────────────────────────────

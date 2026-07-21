@@ -155,7 +155,7 @@ _DEFAULT_MEALS = [
     {
         "meal_id": "almoco", "meal_name": "Almoço", "time": "12:00:00",
         "foods": ["Salada / legumes variados", "Peito de frango grelhado",
-                  "Arroz integral cozido", "Feijão carioca cozido"],
+                  "Arroz branco cozido", "Feijão carioca cozido"],
         "kcal_total": 485, "prot_g": 49.0, "carb_g": 56.0, "fat_g": 6.0,
     },
     {
@@ -166,7 +166,7 @@ _DEFAULT_MEALS = [
     {
         "meal_id": "jantar", "meal_name": "Jantar", "time": "19:00:00",
         "foods": ["Salada / legumes variados", "Peito de frango grelhado",
-                  "Arroz integral cozido", "Feijão carioca cozido"],
+                  "Arroz branco cozido", "Feijão carioca cozido"],
         "kcal_total": 485, "prot_g": 49.0, "carb_g": 56.0, "fat_g": 6.0,
     },
     {

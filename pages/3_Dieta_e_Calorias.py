@@ -221,8 +221,8 @@ for _d in sorted(_dias_filtro):
         "✔":         "✅" if isinstance(_def, int) and _def >= 0 else ("⚠️" if isinstance(_def, int) else "—"),
     })
 
-_com_reg = [r for r in _sem_rows if isinstance(r["Déficit"], int)]
-_def_tot = sum(r["Déficit"] for r in _com_reg)
+_com_reg = [r for r in _sem_rows if r["Déficit"] != "—"]
+_def_tot = sum(int(r["Déficit"].replace(",", "")) for r in _com_reg)
 _kg_est  = _def_tot / 7700
 
 _sw1, _sw2, _sw3 = st.columns(3)

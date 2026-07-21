@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from utils.data_manager import load_diet, load_food_log, save_food_log, load_bioimpedance, load_exercises, calc_tdee
+from utils.data_manager import load_diet, load_food_log, save_food_log, load_bioimpedance, load_exercises, calc_tdee, ensure_today_defaults
 
 st.set_page_config(page_title="Dieta & Calorias", page_icon="🥗", layout="wide")
 
@@ -40,6 +40,8 @@ exercises = load_exercises()
 
 BRASILIA  = timezone(timedelta(hours=-3))
 today_str = datetime.now(BRASILIA).strftime("%Y-%m-%d")
+
+food_logs = ensure_today_defaults(food_logs, today_str)
 
 # ── Session state ──────────────────────────────────────────────────────────────
 if "diet_form_key"   not in st.session_state: st.session_state.diet_form_key   = 0

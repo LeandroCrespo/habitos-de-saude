@@ -146,6 +146,59 @@ def status_emoji(status):
     return {"normal": "✅", "alta": "⬆️", "baixa": "⬇️", "info": "ℹ️"}.get(status, "❓")
 
 
+_DEFAULT_MEALS = [
+    {
+        "meal_id": "cafe", "meal_name": "Café da Manhã", "time": "07:00:00",
+        "foods": ["Banana", "Psyllium", "Pão Francês", "Ovo cozido / mexido", "Café sem açúcar"],
+        "kcal_total": 380, "prot_g": 17.9, "carb_g": 55.5, "fat_g": 11.3,
+    },
+    {
+        "meal_id": "almoco", "meal_name": "Almoço", "time": "12:00:00",
+        "foods": ["Salada / legumes variados", "Peito de frango grelhado",
+                  "Arroz integral cozido", "Feijão carioca cozido"],
+        "kcal_total": 485, "prot_g": 49.0, "carb_g": 56.0, "fat_g": 6.0,
+    },
+    {
+        "meal_id": "lanche", "meal_name": "Lanche da Tarde", "time": "15:30:00",
+        "foods": ["Banana", "Pão Francês", "Ovo cozido", "Café sem açúcar"],
+        "kcal_total": 365, "prot_g": 17.4, "carb_g": 51.5, "fat_g": 11.3,
+    },
+    {
+        "meal_id": "jantar", "meal_name": "Jantar", "time": "19:00:00",
+        "foods": ["Salada / legumes variados", "Peito de frango grelhado",
+                  "Arroz integral cozido", "Feijão carioca cozido"],
+        "kcal_total": 485, "prot_g": 49.0, "carb_g": 56.0, "fat_g": 6.0,
+    },
+    {
+        "meal_id": "cha", "meal_name": "Hora do Chá", "time": "21:00:00",
+        "foods": ["Chá de manjericão com limão"],
+        "kcal_total": 5, "prot_g": 0.0, "carb_g": 1.0, "fat_g": 0.0,
+    },
+]
+
+
+def ensure_today_defaults(food_logs, today_str):
+    """Garante que as refeições base do dia estejam em food_logs. Salva e retorna logs atualizados."""
+    existing_today = {l["meal_id"] for l in food_logs if l.get("date") == today_str}
+    next_id = max((l["id"] for l in food_logs), default=0) + 1
+    added = []
+    for meal in _DEFAULT_MEALS:
+        if meal["meal_id"] not in existing_today:
+            added.append({
+                "id": next_id, "date": today_str, "time": meal["time"],
+                "meal_id": meal["meal_id"], "meal_name": meal["meal_name"],
+                "foods": meal["foods"],
+                "kcal_total": meal["kcal_total"], "prot_g": meal["prot_g"],
+                "carb_g": meal["carb_g"], "fat_g": meal["fat_g"],
+                "extra_desc": "", "extra_kcal": 0, "obs": "Padrão automático",
+            })
+            next_id += 1
+    if added:
+        food_logs = food_logs + added
+        save_food_log(food_logs)
+    return food_logs
+
+
 def calc_tdee(tmb_kcal, steps, exercise_min=0):
     """Calcula TDEE (gasto total) com base no TMB, passos e exercício."""
     if steps < 3000:

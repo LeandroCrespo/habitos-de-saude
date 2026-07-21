@@ -73,8 +73,10 @@ coef_peso = np.polyfit(x_dias, pesos, 1)
 coef_gord = np.polyfit(x_dias, gorduras, 1)
 coef_musc = np.polyfit(x_dias, musculos, 1)
 
-# ── Predição original (baseada apenas nos 3 primeiros registros) ───────────────
-N_BASE = 3
+# ── Predição original (primeiro terço dos dados — escala com o histórico) ──────
+# Mínimo de 6 medições (~6 semanas) para superar a fase inicial de adaptação
+# hídrica e capturar a tendência metabólica real.
+N_BASE = max(6, len(bio_recente) // 3)
 x_base   = x_dias[:N_BASE]
 coef_peso_orig = np.polyfit(x_base, pesos[:N_BASE], 1)
 coef_gord_orig = np.polyfit(x_base, gorduras[:N_BASE], 1)

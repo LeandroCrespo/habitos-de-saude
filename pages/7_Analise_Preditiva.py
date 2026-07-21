@@ -41,16 +41,18 @@ REF_DATE = datetime(2026, 1, 1)
 TODAY    = datetime.now()
 TODAY_X  = (TODAY - REF_DATE).days
 
-# Ponto de quebra estrutural: início do Puran T4 (levotiroxina)
+# Marco do Puran T4 (levotiroxina) — usado apenas como anotação nos gráficos
 PURAN_T4_DATE = "2026-06-01"
 
-# Medições pós-Puran T4 — usadas para regressão e projeções
-bio_recente = [b for b in bio_list if b["date"] >= PURAN_T4_DATE]
+# Regressão desde o início do acompanhamento semanal sistemático (mar/2026)
+# Inclui toda a perda de peso real (dieta + exercício + Puran T4)
+TRACKING_START = "2026-03-25"
+bio_recente = [b for b in bio_list if b["date"] >= TRACKING_START]
 if len(bio_recente) < 3:
     bio_recente = bio_list  # fallback
 
-# Medições anteriores ao Puran T4 — apenas contexto histórico nos gráficos
-bio_historico = [b for b in bio_list if b["date"] < PURAN_T4_DATE]
+# Medições antigas (antes do acompanhamento semanal) — apenas contexto nos gráficos
+bio_historico = [b for b in bio_list if b["date"] < TRACKING_START]
 
 # ── Frequência e gasto calórico reais (últimos 60 dias) ───────────────────────
 _cutoff60 = (TODAY - timedelta(days=60)).strftime("%Y-%m-%d")
@@ -176,7 +178,7 @@ if desvios_peso:
 <div style='font-size:13px;color:{cor_m};font-weight:600'>{txt_m}</div>
 <div style='font-size:12px;color:#888;margin-top:4px'>Previsto hoje: {pred_hoje_musc:.1f} kg · Real: {musc_atual:.1f} kg</div>
 </div>""", unsafe_allow_html=True)
-    st.caption(f"Predição original calculada com os {N_BASE} primeiros registros pós-Puran T4 (jun/2026). A projeção é recalibrada com todas as medições desde o início do tratamento.")
+    st.caption(f"Predição original calculada com os {N_BASE} primeiros registros do acompanhamento semanal (mar/2026). A projeção é recalibrada com todos os dados desde então, incluindo o período pós-Puran T4.")
     st.markdown("")
 
 # ── Configurador de Cenário de Treino ─────────────────────────────────────────
@@ -424,8 +426,13 @@ with tab1:
                 line_dash="dot", line_color="#27AE60", line_width=1.5,
                 annotation_text=f"{freq_treino}x: {dt_peso_aj.strftime('%m/%Y')}", annotation_position="top left",
             )
+        fig_peso.add_vline(
+            x=pd.Timestamp(PURAN_T4_DATE).value // 10**6,
+            line_dash="dashdot", line_color="#8E44AD", line_width=1.2,
+            annotation_text="Puran T4", annotation_position="bottom right",
+        )
         fig_peso.update_layout(
-            title=f"Projeção de Peso" + (f" — Comparativo 3x vs {freq_treino}x/semana" if usar_aj else ""),
+            title=f"Projeção de Peso" + (f" — Comparativo {freq_real_slider}x vs {freq_treino}x/semana" if usar_aj else ""),
             height=360, plot_bgcolor="white", paper_bgcolor="white",
             xaxis=dict(showgrid=False, automargin=True, tickangle=-15, tickformat="%b/%y"),
             yaxis=dict(showgrid=True, gridcolor="#eee", title="kg", automargin=True,

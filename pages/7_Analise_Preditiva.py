@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from utils.data_manager import load_bioimpedance, load_exams
+from utils.data_manager import load_bioimpedance, load_exams, load_exercises
 
 st.set_page_config(page_title="Análise Preditiva", page_icon="🔮", layout="wide")
 
@@ -29,8 +29,9 @@ st.markdown("## 🔮 Análise Preditiva")
 st.caption("Projeções baseadas nos seus dados históricos e evidências médicas. As datas são estimativas — não substituem avaliação médica.")
 
 # ── Carregar dados ──────────────────────────────────────────────────────────────
-bio_list  = sorted(load_bioimpedance(), key=lambda x: x["date"])
+bio_list   = sorted(load_bioimpedance(), key=lambda x: x["date"])
 exams_data = load_exams()
+ex_list    = load_exercises()
 
 if len(bio_list) < 3:
     st.warning("Dados insuficientes para projeções. Adicione mais medições de bioimpedância.")
@@ -40,9 +41,25 @@ REF_DATE = datetime(2026, 1, 1)
 TODAY    = datetime.now()
 TODAY_X  = (TODAY - REF_DATE).days
 
-bio_recente = [b for b in bio_list if b["date"] >= "2026-01-01"]
+# Ponto de quebra estrutural: início do Puran T4 (levotiroxina)
+PURAN_T4_DATE = "2026-06-01"
+
+# Medições pós-Puran T4 — usadas para regressão e projeções
+bio_recente = [b for b in bio_list if b["date"] >= PURAN_T4_DATE]
 if len(bio_recente) < 3:
-    bio_recente = bio_list
+    bio_recente = bio_list  # fallback
+
+# Medições anteriores ao Puran T4 — apenas contexto histórico nos gráficos
+bio_historico = [b for b in bio_list if b["date"] < PURAN_T4_DATE]
+
+# ── Frequência e gasto calórico reais (últimos 60 dias) ───────────────────────
+_cutoff60 = (TODAY - timedelta(days=60)).strftime("%Y-%m-%d")
+_ex60     = [e for e in ex_list if e.get("date", "") >= _cutoff60]
+_dias_treino = len({e["date"] for e in _ex60})
+freq_real  = round(_dias_treino / (60 / 7), 1)          # sessões/semana (float)
+freq_real_slider = max(3, min(7, round(freq_real)))      # valor para o slider
+_kcal_vals = [e["calories_burned"] for e in _ex60 if e.get("calories_burned", 0) > 50]
+kcal_real  = max(200, min(700, int(sum(_kcal_vals) / len(_kcal_vals)))) if _kcal_vals else 420
 
 x_dias   = [(datetime.strptime(b["date"], "%Y-%m-%d") - REF_DATE).days for b in bio_recente]
 pesos    = [b["peso_kg"] for b in bio_recente]
@@ -159,7 +176,7 @@ if desvios_peso:
 <div style='font-size:13px;color:{cor_m};font-weight:600'>{txt_m}</div>
 <div style='font-size:12px;color:#888;margin-top:4px'>Previsto hoje: {pred_hoje_musc:.1f} kg · Real: {musc_atual:.1f} kg</div>
 </div>""", unsafe_allow_html=True)
-    st.caption(f"Predição original calculada com os {N_BASE} primeiros registros. A projeção futura é recalibrada automaticamente com todos os dados.")
+    st.caption(f"Predição original calculada com os {N_BASE} primeiros registros pós-Puran T4 (jun/2026). A projeção é recalibrada com todas as medições desde o início do tratamento.")
     st.markdown("")
 
 # ── Configurador de Cenário de Treino ─────────────────────────────────────────
@@ -170,22 +187,22 @@ with c_s1:
     freq_treino = st.select_slider(
         "Treinos por semana:",
         options=[3, 4, 5, 6, 7],
-        value=3,
+        value=freq_real_slider,
         format_func=lambda x: f"{x}x/semana",
         key="freq_treino_slider",
-        help="Seu histórico atual reflete 3x/semana. Ajuste para ver projeções de diferentes cenários."
+        help=f"Frequência calculada do seu histórico (60 dias): {freq_real:.1f}x/sem. Ajuste para simular cenários."
     )
 with c_s2:
     kcal_por_sessao = st.number_input(
         "Kcal por treino:",
-        min_value=200, max_value=700, value=420, step=10,
+        min_value=200, max_value=700, value=kcal_real, step=10,
         key="kcal_sessao_input",
-        help="Gasto calórico médio por sessão de musculação (~420 kcal para ~60 min)"
+        help=f"Média real dos seus treinos recentes: {kcal_real} kcal/sessão"
     )
 
 # Cálculo do ajuste de cenário
 KCAL_POR_KG_GORDURA = 7700  # kcal necessárias para perder 1 kg de gordura
-extra_sessoes = freq_treino - 3
+extra_sessoes = freq_treino - freq_real  # delta em relação à frequência real
 
 # Impacto extra semanal (adicional ao baseline de 3x/sem)
 extra_kcal_sem   = extra_sessoes * kcal_por_sessao
@@ -205,7 +222,7 @@ adj_slope_musc = +extra_musc_sem / 7
 
 with c_s3:
     if extra_sessoes == 0:
-        st.info("📊 **Cenário atual** — baseado no seu histórico de 3 treinos/semana.")
+        st.info(f"📊 **Cenário atual** — frequência real calculada: {freq_real:.1f}x/semana (últimos 60 dias).")
     else:
         extra_kg_mes = extra_peso_sem * 4.3
         st.markdown(f"""<div class='scenario-box'>
@@ -353,8 +370,17 @@ with tab1:
     with col_g:
         # Gráfico de peso
         fig_peso = go.Figure()
+        if bio_historico:
+            _h_datas = [datetime.strptime(b["date"], "%Y-%m-%d") for b in bio_historico]
+            _h_pesos = [b["peso_kg"] for b in bio_historico]
+            fig_peso.add_trace(go.Scatter(
+                x=_h_datas, y=_h_pesos, name="Histórico pré-Puran T4",
+                mode="lines+markers", opacity=0.35,
+                line=dict(color="#95A5A6", width=1.5, dash="dot"),
+                marker=dict(size=5, color="#95A5A6"),
+            ))
         fig_peso.add_trace(go.Scatter(
-            x=hist_datas, y=pesos, name="Peso real",
+            x=hist_datas, y=pesos, name="Peso real (pós-Puran T4)",
             mode="lines+markers",
             line=dict(color="#2980B9", width=2.5),
             marker=dict(size=7, color="#2980B9"),
@@ -374,7 +400,7 @@ with tab1:
             line=dict(color="#E67E22", width=1.5, dash="dashdot"),
         ))
         fig_peso.add_trace(go.Scatter(
-            x=proj_datas, y=proj_pesos, name="Projeção 3x/sem",
+            x=proj_datas, y=proj_pesos, name=f"Projeção {freq_real_slider}x/sem (atual)",
             mode="lines",
             line=dict(color="#9B59B6", width=2, dash="dash"),
         ))
@@ -412,8 +438,16 @@ with tab1:
 
         # Gráfico de gordura
         fig_gord = go.Figure()
+        if bio_historico:
+            _h_gords = [b.get("percentual_gordura", 0) for b in bio_historico]
+            fig_gord.add_trace(go.Scatter(
+                x=_h_datas, y=_h_gords, name="Histórico pré-Puran T4",
+                mode="lines+markers", opacity=0.35,
+                line=dict(color="#95A5A6", width=1.5, dash="dot"),
+                marker=dict(size=5, color="#95A5A6"),
+            ))
         fig_gord.add_trace(go.Scatter(
-            x=hist_datas, y=gorduras, name="Gordura real (%)",
+            x=hist_datas, y=gorduras, name="Gordura real (pós-Puran T4)",
             mode="lines+markers",
             line=dict(color="#E74C3C", width=2.5), marker=dict(size=7),
         ))
@@ -425,7 +459,7 @@ with tab1:
             line=dict(color="#E67E22", width=1.5, dash="dashdot"),
         ))
         fig_gord.add_trace(go.Scatter(
-            x=proj_datas, y=proj_gorduras, name="Projeção 3x/sem",
+            x=proj_datas, y=proj_gorduras, name=f"Projeção {freq_real_slider}x/sem (atual)",
             mode="lines",
             line=dict(color="#9B59B6", width=2, dash="dash"),
         ))
@@ -469,7 +503,7 @@ with tab1:
         if dt_peso:
             meses_b = int(dias_peso_falta / 30)
             st.markdown(
-                f"<div class='proj-warn'><b>⚖️ 3x/sem — Meta 82 kg</b><br>"
+                f"<div class='proj-warn'><b>⚖️ {freq_real_slider}x/sem (atual) — Meta 82 kg</b><br>"
                 f"Chegará em <b>{dt_peso.strftime('%d/%m/%Y')}</b><br>"
                 f"~{meses_b} meses · {taxa_peso_sem:.2f} kg/sem</div>",
                 unsafe_allow_html=True,
@@ -532,8 +566,16 @@ with tab2:
     col_mg, col_mr = st.columns([3, 1])
     with col_mg:
         fig_musc = go.Figure()
+        if bio_historico:
+            _h_muscs = [b.get("musculo_esqueletico_kg", 0) for b in bio_historico]
+            fig_musc.add_trace(go.Scatter(
+                x=_h_datas, y=_h_muscs, name="Histórico pré-Puran T4",
+                mode="lines+markers", opacity=0.35,
+                line=dict(color="#95A5A6", width=1.5, dash="dot"),
+                marker=dict(size=5, color="#95A5A6"),
+            ))
         fig_musc.add_trace(go.Scatter(
-            x=hist_datas, y=musculos, name="Músculo real",
+            x=hist_datas, y=musculos, name="Músculo real (pós-Puran T4)",
             mode="lines+markers",
             line=dict(color="#27AE60", width=2.5), marker=dict(size=7),
         ))
@@ -552,7 +594,7 @@ with tab2:
             line=dict(color="#E67E22", width=1.5, dash="dashdot"),
         ))
         fig_musc.add_trace(go.Scatter(
-            x=proj_datas, y=proj_musculos, name="Projeção 3x/sem",
+            x=proj_datas, y=proj_musculos, name=f"Projeção {freq_real_slider}x/sem (atual)",
             mode="lines",
             line=dict(color="#9B59B6", width=2, dash="dash"),
         ))
@@ -602,7 +644,7 @@ with tab2:
         with c_m3:
             taxa_kpi = taxa_musc_aj if usar_aj else taxa_musc_sem
             st.metric("Ritmo projetado", f"+{taxa_kpi * 4.3:.2f} kg/mês",
-                      delta=f"{freq_treino}x/sem" if usar_aj else "3x/sem")
+                      delta=f"{freq_treino}x/sem" if usar_aj else f"{freq_real_slider}x/sem")
 
     with col_mr:
         st.markdown("**📋 Projeção Muscular**")
@@ -611,7 +653,7 @@ with tab2:
         if dt_musc and taxa_musc_sem > 0:
             meses_musc = int(dias_musc_falta / 30)
             st.markdown(
-                f"<div class='proj-warn'><b>💪 3x/sem — Meta {MUSC_META} kg</b><br>"
+                f"<div class='proj-warn'><b>💪 {freq_real_slider}x/sem (atual) — Meta {MUSC_META} kg</b><br>"
                 f"Chegará em <b>{dt_musc.strftime('%d/%m/%Y')}</b><br>"
                 f"~{meses_musc} meses</div>",
                 unsafe_allow_html=True,
@@ -645,6 +687,60 @@ with tab2:
             "Com Puran T4 controlado: tende a melhorar</div>",
             unsafe_allow_html=True,
         )
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# GORDURA VISCERAL — painel contextual (fora das tabs, largura total)
+# ═══════════════════════════════════════════════════════════════════════════════
+_gv_vals  = [(datetime.strptime(b["date"], "%Y-%m-%d"), b.get("gordura_visceral", 0))
+             for b in bio_list if b.get("gordura_visceral")]
+if _gv_vals:
+    _gv_datas, _gv_nums = zip(*_gv_vals)
+    _gv_atual = _gv_nums[-1]
+    # Classificação clínica (escala Tanita/similares: 1-59)
+    if _gv_atual <= 9:
+        _gv_cor, _gv_label = "#27AE60", "Zona segura (≤ 9)"
+    elif _gv_atual <= 14:
+        _gv_cor, _gv_label = "#F39C12", "Risco moderado (10–14)"
+    else:
+        _gv_cor, _gv_label = "#E74C3C", "Risco alto (≥ 15)"
+
+    st.markdown("<div class='section-header'>🫀 Gordura Visceral — Monitoramento</div>", unsafe_allow_html=True)
+    _gvc1, _gvc2 = st.columns([1, 3])
+    with _gvc1:
+        st.markdown(f"""<div style='background:#f8f8f8;border-left:5px solid {_gv_cor};
+border-radius:8px;padding:16px;text-align:center;'>
+<div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Valor Atual</div>
+<div style='font-size:48px;font-weight:700;color:{_gv_cor}'>{_gv_atual}</div>
+<div style='font-size:13px;color:{_gv_cor};font-weight:600'>{_gv_label}</div>
+<div style='font-size:12px;color:#888;margin-top:6px'>Meta: ≤ 9</div>
+</div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div style='background:#fffbf0;border-left:4px solid #F39C12;
+border-radius:0 8px 8px 0;padding:10px 12px;margin-top:8px;font-size:12px'>
+<b>ℹ️ Sobre a projeção</b><br>
+A gordura visceral responde mais lentamente do que o peso e a gordura total.
+Tende a começar a cair após <b>3–6 meses</b> de déficit calórico sustentado.
+Não é projetada por data — acompanhe a tendência nas medições semanais.</div>""",
+        unsafe_allow_html=True)
+    with _gvc2:
+        fig_gv = go.Figure()
+        fig_gv.add_trace(go.Scatter(
+            x=list(_gv_datas), y=list(_gv_nums),
+            name="Gordura visceral", mode="lines+markers",
+            line=dict(color=_gv_cor, width=2.5), marker=dict(size=8),
+        ))
+        fig_gv.add_hline(y=9, line_dash="dot", line_color="#27AE60", line_width=1.5,
+                         annotation_text="Meta: 9", annotation_position="right")
+        fig_gv.add_hline(y=15, line_dash="dot", line_color="#E74C3C", line_width=1,
+                         annotation_text="Risco alto: 15", annotation_position="right")
+        fig_gv.update_layout(
+            title="Histórico de Gordura Visceral",
+            height=250, plot_bgcolor="white", paper_bgcolor="white",
+            xaxis=dict(showgrid=False, tickangle=-15, tickformat="%b/%y"),
+            yaxis=dict(showgrid=True, gridcolor="#eee", title="Índice", range=[0, max(20, _gv_atual + 3)]),
+            margin=dict(l=50, r=120, t=40, b=60),
+            showlegend=False,
+        )
+        st.plotly_chart(fig_gv, use_container_width=True, key="pred_gv")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TAB 3: EXAMES

@@ -1025,6 +1025,126 @@
       "ref_text": "Calculada a partir do HbA1c",
       "status": "info",
       "notes": "eAG calculada via fórmula ADA 2024 a partir do HbA1c 5,9%."
+    },
+    {
+      "session_id": "s004",
+      "category": "Metabólico",
+      "exam": "Glicose",
+      "value": 106,
+      "unit": "mg/dL",
+      "ref_min": 70,
+      "ref_max": 99,
+      "ref_text": "70 a 99",
+      "status": "alta",
+      "notes": "Acima do normal. Combinado com HOMA-IR 6,16 indica resistência insulínica."
+    },
+    {
+      "session_id": "s004",
+      "category": "Metabólico",
+      "exam": "Insulina",
+      "value": 23.5,
+      "unit": "µUI/mL",
+      "ref_min": 2.5,
+      "ref_max": 13.1,
+      "ref_text": "2,5 a 13,1",
+      "status": "alta",
+      "notes": "Hiperinsulinemia de jejum — 1ª medição. Método: quimioluminescência."
+    },
+    {
+      "session_id": "s004",
+      "category": "Metabólico",
+      "exam": "HOMA-IR",
+      "value": 6.16,
+      "unit": "",
+      "ref_min": null,
+      "ref_max": 2.7,
+      "ref_text": "< 2,70",
+      "status": "alta",
+      "notes": "Resistência insulínica significativa (>4 = moderada/grave). 1ª medição."
+    },
+    {
+      "session_id": "s004",
+      "category": "Lipídeos",
+      "exam": "Colesterol Total",
+      "value": 197,
+      "unit": "mg/dL",
+      "ref_min": null,
+      "ref_max": 190,
+      "ref_text": "< 190",
+      "status": "alta",
+      "notes": "Levemente acima. Método: enzimático CHOP-POD."
+    },
+    {
+      "session_id": "s004",
+      "category": "Lipídeos",
+      "exam": "LDL",
+      "value": 127,
+      "unit": "mg/dL",
+      "ref_min": null,
+      "ref_max": 115,
+      "ref_text": "< 115 (risco baixo)",
+      "status": "alta",
+      "notes": "Risco cardiovascular baixo = meta < 115. Calculado."
+    },
+    {
+      "session_id": "s004",
+      "category": "Lipídeos",
+      "exam": "HDL",
+      "value": 42,
+      "unit": "mg/dL",
+      "ref_min": 40,
+      "ref_max": null,
+      "ref_text": "> 40",
+      "status": "normal",
+      "notes": "Recuperou após queda para 33 em mai/26 (hipotireoidismo). Método: HDL homogêneo."
+    },
+    {
+      "session_id": "s004",
+      "category": "Lipídeos",
+      "exam": "VLDL",
+      "value": 16,
+      "unit": "mg/dL",
+      "ref_min": null,
+      "ref_max": null,
+      "ref_text": "Sem referência definida",
+      "status": "info",
+      "notes": "Calculado."
+    },
+    {
+      "session_id": "s004",
+      "category": "Lipídeos",
+      "exam": "Triglicérides",
+      "value": 80,
+      "unit": "mg/dL",
+      "ref_min": null,
+      "ref_max": 150,
+      "ref_text": "< 150",
+      "status": "normal",
+      "notes": "Normalizado após alta de 117 em mai/26. Método: enzimático."
+    },
+    {
+      "session_id": "s004",
+      "category": "Tireoide",
+      "exam": "TSH",
+      "value": 1.84,
+      "unit": "µUI/mL",
+      "ref_min": 0.4,
+      "ref_max": 4.3,
+      "ref_text": "0,40 a 4,30",
+      "status": "normal",
+      "notes": "NORMALIZADO. Era 7,48 em mai/26. Puran T4 na dose correta. Método: quimioluminescência."
+    },
+    {
+      "session_id": "s004",
+      "category": "Tireoide",
+      "exam": "T4 Livre",
+      "value": 1.43,
+      "unit": "ng/dL",
+      "ref_min": 0.89,
+      "ref_max": 1.76,
+      "ref_text": "0,89 a 1,76",
+      "status": "normal",
+      "notes": "Normalizado após 1,22 em mai/26. Método: quimioluminescência."
     }
   ]
 }

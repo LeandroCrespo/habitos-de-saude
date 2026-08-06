@@ -2623,6 +2623,17 @@
       "steps": 1611,
       "sleep_score": 75,
       "notes": ""
+    },
+    {
+      "id": 260,
+      "date": "2026-08-01",
+      "type": "Caminhada",
+      "duration_min": 28,
+      "calories_burned": 122,
+      "distance_km": 1.97,
+      "steps": 2539,
+      "sleep_score": 75,
+      "notes": ""
     }
   ]
 }

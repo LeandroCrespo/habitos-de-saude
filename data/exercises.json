@@ -2694,10 +2694,10 @@
       "id": 266,
       "date": "2026-08-06",
       "type": "Caminhada",
-      "duration_min": 22,
-      "calories_burned": 159,
-      "distance_km": 1.86,
-      "steps": 2306,
+      "duration_min": 75,
+      "calories_burned": 215,
+      "distance_km": 3.17,
+      "steps": 4204,
       "sleep_score": 75,
       "notes": ""
     }

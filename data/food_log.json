@@ -12155,6 +12155,26 @@
       "extra_desc": "",
       "extra_kcal": 0,
       "obs": "Padrão automático"
+    },
+    {
+      "id": 2446,
+      "date": "2026-08-03",
+      "time": "02:02:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz integral cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485.0,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0.0,
+      "obs": ""
     }
   ]
 }

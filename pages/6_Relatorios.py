@@ -41,7 +41,105 @@ report_type = st.selectbox("Tipo de Relatório:", [
 def gerar_resumo_geral():
     lat = bio_list[-1] if bio_list else {}
     fi  = bio_list[0]  if bio_list else {}
-    n_alerta = sum(1 for r in results if r["status"] in ("alta","baixa") and r["session_id"] == "s003")
+
+    # ── Sessão mais recente ──────────────────────────────────────────────────────
+    all_sess = sorted(sessions.values(), key=lambda s: s["date"])
+    if all_sess:
+        last_sess      = all_sess[-1]
+        latest_sid     = last_sess["id"]
+        latest_date_fmt = datetime.strptime(last_sess["date"], "%Y-%m-%d").strftime("%d/%m/%Y")
+        latest_lab     = last_sess.get("lab", "—")
+    else:
+        latest_sid, latest_date_fmt, latest_lab = "", "—", "—"
+
+    n_alerta = sum(1 for r in results if r["status"] in ("alta", "baixa") and r["session_id"] == latest_sid)
+
+    # ── Helper: último valor registrado de um exame ──────────────────────────────
+    def lv(exam_name):
+        best_d, best_v, best_u = "", None, ""
+        for r in results:
+            if r["exam"] == exam_name and r["value"] is not None:
+                d = sessions.get(r["session_id"], {}).get("date", "")
+                if d > best_d:
+                    best_d, best_v, best_u = d, r["value"], r.get("unit", "")
+        return best_v, best_u
+
+    # ── Alertas dinâmicos da última coleta ──────────────────────────────────────
+    alert_lines = []
+    for r in sorted(results, key=lambda x: x["exam"]):
+        if r["session_id"] != latest_sid or r["status"] not in ("alta", "baixa"):
+            continue
+        sym  = "⬆️" if r["status"] == "alta" else "⬇️"
+        val  = f"{r['value']} {r.get('unit','')}" if r["value"] is not None else (r.get("notes") or "—")
+        ref  = f" (ref: {r['ref_text']})" if r.get("ref_text") else ""
+        alert_lines.append(f"{sym} {r['exam']}: {val.strip()}{ref}")
+    alertas_txt = "\n".join(alert_lines) if alert_lines else "Nenhum parâmetro alterado nesta coleta."
+
+    # ── Condições identificadas (dinâmico por limiares atuais) ──────────────────
+    tsh_v, _    = lv("TSH")
+    hdl_v, _    = lv("HDL")
+    ldl_v, _    = lv("LDL")
+    hba1c_v, _  = lv("HbA1c")
+    homa_v, _   = lv("HOMA-IR")
+    tgo_v, _    = lv("TGO (AST)")
+    tgp_v, _    = lv("TGP (ALT)")
+    homo_v, _   = lv("Homocisteína")
+    antihbs_v,_ = lv("Anti-HBs")
+    glicose_v,_ = lv("Glicose")
+    ct_v, _     = lv("Colesterol Total")
+
+    condicoes = []
+    if tsh_v is not None:
+        if tsh_v > 4.3:
+            condicoes.append(f"• Hipotireoidismo (TSH {tsh_v} — em tratamento com Puran T4)")
+        else:
+            condicoes.append(f"• Hipotireoidismo tratado e controlado ✓ (TSH {tsh_v} — normal)")
+    condicoes.append("• Possível Tireoidite de Hashimoto (anti-TG positivo — histórico mai/2026)")
+    _hdl_baixo = hdl_v is not None and hdl_v < 40
+    _ldl_alto  = ldl_v is not None and ldl_v >= 130
+    if _hdl_baixo and _ldl_alto:
+        condicoes.append(f"• Dislipidemia: HDL baixo ({hdl_v} mg/dL) e LDL elevado ({ldl_v} mg/dL)")
+    elif _hdl_baixo:
+        condicoes.append(f"• Dislipidemia: HDL baixo ({hdl_v} mg/dL)")
+    elif _ldl_alto:
+        condicoes.append(f"• Dislipidemia: LDL elevado ({ldl_v} mg/dL)")
+    if ct_v is not None and ct_v >= 190:
+        condicoes.append(f"• Colesterol Total elevado ({ct_v} mg/dL)")
+    if hba1c_v is not None and hba1c_v >= 5.7:
+        label = "Pré-diabetes" if hba1c_v < 6.5 else "Diabetes"
+        condicoes.append(f"• {label} (HbA1c {hba1c_v}%)")
+    if homa_v is not None and homa_v > 2.7:
+        condicoes.append(f"• Resistência à insulina (HOMA-IR {homa_v} — ref < 2,70)")
+    if (tgo_v is not None and tgo_v > 34) or (tgp_v is not None and tgp_v > 49):
+        condicoes.append(f"• Transaminases elevadas (TGO: {tgo_v}, TGP: {tgp_v} — investigar com US)")
+    if homo_v is not None and homo_v > 15:
+        condicoes.append(f"• Homocisteína elevada ({homo_v} µmol/L)")
+    if antihbs_v is not None and antihbs_v < 10:
+        condicoes.append("• Sem imunidade para Hepatite B (Anti-HBs baixo)")
+    if lat.get("imc"):
+        condicoes.append(f"• Sobrepeso (IMC {lat.get('imc','—')})")
+    condicoes.append("• Coluna lombo-sacra — RM realizada")
+    condicoes_txt = "\n".join(condicoes)
+
+    # ── Pontos positivos (dinâmico) ─────────────────────────────────────────────
+    positivos = []
+    if bio_list and fi and lat:
+        if lat.get("peso_kg",0) < fi.get("peso_kg",0):
+            positivos.append("✅ Perda consistente de peso e gordura")
+        if lat.get("musculo_esqueletico_kg",0) > fi.get("musculo_esqueletico_kg",0):
+            positivos.append("✅ Ganho de massa muscular")
+    if tsh_v is not None and tsh_v <= 4.3:
+        positivos.append(f"✅ TSH normalizado ({tsh_v} µUI/mL) — hipotireoidismo controlado")
+    if hdl_v is not None and hdl_v >= 40:
+        positivos.append(f"✅ HDL dentro da referência ({hdl_v} mg/dL ≥ 40)")
+    if ldl_v is not None and ldl_v < 130:
+        positivos.append(f"✅ LDL normalizado ({ldl_v} mg/dL)")
+    if glicose_v is not None and glicose_v < 100:
+        positivos.append(f"✅ Glicose normalizada ({glicose_v} mg/dL)")
+    positivos.append("✅ Hemograma normal")
+    positivos.append("✅ PSA normal")
+    positivos.append("✅ Função renal estável")
+    positivos_txt = "\n".join(positivos)
 
     txt = f"""╔══════════════════════════════════════════════════════════════╗
 ║         RELATÓRIO DE SAÚDE — LEANDRO LEME CRESPO             ║
@@ -59,7 +157,7 @@ Medicamentos: {', '.join(m['nome'] for m in profile.get('medicamentos',[]))}
 
 BIOIMPEDÂNCIA — ÚLTIMA MEDIÇÃO
 ───────────────────────────────
-Data: {datetime.strptime(lat.get('date','2026-06-24'),'%Y-%m-%d').strftime('%d/%m/%Y')}
+Data: {datetime.strptime(lat.get('date','2026-06-24'),'%Y-%m-%d').strftime('%d/%m/%Y') if lat.get('date') else '—'}
 Peso: {lat.get('peso_kg','—')} kg | IMC: {lat.get('imc','—')}
 Gordura: {lat.get('percentual_gordura','—')}% ({lat.get('massa_gordura_kg','—')} kg)
 Músculo Esq.: {lat.get('musculo_esqueletico_kg','—')} kg ({lat.get('percentual_musculo','—')}%)
@@ -72,41 +170,19 @@ Peso: {fi.get('peso_kg','—')} → {lat.get('peso_kg','—')} kg (Δ {round(lat
 Gordura: {fi.get('percentual_gordura','—')}% → {lat.get('percentual_gordura','—')}% (Δ {round(lat.get('percentual_gordura',0)-fi.get('percentual_gordura',0),1)} pp)
 Músculo: {fi.get('musculo_esqueletico_kg','—')} → {lat.get('musculo_esqueletico_kg','—')} kg (Δ +{round(lat.get('musculo_esqueletico_kg',0)-fi.get('musculo_esqueletico_kg',0),1)} kg)
 
-EXAMES LABORATORIAIS — ALERTAS (última coleta 13/05/2026)
-──────────────────────────────────────────────────────────
-{n_alerta} parâmetros com valores fora da referência:
+EXAMES LABORATORIAIS — ALERTAS (última coleta: {latest_date_fmt} — {latest_lab})
+──────────────────────────────────────────────────────────────────────
+{n_alerta} parâmetro(s) com valores fora da referência:
 
-⬆️ TSH: 7,48 µUI/mL (ref 0,40–4,30) — HIPOTIREOIDISMO
-⬆️ TGO: 60 U/L (ref < 34) — ELEVADO
-⬆️ TGP: 61 U/L (ref 10–49) — ELEVADO
-⬆️ Anti-tireoglobulina: 8,2 UI/mL (ref < 4,5) — HASHIMOTO?
-⬇️ HDL: 33 mg/dL (ref > 40) — BAIXO
-⬆️ LDL: 143 mg/dL (ref < 130) — ELEVADO
-⬆️ Colesterol Total: 199 mg/dL (ref < 190) — LEVEMENTE ELEVADO
-⬆️ HbA1c: 5,9% (ref < 5,7%) — PRÉ-DIABETES
-⬇️ Anti-HBs: < 2,0 mUI/mL (ref > 10) — SEM IMUNIDADE HEP B
+{alertas_txt}
 
 CONDIÇÕES IDENTIFICADAS
 ────────────────────────
-• Hipotireoidismo subclínico (TSH progressivo 4,31→4,50→7,48)
-• Possível Tireoidite de Hashimoto (anti-TG positivo)
-• Dislipidemia (HDL baixo, LDL elevado)
-• Pré-diabetes (HbA1c 5,8–5,9%)
-• Transaminases elevadas (investigar com ultrassom)
-• Homocisteína elevada (19 µmol/L — out/2025)
-• Sem imunidade para Hepatite B
-• Sobrepeso (IMC {lat.get('imc','—')})
-• Coluna lombo-sacra — RM realizada
+{condicoes_txt}
 
 PONTOS POSITIVOS
 ─────────────────
-✅ Perda consistente de peso e gordura
-✅ Ganho de massa muscular
-✅ Glicose normalizada (103→96 mg/dL)
-✅ Colesterol total e LDL melhorando
-✅ Hemograma normal
-✅ PSA normal
-✅ Função renal estável
+{positivos_txt}
 
 ══════════════════════════════════════════════════════════════
 AVISO: Este relatório é de acompanhamento pessoal e não
@@ -153,6 +229,63 @@ IMC: {fi['imc']} → {la['imc']}
 
 
 def gerar_lista_medica():
+    # ── Helpers para lista médica ─────────────────────────────────────────────────
+    def lv_med(exam_name):
+        best_d, best_v, best_u = "", None, ""
+        for r in results:
+            if r["exam"] == exam_name and r["value"] is not None:
+                d = sessions.get(r["session_id"], {}).get("date", "")
+                if d > best_d:
+                    best_d, best_v, best_u = d, r["value"], r.get("unit", "")
+        return best_v, best_u
+
+    def trend_med(exam_name):
+        """Histórico do exame em forma de progressão 'v (data) → v (data)'."""
+        pts = []
+        for r in results:
+            if r["exam"] == exam_name and r["value"] is not None:
+                d = sessions.get(r["session_id"], {}).get("date", "")
+                lab = sessions.get(r["session_id"], {}).get("lab", "")
+                if d:
+                    pts.append((d, r["value"], r.get("unit",""), lab))
+        pts.sort()
+        if not pts:
+            return "—"
+        meses_pt = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
+        parts = []
+        for d, v, u, lab in pts:
+            dt = datetime.strptime(d, "%Y-%m-%d")
+            parts.append(f"{v} {u} ({meses_pt[dt.month-1]}/{str(dt.year)[2:]})")
+        return " → ".join(parts)
+
+    # Coletas registradas
+    datas_coletas = " | ".join(
+        f"{datetime.strptime(s['date'],'%Y-%m-%d').strftime('%d/%m/%Y')} ({s.get('lab','—')})"
+        for s in sorted(sessions.values(), key=lambda x: x["date"])
+    ) or "—"
+
+    # TSH status
+    tsh_v_med, tsh_u_med = lv_med("TSH")
+    _tsh_ctrl = tsh_v_med is not None and tsh_v_med <= 4.3
+    _tsh_histo = trend_med("TSH")
+    tsh_bloco = (
+        f"   TSH: {_tsh_histo}\n"
+        f"   ✅ TSH CONTROLADO em {tsh_v_med} µUI/mL — dentro da referência (0,40–4,30)\n"
+        f"   Puran T4 (levotiroxina) iniciado jun/2026 — efeito confirmado."
+        if _tsh_ctrl else
+        f"   TSH: {_tsh_histo}\n"
+        f"   Anti-tireoglobulina: 8,2 UI/mL (ref < 4,5) | Anti-TPO: normal\n"
+        f"   T4 Livre: 1,22 ng/dL (normal)\n"
+        f"   Iniciou Puran T4 em jun/2026. Aguardar controle do TSH em 8–12 semanas."
+    )
+
+    # TGO/TGP
+    tgo_v_med, _ = lv_med("TGO (AST)")
+    tgp_v_med, _ = lv_med("TGP (ALT)")
+    _trans_ok_med = (tgo_v_med is None or tgo_v_med <= 34) and (tgp_v_med is None or tgp_v_med <= 49)
+    tgo_hist = trend_med("TGO (AST)")
+    tgp_hist = trend_med("TGP (ALT)")
+
     txt = f"""LISTA PARA CONSULTA MÉDICA — LEANDRO LEME CRESPO
 Gerado em: {hoje}
 Data de nascimento: 30/06/1981 | {idade} anos
@@ -164,23 +297,28 @@ RESUMO DO CONTEXTO
 Paciente em acompanhamento por sobrepeso, pré-diabetes e dislipidemia.
 Em uso de Puran T4 (levotiroxina, iniciado jun/2026) e Psyllium. Última bioimpedância: {bio_list[-1]['peso_kg'] if bio_list else '—'} kg,
 {bio_list[-1]['percentual_gordura'] if bio_list else '—'}% gordura. Pratica musculação regularmente.
-Exames laboratoriais de 06/05/2026 e 13/05/2026 (Lavoisier + Delboni).
+Exames laboratoriais registrados: {datas_coletas}
 
-🔴 SITUAÇÕES URGENTES A DISCUTIR
+🔴 SITUAÇÕES A DISCUTIR
 ──────────────────────────────────
 
-1. HIPOTIREOIDISMO / HASHIMOTO — EM TRATAMENTO
-   TSH: 4,31 (out/25) → 4,50 (mai/06) → 7,48 µUI/mL (mai/13)
-   Anti-tireoglobulina: 8,2 UI/mL (ref < 4,5) | Anti-TPO: normal
-   T4 Livre: 1,22 ng/dL (normal)
-   Iniciou Puran T4 em jun/2026. Aguardar controle do TSH em 8–12 semanas.
+1. HIPOTIREOIDISMO / HASHIMOTO
+{tsh_bloco}
+   Anti-tireoglobulina: 8,2 UI/mL (ref < 4,5) | Possível Tireoidite de Hashimoto
 
-2. TRANSAMINASES ELEVADAS E PIORAS
-   TGO: 22 → 53 → 60 U/L | TGP: 34 → 35 → 61 U/L
-   Ultrassonografia abdominal foi solicitada em 12/05/2026 — aguardo resultado.
-   Pergunta: Resultados da ultrassonografia? Qual conduta com as transaminases?
+2. TRANSAMINASES{" — NORMALIZADAS ✅" if _trans_ok_med else " — ELEVADAS"}
+   TGO: {tgo_hist}
+   TGP: {tgp_hist}
+   {"Transaminases dentro dos limites de referência." if _trans_ok_med else "Ultrassonografia abdominal solicitada em mai/2026 — aguardo resultado."}
+   {"" if _trans_ok_med else "Pergunta: Resultados da ultrassonografia? Qual conduta?"}
 
-3. VACINA HEPATITE B
+3. RESISTÊNCIA À INSULINA / PRÉ-DIABETES
+   HOMA-IR: {trend_med("HOMA-IR")} (ref < 2,70)
+   HbA1c: {trend_med("HbA1c")} (ref < 5,7%)
+   Glicose: {trend_med("Glicose")} mg/dL | Insulina: {trend_med("Insulina")} µUI/mL
+   Pergunta: Indicação de metformina? Ajuste na dieta/exercício para IR?
+
+4. VACINA HEPATITE B
    Anti-HBs < 2,0 mUI/mL | Anti-HBc negativo (nunca vacinou)
    Preciso iniciar esquema de vacinação (0–1–6 meses).
 

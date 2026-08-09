@@ -968,21 +968,31 @@ with tab3:
         ("HDL",             "mg/dL",  "> 40",    40,   None),
         ("LDL",             "mg/dL",  "< 130",   None, 130),
         ("HbA1c",           "%",      "< 5,7%",  None, 5.7),
+        ("Glicose",         "mg/dL",  "< 100",   None, 100),
+        ("Insulina",        "µUI/mL", "< 15",    None, 15),
+        ("HOMA-IR",         "índice", "< 2,70",  None, 2.70),
         ("Colesterol Total","mg/dL",  "< 190",   None, 190),
     ]
 
+    # Colunas dinâmicas: uma por sessão real, ordenada por data
+    _meses_pt = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
+    def _col_lbl(d):
+        dt = datetime.strptime(d, "%Y-%m-%d")
+        return f"{_meses_pt[dt.month - 1]}/{str(dt.year)[2:]}"
+
+    _sorted_dates = sorted(set(sessions.values()))  # lista de datas ISO únicas, ordenadas
+    _col_names    = [_col_lbl(d) for d in _sorted_dates]
+
     rows = []
     for exam_name, unit, ref_label, ref_min, ref_max in exams_compare:
-        vals_by_session = {}
+        vals_by_date = {}
         for r in results:
             if r["exam"] == exam_name and r["value"] is not None:
-                vals_by_session[sessions.get(r["session_id"], "")] = r["value"]
+                d = sessions.get(r["session_id"], "")
+                if d:
+                    vals_by_date[d] = r["value"]
 
-        s1  = vals_by_session.get("2025-10-18", "—")
-        s2  = vals_by_session.get("2026-05-06", "—")
-        s3  = vals_by_session.get("2026-05-13", "—")
         cur = _val(exam_name)
-
         if cur is not None and ref_max is not None:
             ok = cur <= ref_max
         elif cur is not None and ref_min is not None:
@@ -990,14 +1000,12 @@ with tab3:
         else:
             ok = True
 
-        rows.append({
-            "Exame":       exam_name,
-            "Out/2025":    s1,
-            "Mai 06/26":   s2,
-            "Mai 13/26":   s3,
-            "Referência":  ref_label,
-            "Status":      "✅ Normal" if ok else "🔴 Alterado",
-        })
+        row = {"Exame": f"{exam_name} ({unit})"}
+        for d, cn in zip(_sorted_dates, _col_names):
+            row[cn] = vals_by_date.get(d, "—")
+        row["Referência"] = ref_label
+        row["Status"]     = "✅ Normal" if ok else "🔴 Alterado"
+        rows.append(row)
 
     st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
@@ -1005,11 +1013,24 @@ with tab3:
     st.markdown("### 🎯 Projeção de Normalização por Exame")
 
     # HDL: ajustado pela frequência de treino
-    hdl_atual = _val("HDL") or 33
+    hdl_atual = _val("HDL") or 40  # fallback à meta mínima; dados reais têm prioridade
     hdl_melhora_mes_base = 1.5  # mg/dL/mês com exercício aeróbico ≥ 150 min/sem
     hdl_melhora_mes_aj   = hdl_melhora_mes_base + (extra_sessoes * 0.5)
-    hdl_meses_para_40    = max(1, int((40 - hdl_atual) / hdl_melhora_mes_aj)) if usar_aj else max(1, int((40 - hdl_atual) / hdl_melhora_mes_base))
-    hdl_expected         = today_date + timedelta(weeks=int(hdl_meses_para_40 * 4.3))
+    if hdl_atual < 40:
+        hdl_meses_para_40 = (max(1, int((40 - hdl_atual) / hdl_melhora_mes_aj)) if usar_aj
+                             else max(1, int((40 - hdl_atual) / hdl_melhora_mes_base)))
+    else:
+        hdl_meses_para_40 = 0  # já atingiu a meta
+    hdl_expected = today_date + timedelta(weeks=int(hdl_meses_para_40 * 4.3))
+
+    # Helper: tendência histórica dinâmica para notas de projeção
+    def _trend_str(exam_name):
+        """Retorna 'v1 → v2 → v3' com todos os valores históricos do exame."""
+        pts = sorted(
+            [(sessions.get(r["session_id"], ""), r["value"])
+             for r in results if r["exam"] == exam_name and r["value"] is not None]
+        )
+        return " → ".join(str(v) for _, v in pts) if pts else "—"
 
     exam_projs = [
         {
@@ -1071,7 +1092,7 @@ with tab3:
             "expected":   today_date + timedelta(weeks=14),
             "confidence": "Alta",
             "mechanism":  "🥗 Dieta da nutricionista + perda de peso + Puran T4",
-            "note":       "LDL já melhorou (162→143). Com -5 kg a mais, espera-se redução adicional de 8–12%. Normalização em ~3 meses.",
+            "note":       f"LDL: {_trend_str('LDL')} mg/dL. Com -5 kg a mais, espera-se redução adicional de 8–12%. Normalização em ~3 meses caso ainda elevado.",
         },
         {
             "exam":       "HbA1c",
@@ -1095,7 +1116,7 @@ with tab3:
             "expected":   today_date + timedelta(weeks=10),
             "confidence": "Alta",
             "mechanism":  "🥗 Dieta + perda de peso + Puran T4 (hipotireoidismo eleva colesterol)",
-            "note":       "Já melhorou (222→199). Com tratamento da tireoide, colesterol tende a cair mais. Normalização em ~2,5 meses.",
+            "note":       f"CT: {_trend_str('Colesterol Total')} mg/dL. Com tratamento da tireoide, colesterol tende a cair mais. Normalização em ~2,5 meses caso ainda elevado.",
         },
     ]
 
@@ -1149,14 +1170,53 @@ with tab3:
     dt_82kg_str = dt_peso_aj.strftime("%b/%Y") if usar_aj and dt_peso_aj else (dt_peso.strftime("%b/%Y") if dt_peso else "2027")
     dt_musc_str = dt_musc_aj.strftime("%b/%Y") if usar_aj and dt_musc_aj else (dt_musc.strftime("%b/%Y") if dt_musc else "2027+")
 
+    # Verificar status atual de cada meta laboratorial para timeline dinâmica
+    _tsh_cur    = _val("TSH")
+    _ldl_cur    = _val("LDL")
+    _hdl_cur    = _val("HDL")
+    _hba1c_cur  = _val("HbA1c")
+    _ct_cur     = _val("Colesterol Total")
+    _tgo_cur    = _val("TGO (AST)")
+    _tgp_cur    = _val("TGP (ALT)")
+
+    _tsh_ok    = _tsh_cur is not None and _tsh_cur <= 4.3
+    _ldl_ok    = _ldl_cur is not None and _ldl_cur < 130
+    _hdl_ok    = _hdl_cur is not None and _hdl_cur >= 40
+    _hba1c_ok  = _hba1c_cur is not None and _hba1c_cur < 5.7
+    _ct_ok     = _ct_cur is not None and _ct_cur < 190
+    _tgo_ok    = _tgo_cur is None or _tgo_cur <= 34
+    _tgp_ok    = _tgp_cur is None or _tgp_cur <= 49
+    _trans_ok  = _tgo_ok and _tgp_ok
+
+    _hdl_tl = (
+        ("Atingido", "✅", f"HDL ≥ 40 mg/dL ✓ (atual: {_hdl_cur} mg/dL)")
+        if _hdl_ok else
+        (f"~{hdl_meses_para_40} meses", "🟡", f"HDL atinge 40 mg/dL — com {freq_treino}x/sem de exercício")
+    )
     timeline = [
-        ("Jul/2026", "🟣", "Início do efeito do Puran T4 — primeiros sinais de melhora no metabolismo"),
-        ("Ago/2026", "🟢", "TSH normaliza com levotiroxina (8–12 semanas após início)"),
-        ("Set/2026", "🟢", "HbA1c volta ao normal (< 5,7%) — sai da zona pré-diabetes"),
-        ("Set/2026", "🟢", "Colesterol Total < 190 mg/dL com dieta + tratamento da tireoide"),
-        ("Out/2026", "🟢", "LDL < 130 mg/dL com dieta + perda de peso"),
-        ("Nov/2026", "🟡", "TGO e TGP normalizam após TSH controlado + resultado da US"),
-        (f"~{hdl_meses_para_40} meses", "🟡", f"HDL atinge 40 mg/dL — com {freq_treino}x/sem de exercício"),
+        # Jul/2026 já passou — Puran T4 em andamento
+        ("Jul/2026", "✅", "Início do efeito do Puran T4 — primeiros sinais de melhora no metabolismo"),
+        ("Ago/2026",
+         "✅" if _tsh_ok else "🟢",
+         f"TSH normalizado com levotiroxina ✓ (atual: {_tsh_cur} µUI/mL)" if _tsh_ok
+         else f"TSH esperado normalizar (atual: {_tsh_cur} µUI/mL — meta ≤ 4,3)"),
+        ("Set/2026",
+         "✅" if _hba1c_ok else "🟢",
+         f"HbA1c normalizado < 5,7% ✓ (atual: {_hba1c_cur}%)" if _hba1c_ok
+         else f"HbA1c volta ao normal (< 5,7%) — atual: {_hba1c_cur}%"),
+        ("Set/2026",
+         "✅" if _ct_ok else "🟢",
+         f"Colesterol Total < 190 mg/dL ✓ (atual: {_ct_cur} mg/dL)" if _ct_ok
+         else f"Colesterol Total < 190 mg/dL com dieta + tratamento da tireoide (atual: {_ct_cur} mg/dL)"),
+        ("Out/2026",
+         "✅" if _ldl_ok else "🟢",
+         f"LDL < 130 mg/dL ✓ (atual: {_ldl_cur} mg/dL)" if _ldl_ok
+         else f"LDL < 130 mg/dL com dieta + perda de peso (atual: {_ldl_cur} mg/dL)"),
+        ("Nov/2026",
+         "✅" if _trans_ok else "🟡",
+         "TGO e TGP normalizados ✓" if _trans_ok
+         else f"TGO e TGP normalizam após TSH controlado + resultado da US (TGO: {_tgo_cur}, TGP: {_tgp_cur})"),
+        _hdl_tl,
         (dt_82kg_str, "⚖️", f"Meta 82 kg — {peso_atual - PESO_META:.1f} kg abaixo do peso atual" + (f" (cenário {freq_treino}x/sem)" if usar_aj else "")),
         (dt_musc_str, "💪", "Meta 40 kg de músculo esquelético"),
     ]

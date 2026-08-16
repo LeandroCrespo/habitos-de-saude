@@ -2821,6 +2821,17 @@
       "steps": 1938,
       "sleep_score": 75,
       "notes": ""
+    },
+    {
+      "id": 278,
+      "date": "2026-08-14",
+      "type": "Musculação",
+      "duration_min": 34,
+      "calories_burned": 215,
+      "distance_km": 0.0,
+      "steps": 0,
+      "sleep_score": 75,
+      "notes": ""
     }
   ]
 }

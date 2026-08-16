@@ -1,0 +1,35 @@
+name: Preencher dieta padrão diária
+
+# Roda de forma independente do app Streamlit — garante que todo dia
+# receba as refeições-padrão mesmo se ninguém abrir o sistema.
+on:
+  schedule:
+    # 01:00 UTC = 22:00 horário de Brasília (UTC-3, Brasil não usa mais horário de verão)
+    - cron: "0 1 * * *"
+  workflow_dispatch: {}   # permite disparo manual pela aba Actions do GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Preencher refeições padrão faltantes
+        run: python scripts/backfill_food_log.py
+
+      - name: Commit e push se houver mudanças
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/food_log.json
+          git diff --cached --quiet || git commit -m "auto: preencher dieta padrão do dia (GitHub Actions)"
+          git push

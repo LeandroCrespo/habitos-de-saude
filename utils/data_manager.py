@@ -177,22 +177,43 @@ _DEFAULT_MEALS = [
 ]
 
 
-def ensure_today_defaults(food_logs, today_str):
-    """Garante que as refeições base do dia estejam em food_logs. Salva e retorna logs atualizados."""
-    existing_today = {l["meal_id"] for l in food_logs if l.get("date") == today_str}
+def ensure_today_defaults(food_logs, today_str, backfill_days=14):
+    """Garante que as refeições base do dia estejam em food_logs.
+
+    Também recupera dias recentes em que o app não foi aberto. Isto é uma
+    camada extra de segurança apenas — a recuperação principal e realmente
+    automática (independente de o app ser aberto) roda via GitHub Actions
+    (`.github/workflows/daily-food-log.yml` + `scripts/backfill_food_log.py`).
+    Verifica os últimos `backfill_days` dias anteriores a hoje e completa
+    qualquer um que esteja totalmente vazio, sem sobrescrever dias já
+    preenchidos (mesmo que parcialmente). Salva e retorna logs atualizados.
+    """
+    from datetime import datetime as _dt, timedelta as _td
+
+    existing_dates = {l.get("date") for l in food_logs}
     next_id = max((l["id"] for l in food_logs), default=0) + 1
     added = []
-    for meal in _DEFAULT_MEALS:
-        if meal["meal_id"] not in existing_today:
+
+    today_dt = _dt.strptime(today_str, "%Y-%m-%d")
+    dias_a_checar = [today_str] + [
+        (today_dt - _td(days=i)).strftime("%Y-%m-%d") for i in range(1, backfill_days + 1)
+    ]
+
+    for d in dias_a_checar:
+        if d in existing_dates:
+            continue  # dia já tem pelo menos um registro — não mexe
+        for meal in _DEFAULT_MEALS:
             added.append({
-                "id": next_id, "date": today_str, "time": meal["time"],
+                "id": next_id, "date": d, "time": meal["time"],
                 "meal_id": meal["meal_id"], "meal_name": meal["meal_name"],
                 "foods": meal["foods"],
                 "kcal_total": meal["kcal_total"], "prot_g": meal["prot_g"],
                 "carb_g": meal["carb_g"], "fat_g": meal["fat_g"],
-                "extra_desc": "", "extra_kcal": 0, "obs": "Padrão automático",
+                "extra_desc": "", "extra_kcal": 0,
+                "obs": "Padrão automático" if d == today_str else "Padrão automático (dia recuperado retroativamente)",
             })
             next_id += 1
+
     if added:
         food_logs = food_logs + added
         save_food_log(food_logs)

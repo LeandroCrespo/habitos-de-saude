@@ -12689,6 +12689,496 @@
       "extra_desc": "",
       "extra_kcal": 0,
       "obs": "Padrão automático"
+    },
+    {
+      "id": 2473,
+      "date": "2026-08-15",
+      "time": "07:00:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 380,
+      "prot_g": 17.9,
+      "carb_g": 55.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2474,
+      "date": "2026-08-15",
+      "time": "12:00:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2475,
+      "date": "2026-08-15",
+      "time": "15:30:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Pão Francês",
+        "Ovo cozido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 365,
+      "prot_g": 17.4,
+      "carb_g": 51.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2476,
+      "date": "2026-08-15",
+      "time": "19:00:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2477,
+      "date": "2026-08-15",
+      "time": "21:00:00",
+      "meal_id": "cha",
+      "meal_name": "Hora do Chá",
+      "foods": [
+        "Chá de manjericão com limão"
+      ],
+      "kcal_total": 5,
+      "prot_g": 0.0,
+      "carb_g": 1.0,
+      "fat_g": 0.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2478,
+      "date": "2026-08-14",
+      "time": "07:00:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 380,
+      "prot_g": 17.9,
+      "carb_g": 55.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2479,
+      "date": "2026-08-14",
+      "time": "12:00:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2480,
+      "date": "2026-08-14",
+      "time": "15:30:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Pão Francês",
+        "Ovo cozido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 365,
+      "prot_g": 17.4,
+      "carb_g": 51.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2481,
+      "date": "2026-08-14",
+      "time": "19:00:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2482,
+      "date": "2026-08-14",
+      "time": "21:00:00",
+      "meal_id": "cha",
+      "meal_name": "Hora do Chá",
+      "foods": [
+        "Chá de manjericão com limão"
+      ],
+      "kcal_total": 5,
+      "prot_g": 0.0,
+      "carb_g": 1.0,
+      "fat_g": 0.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2483,
+      "date": "2026-08-13",
+      "time": "07:00:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 380,
+      "prot_g": 17.9,
+      "carb_g": 55.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2484,
+      "date": "2026-08-13",
+      "time": "12:00:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2485,
+      "date": "2026-08-13",
+      "time": "15:30:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Pão Francês",
+        "Ovo cozido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 365,
+      "prot_g": 17.4,
+      "carb_g": 51.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2486,
+      "date": "2026-08-13",
+      "time": "19:00:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2487,
+      "date": "2026-08-13",
+      "time": "21:00:00",
+      "meal_id": "cha",
+      "meal_name": "Hora do Chá",
+      "foods": [
+        "Chá de manjericão com limão"
+      ],
+      "kcal_total": 5,
+      "prot_g": 0.0,
+      "carb_g": 1.0,
+      "fat_g": 0.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2488,
+      "date": "2026-08-12",
+      "time": "07:00:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 380,
+      "prot_g": 17.9,
+      "carb_g": 55.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2489,
+      "date": "2026-08-12",
+      "time": "12:00:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2490,
+      "date": "2026-08-12",
+      "time": "15:30:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Pão Francês",
+        "Ovo cozido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 365,
+      "prot_g": 17.4,
+      "carb_g": 51.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2491,
+      "date": "2026-08-12",
+      "time": "19:00:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2492,
+      "date": "2026-08-12",
+      "time": "21:00:00",
+      "meal_id": "cha",
+      "meal_name": "Hora do Chá",
+      "foods": [
+        "Chá de manjericão com limão"
+      ],
+      "kcal_total": 5,
+      "prot_g": 0.0,
+      "carb_g": 1.0,
+      "fat_g": 0.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2493,
+      "date": "2026-08-10",
+      "time": "07:00:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 380,
+      "prot_g": 17.9,
+      "carb_g": 55.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2494,
+      "date": "2026-08-10",
+      "time": "12:00:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2495,
+      "date": "2026-08-10",
+      "time": "15:30:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Pão Francês",
+        "Ovo cozido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 365,
+      "prot_g": 17.4,
+      "carb_g": 51.5,
+      "fat_g": 11.3,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2496,
+      "date": "2026-08-10",
+      "time": "19:00:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 485,
+      "prot_g": 49.0,
+      "carb_g": 56.0,
+      "fat_g": 6.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
+    },
+    {
+      "id": 2497,
+      "date": "2026-08-10",
+      "time": "21:00:00",
+      "meal_id": "cha",
+      "meal_name": "Hora do Chá",
+      "foods": [
+        "Chá de manjericão com limão"
+      ],
+      "kcal_total": 5,
+      "prot_g": 0.0,
+      "carb_g": 1.0,
+      "fat_g": 0.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático (dia recuperado via GitHub Actions)"
     }
   ]
 }

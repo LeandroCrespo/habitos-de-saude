@@ -21,5 +21,13 @@
     "Transaminases elevadas (TGO/TGP — investigar causa)",
     "Coluna lombar — RM realizada (verificar laudo)"
   ],
+  "eventos_medicos": [
+    {
+      "data": "2026-08-16",
+      "tipo": "Dor lombar aguda",
+      "descricao": "Crise de dor lombar. Tomou 1 comprimido de Torsilax (carisoprodol + diclofenaco sódico + paracetamol + cafeína) no domingo à noite e usou Salonpas (adesivo analgésico) na região. Não repetiu a medicação depois dessa dose única. Dor cessou, mas amplitude de movimento ainda não estava 100% nos dias seguintes.",
+      "obs": "Diclofenaco (AINE) tem efeito conhecido de retenção de sódio/água — explica parte do aumento de peso e %gordura na bioimpedância de 18/08/2026 (efeito temporário, não gordura real). Carisoprodol é substância controlada (potencial de dependência) — evitar uso repetido sem orientação médica; mencionar à Dra. Celina se a dor voltar."
+    }
+  ],
   "objetivo": "Emagrecimento com preservação/ganho de massa muscular"
 }

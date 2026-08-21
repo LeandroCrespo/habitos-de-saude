@@ -2355,7 +2355,7 @@
       "type": "Musculação",
       "duration_min": 36,
       "calories_burned": 240,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2388,7 +2388,7 @@
       "type": "Musculação",
       "duration_min": 37,
       "calories_burned": 248,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2410,7 +2410,7 @@
       "type": "Bicicleta",
       "duration_min": 5,
       "calories_burned": 21,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 0,
       "notes": ""
@@ -2421,7 +2421,7 @@
       "type": "Musculação",
       "duration_min": 56,
       "calories_burned": 393,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 0,
       "notes": ""
@@ -2487,7 +2487,7 @@
       "type": "Caminhada",
       "duration_min": 55,
       "calories_burned": 314,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 2557,
       "sleep_score": 91,
       "notes": ""
@@ -2509,7 +2509,7 @@
       "type": "Musculação",
       "duration_min": 48,
       "calories_burned": 332,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 0,
       "notes": ""
@@ -2542,7 +2542,7 @@
       "type": "Musculação",
       "duration_min": 47,
       "calories_burned": 332,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2564,7 +2564,7 @@
       "type": "Bicicleta",
       "duration_min": 15,
       "calories_burned": 112,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2685,7 +2685,7 @@
       "type": "Musculação",
       "duration_min": 35,
       "calories_burned": 226,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2718,7 +2718,7 @@
       "type": "Musculação",
       "duration_min": 54,
       "calories_burned": 380,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2729,7 +2729,7 @@
       "type": "Bicicleta",
       "duration_min": 10,
       "calories_burned": 72,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2795,7 +2795,7 @@
       "type": "Musculação",
       "duration_min": 26,
       "calories_burned": 184,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2806,7 +2806,7 @@
       "type": "Bicicleta",
       "duration_min": 11,
       "calories_burned": 73,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2828,7 +2828,7 @@
       "type": "Musculação",
       "duration_min": 34,
       "calories_burned": 215,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2850,7 +2850,7 @@
       "type": "Caminhada",
       "duration_min": 57,
       "calories_burned": 261,
-      "distance_km": 4.0,
+      "distance_km": 4,
       "steps": 5159,
       "sleep_score": 75,
       "notes": ""
@@ -2883,7 +2883,7 @@
       "type": "Musculação",
       "duration_min": 13,
       "calories_burned": 79,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -2909,6 +2909,28 @@
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
+    },
+    {
+      "date": "2026-08-20",
+      "type": "Musculação",
+      "start_time": "18:04",
+      "duration_min": 33,
+      "calories_burned": 237,
+      "steps": 4502,
+      "sleep_score": 0,
+      "notes": "Auto-importado Samsung Health",
+      "id": 286
+    },
+    {
+      "date": "2026-08-20",
+      "type": "Corrida",
+      "start_time": "18:39",
+      "duration_min": 25,
+      "calories_burned": 172,
+      "steps": 4502,
+      "sleep_score": 0,
+      "notes": "Auto-importado Samsung Health",
+      "id": 287
     }
   ]
 }

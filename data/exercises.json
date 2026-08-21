@@ -2912,17 +2912,6 @@
     },
     {
       "date": "2026-08-20",
-      "type": "Musculação",
-      "start_time": "18:04",
-      "duration_min": 33,
-      "calories_burned": 237,
-      "steps": 4502,
-      "sleep_score": 0,
-      "notes": "Auto-importado Samsung Health",
-      "id": 286
-    },
-    {
-      "date": "2026-08-20",
       "type": "Corrida",
       "start_time": "18:39",
       "duration_min": 25,

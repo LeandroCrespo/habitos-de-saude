@@ -2931,6 +2931,18 @@
       "sleep_score": 0,
       "notes": "Auto-importado Samsung Health",
       "id": 287
+    },
+    {
+      "date": "2026-08-20",
+      "type": "Musculação",
+      "start_time": "22:13",
+      "duration_min": 34,
+      "calories_burned": 237,
+      "distance_km": 0,
+      "steps": 0,
+      "sleep_score": 0,
+      "notes": "Registrado via HealthSync",
+      "id": 288
     }
   ]
 }

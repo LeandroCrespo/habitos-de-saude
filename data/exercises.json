@@ -2976,6 +2976,17 @@
       "sleep_score": 0,
       "notes": "Auto-importado Samsung Health",
       "id": 294
+    },
+    {
+      "id": 295,
+      "date": "2026-08-22",
+      "type": "Caminhada",
+      "duration_min": 100,
+      "calories_burned": 221,
+      "distance_km": 3.49,
+      "steps": 4950,
+      "sleep_score": 75,
+      "notes": ""
     }
   ]
 }

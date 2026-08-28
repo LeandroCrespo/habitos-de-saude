@@ -21,32 +21,34 @@ BRASILIA = timezone(timedelta(hours=-3))
 BACKFILL_DAYS = 14  # janela de recuperação em caso de falha de execuções anteriores
 
 # Mantido em sincronia manual com _DEFAULT_MEALS em utils/data_manager.py
+# Alinhado ao plano da nutricionista Maria Eduarda Tardin de 28/08/2026 (docs/dieta/)
 _DEFAULT_MEALS = [
     {
         "meal_id": "cafe", "meal_name": "Café da Manhã", "time": "07:00:00",
-        "foods": ["Banana", "Psyllium", "Pão Francês", "Ovo cozido / mexido", "Café sem açúcar"],
-        "kcal_total": 380, "prot_g": 17.9, "carb_g": 55.5, "fat_g": 11.3,
+        "foods": ["Banana", "Chia", "Pão Francês", "Ovo cozido / mexido", "Café sem açúcar"],
+        "kcal_total": 423, "prot_g": 19.4, "carb_g": 55.5, "fat_g": 15.0,
     },
     {
         "meal_id": "almoco", "meal_name": "Almoço", "time": "12:00:00",
-        "foods": ["Salada / legumes variados", "Peito de frango grelhado",
+        "foods": ["Salada / legumes variados", "Peito de frango grelhado sem pele",
                   "Arroz branco cozido", "Feijão carioca cozido"],
-        "kcal_total": 485, "prot_g": 49.0, "carb_g": 56.0, "fat_g": 6.0,
+        "kcal_total": 408, "prot_g": 46.2, "carb_g": 41.4, "fat_g": 5.18,
     },
     {
         "meal_id": "lanche", "meal_name": "Lanche da Tarde", "time": "15:30:00",
-        "foods": ["Banana", "Pão Francês", "Ovo cozido", "Café sem açúcar"],
-        "kcal_total": 365, "prot_g": 17.4, "carb_g": 51.5, "fat_g": 11.3,
+        "foods": ["Banana", "Chia", "Pão de forma integral", "Frango desfiado",
+                  "Creme de ricota light", "Café sem açúcar"],
+        "kcal_total": 375, "prot_g": 24.7, "carb_g": 52.5, "fat_g": 8.8,
     },
     {
         "meal_id": "jantar", "meal_name": "Jantar", "time": "19:00:00",
-        "foods": ["Salada / legumes variados", "Peito de frango grelhado",
+        "foods": ["Salada / legumes variados", "Peito de frango grelhado sem pele",
                   "Arroz branco cozido", "Feijão carioca cozido"],
-        "kcal_total": 485, "prot_g": 49.0, "carb_g": 56.0, "fat_g": 6.0,
+        "kcal_total": 408, "prot_g": 46.2, "carb_g": 41.4, "fat_g": 5.18,
     },
     {
         "meal_id": "cha", "meal_name": "Hora do Chá", "time": "21:00:00",
-        "foods": ["Chá de manjericão com limão"],
+        "foods": ["Chá de manjericão com casca de limão"],
         "kcal_total": 5, "prot_g": 0.0, "carb_g": 1.0, "fat_g": 0.0,
     },
 ]

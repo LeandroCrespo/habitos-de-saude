@@ -688,6 +688,32 @@ st.caption(f"Objetivo: **{diet.get('goal', '—')}** · Total planejado: **{diet
 if diet.get("notes"):
     st.info(f"📝 {diet['notes']}")
 
+if diet.get("orientacoes") or diet.get("metas_autocuidado"):
+    with st.expander("📋 Orientações da Nutricionista & Metas de Autocuidado"):
+        if diet.get("orientacoes"):
+            st.markdown("**Orientações gerais:**")
+            for o in diet["orientacoes"]:
+                st.markdown(f"- {o}")
+        metas = diet.get("metas_autocuidado")
+        if metas:
+            st.markdown("---")
+            st.markdown("**🎯 Metas de autocuidado:**")
+            c1, c2 = st.columns(2)
+            with c1:
+                if metas.get("fisico"):
+                    st.markdown(f"**Físico:** {metas['fisico']}")
+                if metas.get("social"):
+                    st.markdown(f"**Social:** {metas['social']}")
+            with c2:
+                if metas.get("emocional"):
+                    st.markdown(f"**Emocional:** {metas['emocional']}")
+                if metas.get("espiritual"):
+                    st.markdown(f"**Espiritual:** {metas['espiritual']}")
+            if metas.get("metas_numeradas"):
+                st.markdown("---")
+                for mn in metas["metas_numeradas"]:
+                    st.markdown(f"- {mn}")
+
 ICONS = {"cafe": "☕", "almoco": "🍽️", "lanche": "🥤", "jantar": "🌙", "cha": "🍵"}
 for meal in diet.get("meals", []):
     with st.expander(f"{ICONS.get(meal['id'],'🍴')} {meal['name']} — ~{meal['kcal_estimated']} kcal | {meal.get('time_suggested','')}"):

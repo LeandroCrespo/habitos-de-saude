@@ -2970,12 +2970,13 @@
       "date": "2026-08-27",
       "type": "Corrida",
       "start_time": "18:54",
-      "duration_min": 24,
-      "calories_burned": 166,
+      "duration_min": 89,
+      "calories_burned": 271,
       "steps": 4789,
       "sleep_score": 0,
       "notes": "Auto-importado Samsung Health",
-      "id": 294
+      "id": 294,
+      "distance_km": 3.45
     },
     {
       "id": 295,

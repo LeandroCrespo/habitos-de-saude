@@ -35,16 +35,16 @@
       "Meta 4: Evitar carne vermelha, alimentos processados, açúcar e gordura"
     ]
   },
-  "total_kcal_plan": 1619,
+  "total_kcal_plan": 1634,
   "total_prot_plan_g": 137,
-  "total_carb_plan_g": 192,
+  "total_carb_plan_g": 196,
   "total_fat_plan_g": 34,
   "meals": [
     {
       "id": "cafe",
       "name": "Café da Manhã",
       "time_suggested": "07:00",
-      "kcal_estimated": 423,
+      "kcal_estimated": 438,
       "groups": [
         {
           "id": "fruta",
@@ -66,11 +66,20 @@
           "id": "sementes",
           "name": "Sementes",
           "emoji": "🌰",
-          "instruction": "1 colher de sopa — escolha 1 opção (substituiu o psyllium no plano de 28/08)",
+          "instruction": "1 colher de sopa — escolha 1 opção (adicionado ao plano de 28/08)",
           "items": [
             {"item": "Chia", "qty": "1 colher de sopa (12g)", "kcal": 58, "prot_g": 2.0, "carb_g": 4.0, "fat_g": 3.7, "default": true},
             {"item": "Farelo de aveia", "qty": "1 colher de sopa (8g)", "kcal": 30, "prot_g": 1.0, "carb_g": 5.2, "fat_g": 0.6},
             {"item": "Semente de abóbora", "qty": "1 colher de sopa (9g)", "kcal": 50, "prot_g": 2.5, "carb_g": 1.5, "fat_g": 4.0}
+          ]
+        },
+        {
+          "id": "psyllium",
+          "name": "Psyllium",
+          "emoji": "🌿",
+          "instruction": "adicionar à fruta — fibra solúvel de uso contínuo (mantido a pedido do paciente)",
+          "items": [
+            {"item": "Psyllium", "qty": "1 colher de sopa", "kcal": 15, "prot_g": 0.5, "carb_g": 4.0, "fat_g": 0.0, "default": true}
           ]
         },
         {

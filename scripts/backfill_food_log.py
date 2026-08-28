@@ -25,8 +25,8 @@ BACKFILL_DAYS = 14  # janela de recuperação em caso de falha de execuções an
 _DEFAULT_MEALS = [
     {
         "meal_id": "cafe", "meal_name": "Café da Manhã", "time": "07:00:00",
-        "foods": ["Banana", "Chia", "Pão Francês", "Ovo cozido / mexido", "Café sem açúcar"],
-        "kcal_total": 423, "prot_g": 19.4, "carb_g": 55.5, "fat_g": 15.0,
+        "foods": ["Banana", "Chia", "Psyllium", "Pão Francês", "Ovo cozido / mexido", "Café sem açúcar"],
+        "kcal_total": 438, "prot_g": 19.9, "carb_g": 59.5, "fat_g": 15.0,
     },
     {
         "meal_id": "almoco", "meal_name": "Almoço", "time": "12:00:00",

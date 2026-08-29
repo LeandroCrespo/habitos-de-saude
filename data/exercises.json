@@ -2995,7 +2995,7 @@
       "type": "Bicicleta",
       "duration_min": 15,
       "calories_burned": 109,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3039,7 +3039,7 @@
       "type": "Musculação",
       "duration_min": 40,
       "calories_burned": 283,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3054,6 +3054,16 @@
       "steps": 1988,
       "sleep_score": 75,
       "notes": ""
+    },
+    {
+      "date": "2026-08-28",
+      "type": "Caminhada",
+      "duration_min": 0,
+      "calories_burned": 0,
+      "steps": 1869,
+      "sleep_score": 0,
+      "notes": "Passos do dia: 1869",
+      "id": 303
     }
   ]
 }

@@ -14860,6 +14860,107 @@
       "extra_desc": "",
       "extra_kcal": 0,
       "obs": "Padrão automático"
+    },
+    {
+      "id": 2583,
+      "date": "2026-09-03",
+      "time": "07:00:00",
+      "meal_id": "cafe",
+      "meal_name": "Café da Manhã",
+      "foods": [
+        "Banana",
+        "Chia",
+        "Psyllium",
+        "Pão Francês",
+        "Ovo cozido / mexido",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 438,
+      "prot_g": 19.9,
+      "carb_g": 59.5,
+      "fat_g": 15.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático"
+    },
+    {
+      "id": 2584,
+      "date": "2026-09-03",
+      "time": "12:00:00",
+      "meal_id": "almoco",
+      "meal_name": "Almoço",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado sem pele",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 408,
+      "prot_g": 46.2,
+      "carb_g": 41.4,
+      "fat_g": 5.18,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático"
+    },
+    {
+      "id": 2585,
+      "date": "2026-09-03",
+      "time": "15:30:00",
+      "meal_id": "lanche",
+      "meal_name": "Lanche da Tarde",
+      "foods": [
+        "Banana",
+        "Chia",
+        "Pão de forma integral",
+        "Frango desfiado",
+        "Creme de ricota light",
+        "Café sem açúcar"
+      ],
+      "kcal_total": 375,
+      "prot_g": 24.7,
+      "carb_g": 52.5,
+      "fat_g": 8.8,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático"
+    },
+    {
+      "id": 2586,
+      "date": "2026-09-03",
+      "time": "19:00:00",
+      "meal_id": "jantar",
+      "meal_name": "Jantar",
+      "foods": [
+        "Salada / legumes variados",
+        "Peito de frango grelhado sem pele",
+        "Arroz branco cozido",
+        "Feijão carioca cozido"
+      ],
+      "kcal_total": 408,
+      "prot_g": 46.2,
+      "carb_g": 41.4,
+      "fat_g": 5.18,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático"
+    },
+    {
+      "id": 2587,
+      "date": "2026-09-03",
+      "time": "21:00:00",
+      "meal_id": "cha",
+      "meal_name": "Hora do Chá",
+      "foods": [
+        "Chá de manjericão com casca de limão"
+      ],
+      "kcal_total": 5,
+      "prot_g": 0.0,
+      "carb_g": 1.0,
+      "fat_g": 0.0,
+      "extra_desc": "",
+      "extra_kcal": 0,
+      "obs": "Padrão automático"
     }
   ]
 }

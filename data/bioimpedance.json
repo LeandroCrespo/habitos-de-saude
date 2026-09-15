@@ -562,6 +562,25 @@
       "percentual_proteina": 13.4,
       "device": "Smartwatch AiLink",
       "notes": ""
+    },
+    {
+      "id": 30,
+      "date": "2026-09-15",
+      "peso_kg": 91.2,
+      "imc": 27.5,
+      "percentual_gordura": 29.2,
+      "massa_gordura_kg": 26.4,
+      "massa_magra_kg": 64.8,
+      "musculo_esqueletico_kg": 36.1,
+      "percentual_musculo": 66.3,
+      "percentual_agua": 49.8,
+      "massa_ossea_kg": 3.2,
+      "tmb_kcal": 1702,
+      "gordura_visceral": 14,
+      "idade_corporal": 47,
+      "percentual_proteina": 13.4,
+      "device": "Smartwatch AiLink",
+      "notes": ""
     }
   ]
 }

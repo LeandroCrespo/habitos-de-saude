@@ -312,8 +312,33 @@ df_show = df_full[["date_str","peso_kg","imc","percentual_gordura","massa_gordur
                     "musculo_esqueletico_kg","percentual_agua","tmb_kcal","gordura_visceral","device"]].copy()
 df_show.columns = ["Data","Peso (kg)","IMC","Gordura (%)","Gordura (kg)",
                    "Músculo (kg)","Água (%)","TMB (kcal)","G. Visceral","Dispositivo"]
-df_show = df_show.sort_values("Data", ascending=False)
+df_show = df_show.iloc[::-1]  # df_full já está em ordem cronológica → mais recente primeiro
 st.dataframe(df_show, use_container_width=True, hide_index=True)
+
+if st.session_state.get("bio_del_msg"):
+    st.success(f"✅ Medição de {st.session_state.pop('bio_del_msg')} excluída.")
+
+with st.expander("🗑️ Excluir medição"):
+    _opts = list(range(len(bio_sorted)))[::-1]
+    _sel = st.selectbox(
+        "Medição a excluir:", _opts,
+        format_func=lambda i: f"{datetime.strptime(bio_sorted[i]['date'], '%Y-%m-%d').strftime('%d/%m/%Y')} — "
+                              f"{bio_sorted[i].get('peso_kg','—')} kg · {bio_sorted[i].get('percentual_gordura','—')}% gordura",
+        key="bio_del_sel",
+    )
+    _conf = st.checkbox("Confirmo que quero excluir esta medição (não pode ser desfeito)", key="bio_del_conf")
+
+    def _excluir_medicao(idx):
+        _removed = bio_sorted[idx]
+        _restante = [b for i, b in enumerate(bio_sorted) if i != idx]
+        for _i, _b in enumerate(_restante, start=1):  # IDs em ordem cronológica
+            _b["id"] = _i
+        save_bioimpedance(_restante)
+        st.session_state["bio_del_conf"] = False
+        st.session_state["bio_del_msg"] = datetime.strptime(_removed["date"], "%Y-%m-%d").strftime("%d/%m/%Y")
+
+    st.button("Excluir", type="primary", disabled=not _conf, key="bio_del_btn",
+              on_click=_excluir_medicao, args=(_sel,))
 
 # ── Upload + Nova Medição (Google Vision API) ─────────────────────────────────
 st.markdown("<div class='section-header'>📷 Registrar Nova Medição — App AiLink</div>", unsafe_allow_html=True)
@@ -448,6 +473,9 @@ if submitted:
         "device": "Smartwatch AiLink", "notes": notas
     }
     bio_list.append(new_entry)
+    bio_list.sort(key=lambda x: x["date"])
+    for _i, _b in enumerate(bio_list, start=1):  # IDs em ordem cronológica
+        _b["id"] = _i
     save_bioimpedance(bio_list)
     st.session_state["bio_ext"]      = {}
     st.session_state["bio_img_key"]  = ""

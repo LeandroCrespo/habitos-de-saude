@@ -3083,7 +3083,7 @@
       "type": "Musculação",
       "duration_min": 49,
       "calories_burned": 360,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3094,7 +3094,7 @@
       "type": "Bicicleta",
       "duration_min": 10,
       "calories_burned": 72,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3105,7 +3105,7 @@
       "type": "Caminhada",
       "duration_min": 17,
       "calories_burned": 78,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 1557,
       "sleep_score": 75,
       "notes": ""
@@ -3116,7 +3116,7 @@
       "type": "Caminhada",
       "duration_min": 37,
       "calories_burned": 174,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 3389,
       "sleep_score": 75,
       "notes": ""
@@ -3127,7 +3127,7 @@
       "type": "Caminhada",
       "duration_min": 78,
       "calories_burned": 259,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 4640,
       "sleep_score": 75,
       "notes": ""
@@ -3138,7 +3138,7 @@
       "type": "Musculação",
       "duration_min": 34,
       "calories_burned": 233,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3149,7 +3149,7 @@
       "type": "Caminhada",
       "duration_min": 24,
       "calories_burned": 120,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 2257,
       "sleep_score": 75,
       "notes": ""
@@ -3160,7 +3160,7 @@
       "type": "Caminhada",
       "duration_min": 99,
       "calories_burned": 325,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 5792,
       "sleep_score": 75,
       "notes": ""
@@ -3171,7 +3171,7 @@
       "type": "Musculação",
       "duration_min": 41,
       "calories_burned": 281,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3182,7 +3182,7 @@
       "type": "Caminhada",
       "duration_min": 15,
       "calories_burned": 80,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 1453,
       "sleep_score": 75,
       "notes": ""
@@ -3215,7 +3215,7 @@
       "type": "Musculação",
       "duration_min": 39,
       "calories_burned": 282,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3237,7 +3237,7 @@
       "type": "Musculação",
       "duration_min": 36,
       "calories_burned": 245,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3248,7 +3248,7 @@
       "type": "Caminhada",
       "duration_min": 21,
       "calories_burned": 106,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 1993,
       "sleep_score": 75,
       "notes": ""
@@ -3281,7 +3281,7 @@
       "type": "Musculação",
       "duration_min": 39,
       "calories_burned": 272,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3292,7 +3292,7 @@
       "type": "Bicicleta",
       "duration_min": 20,
       "calories_burned": 194,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3303,7 +3303,7 @@
       "type": "Caminhada",
       "duration_min": 19,
       "calories_burned": 91,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 1736,
       "sleep_score": 75,
       "notes": ""
@@ -3336,7 +3336,7 @@
       "type": "Musculação",
       "duration_min": 39,
       "calories_burned": 303,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3358,7 +3358,7 @@
       "type": "Caminhada",
       "duration_min": 78,
       "calories_burned": 224,
-      "distance_km": 3.0,
+      "distance_km": 3,
       "steps": 4351,
       "sleep_score": 75,
       "notes": ""
@@ -3369,7 +3369,7 @@
       "type": "Musculação",
       "duration_min": 39,
       "calories_burned": 289,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3391,7 +3391,7 @@
       "type": "Caminhada",
       "duration_min": 21,
       "calories_burned": 97,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 1935,
       "sleep_score": 75,
       "notes": ""
@@ -3424,7 +3424,7 @@
       "type": "Musculação",
       "duration_min": 41,
       "calories_burned": 283,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3479,7 +3479,7 @@
       "type": "Musculação",
       "duration_min": 47,
       "calories_burned": 326,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3490,7 +3490,7 @@
       "type": "Bicicleta",
       "duration_min": 15,
       "calories_burned": 110,
-      "distance_km": 0.0,
+      "distance_km": 0,
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
@@ -3516,6 +3516,28 @@
       "steps": 3,
       "sleep_score": 75,
       "notes": ""
+    },
+    {
+      "date": "2026-09-29",
+      "type": "Musculação",
+      "start_time": "17:25",
+      "duration_min": 40,
+      "calories_burned": 276,
+      "steps": 5930,
+      "sleep_score": 0,
+      "notes": "Auto-importado Samsung Health",
+      "id": 345
+    },
+    {
+      "date": "2026-09-29",
+      "type": "Corrida",
+      "start_time": "18:08",
+      "duration_min": 21,
+      "calories_burned": 144,
+      "steps": 5930,
+      "sleep_score": 0,
+      "notes": "Auto-importado Samsung Health",
+      "id": 346
     }
   ]
 }

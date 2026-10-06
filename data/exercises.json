@@ -3561,6 +3561,17 @@
       "notes": "Auto-importado Samsung Health",
       "id": 348,
       "distance_km": 3.38
+    },
+    {
+      "id": 349,
+      "date": "2026-10-02",
+      "type": "Caminhada",
+      "duration_min": 18,
+      "calories_burned": 88,
+      "distance_km": 1.31,
+      "steps": 1685,
+      "sleep_score": 75,
+      "notes": ""
     }
   ]
 }

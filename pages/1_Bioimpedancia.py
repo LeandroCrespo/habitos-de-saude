@@ -6,7 +6,8 @@ import sys, re, base64
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from utils.data_manager import load_bioimpedance, save_bioimpedance, get_bmi_category, get_fat_category
+from utils.data_manager import load_bioimpedance, save_bioimpedance, load_profile, get_bmi_category, get_fat_category
+from utils.ailink_ocr import parse_ailink
 
 try:
     import requests as _req
@@ -37,75 +38,20 @@ DATA_INICIO_2026 = pd.Timestamp("2026-03-25")
 
 
 # ── Google Vision API helpers ─────────────────────────────────────────────────
-def _vision_ocr(img_bytes: bytes, api_key: str) -> str:
-    """Envia imagem ao Google Cloud Vision API e retorna texto detectado."""
+def _vision_ocr(img_bytes: bytes, api_key: str) -> dict:
+    """Envia imagem ao Google Cloud Vision API e retorna a resposta (texto + posições)."""
     if not _REQ_OK:
-        return ""
+        return {}
     url = f"https://vision.googleapis.com/v1/images:annotate?key={api_key}"
     payload = {"requests": [{"image": {"content": base64.b64encode(img_bytes).decode()},
                               "features": [{"type": "TEXT_DETECTION", "maxResults": 1}]}]}
     try:
         r = _req.post(url, json=payload, timeout=15)
         r.raise_for_status()
-        anns = r.json().get("responses", [{}])[0].get("textAnnotations", [])
-        return anns[0].get("description", "") if anns else ""
+        resp = r.json().get("responses", [{}])[0]
+        return resp if resp.get("textAnnotations") else {}
     except Exception:
-        return ""
-
-
-def _parse_ailink(text: str) -> dict:
-    """Extrai campos de bioimpedância do texto OCR do app AiLink."""
-    result = {}
-
-    def _f(pattern, cast=float):
-        m = re.search(pattern, text, re.IGNORECASE)
-        if m:
-            try:
-                return cast(m.group(1).replace(",", "."))
-            except Exception:
-                pass
-        return None
-
-    # Data: "2026-06-30 09:05"
-    m = re.search(r"(\d{4}-\d{2}-\d{2})\s+\d{2}:\d{2}", text)
-    if m:
-        result["date"] = m.group(1)
-
-    # Peso corporal: ignora valores fora de 60–200 kg (ex: "Peso da água 46.7 kg")
-    for _m in re.finditer(r"\b(\d{2,3}[.,]\d)\s*kg", text, re.IGNORECASE):
-        try:
-            _v = float(_m.group(1).replace(",", "."))
-            if 60.0 <= _v <= 200.0:
-                result["peso_kg"] = _v
-                break
-        except Exception:
-            pass
-
-    for key, pat in [
-        ("imc",                   r"BMI\s*[\(]?\s*(\d{2}[.,]\d)"),
-        ("percentual_gordura",    r"BFR\s*[\(]?\s*(\d{2}[.,]\d)\s*%"),
-        ("percentual_musculo",    r"Velocidade\s+muscular\s*[\(]?\s*(\d{2}[.,]\d)\s*%"),
-        ("musculo_esqueletico_kg",r"Massa\s+muscular\s+esquel[eé]tica\s*[\(]?\s*(\d{2}[.,]\d)\s*kg"),
-        ("percentual_agua",       r"Taxa\s+de\s+umidade\s*[\(]?\s*(\d{2}[.,]\d)\s*%"),
-        ("massa_ossea_kg",        r"Massa\s+[oó]ssea\s*[\(]?\s*(\d[.,]\d)\s*kg"),
-        ("percentual_proteina",   r"Taxa\s+de\s+prote[ií]na\s*[\(]?\s*(\d{2}[.,]\d)\s*%"),
-        ("gordura_subcutanea_pct",r"gordura\s+subcut[aâ]nea\s*[\(]?\s*(\d{2}[.,]\d)\s*%"),
-        ("massa_gordura_kg",      r"Massa\s+gorda\s+(\d{2}[.,]\d)\s*kg"),
-    ]:
-        v = _f(pat)
-        if v is not None:
-            result[key] = v
-
-    for key, pat in [
-        ("tmb_kcal",        r"BMR\s*[\(]?\s*(\d{3,4})\s*kcal"),
-        ("gordura_visceral", r"gordura\s+visceral\s*[\(]?\s*(\d{1,2})\s*[\)]?"),
-        ("idade_corporal",   r"Idade\s+do\s+corpo\s*[\(]?\s*(\d{2})\s*[\)]?"),
-    ]:
-        v = _f(pat, int)
-        if v is not None:
-            result[key] = v
-
-    return result
+        return {}
 
 
 def x_labels_semanal(dates):
@@ -355,12 +301,36 @@ try:
 except Exception:
     pass
 
+_altura_m = (load_profile() or {}).get("altura_m", 1.82)
+if "bio_form_n" not in st.session_state:
+    st.session_state["bio_form_n"] = 0
+
+# Campos do formulário: chave → (rótulo, mín, máx, passo, tipo, obrigatório)
+_CAMPOS_FORM = {
+    "peso_kg":                ("Peso (kg)",                       40.0, 200.0, 0.1, float, True),
+    "imc":                    ("BMI",                             15.0,  50.0, 0.1, float, False),
+    "percentual_gordura":     ("BFR — % Gordura",                  1.0,  60.0, 0.1, float, True),
+    "massa_gordura_kg":       ("Massa Gorda (kg)",                 1.0, 100.0, 0.1, float, False),
+    "musculo_esqueletico_kg": ("Massa Muscular Esquelética (kg)", 10.0,  80.0, 0.1, float, True),
+    "massa_muscular_kg":      ("Massa Muscular (kg)",             10.0, 120.0, 0.1, float, False),
+    "percentual_musculo":     ("Velocidade Muscular (%)",         10.0,  90.0, 0.1, float, True),
+    "percentual_agua":        ("Taxa de Umidade (%)",             20.0,  80.0, 0.1, float, True),
+    "massa_ossea_kg":         ("Massa Óssea (kg)",                 1.0,   6.0, 0.1, float, True),
+    "tmb_kcal":               ("BMR / TMB (kcal)",                1000,  4000, 1,   int,   True),
+    "gordura_visceral":       ("Índice de Gordura Visceral",         1,    30, 1,   int,   True),
+    "idade_corporal":         ("Idade do Corpo",                    18,    99, 1,   int,   True),
+    "percentual_proteina":    ("Taxa de Proteína (%)",             5.0,  30.0, 0.1, float, True),
+}
+_COL1 = ["peso_kg", "imc", "percentual_gordura", "massa_gordura_kg", "musculo_esqueletico_kg", "massa_muscular_kg"]
+_COL2 = ["percentual_musculo", "percentual_agua", "massa_ossea_kg", "tmb_kcal", "gordura_visceral",
+         "idade_corporal", "percentual_proteina"]
+
 img_col, form_col = st.columns([1, 1])
 
 with img_col:
     uploaded = st.file_uploader(
         "Imagem do app AiLink:", type=["jpg", "jpeg", "png"], key="bio_img",
-        help="Use a tela 'Compartilhamento d...' ou 'Antevisão' do AiLink"
+        help="Melhor tela: a de detalhes (toque em 'Expanda para ver detalhes'), que mostra todos os campos."
     )
 
     if uploaded:
@@ -371,23 +341,19 @@ with img_col:
         if _gv_key and _REQ_OK:
             if img_key != st.session_state["bio_img_key"]:
                 with st.spinner("🔍 Lendo dados com Google Vision..."):
-                    ocr = _vision_ocr(img_bytes, _gv_key)
-                    if ocr:
-                        ext = _parse_ailink(ocr)
-                        st.session_state["bio_ext"]      = ext
-                        st.session_state["bio_img_key"]  = img_key
-                        st.session_state["bio_ocr_status"] = "ok" if len(ext) >= 5 else "partial"
+                    resp = _vision_ocr(img_bytes, _gv_key)
+                    st.session_state["bio_img_key"] = img_key
+                    if resp:
+                        st.session_state["bio_ext"] = parse_ailink(resp, _altura_m)
+                        st.session_state["bio_ocr_status"] = "ok"
                     else:
+                        st.session_state["bio_ext"] = {}
                         st.session_state["bio_ocr_status"] = "error"
-                        st.session_state["bio_img_key"]  = img_key
 
-            _status = st.session_state["bio_ocr_status"]
-            if _status == "ok":
-                st.success(f"✅ {len(st.session_state['bio_ext'])} campos extraídos — confirme ao lado →")
-            elif _status == "partial":
-                st.warning("⚠️ Extração parcial — verifique e corrija os campos ao lado")
-            elif _status == "error":
-                st.error("❌ Erro na API — preencha o formulário manualmente")
+            if st.session_state["bio_ocr_status"] == "error":
+                st.error("❌ Erro na leitura da imagem — preencha o formulário manualmente")
+            elif st.session_state["bio_ocr_status"] == "saved":
+                st.info("Medição desta imagem já salva. Envie outra imagem para registrar uma nova medição.")
         elif not _gv_key:
             st.info("💡 Adicione `GOOGLE_VISION_API_KEY` nos secrets para extração automática.\n\n"
                     "Sem a chave: preencha o formulário ao lado lendo os valores da imagem.")
@@ -398,87 +364,96 @@ with img_col:
             <div style='font-size:44px;margin-bottom:10px'>📷</div>
             <div style='font-weight:700;font-size:15px'>Envie a imagem do app AiLink</div>
             <div style='font-size:13px;margin-top:8px;opacity:0.85;line-height:1.6'>
-                Use a tela <b>Compartilhamento</b> ou <b>Antevisão</b><br>
-                Com a chave Google Vision: extração automática<br>
-                Sem a chave: preencha o formulário ao lado
+                Melhor tela: a de <b>detalhes</b> (toque em "Expanda para ver detalhes")<br>
+                Também funcionam <b>Compartilhamento</b> e <b>Antevisão</b><br>
+                Sem a chave Google Vision: preencha o formulário ao lado
             </div>
         </div>""", unsafe_allow_html=True)
 
-# ── Formulário (pré-preenchido com valores extraídos ou última medição) ────────
+# ── Formulário: só vem preenchido o que foi lido da imagem ────────────────────
+# Campos não lidos ficam VAZIOS (nunca copiam a medição anterior) e os obrigatórios
+# precisam ser digitados antes de salvar.
 ext = st.session_state.get("bio_ext", {})
 
-_RANGES = {
-    "peso_kg": (40.0, 200.0), "imc": (15.0, 50.0),
-    "percentual_gordura": (1.0, 60.0), "massa_gordura_kg": (1.0, 100.0),
-    "musculo_esqueletico_kg": (10.0, 80.0), "percentual_musculo": (10.0, 80.0),
-    "percentual_agua": (20.0, 80.0), "massa_ossea_kg": (1.0, 6.0),
-    "tmb_kcal": (1000, 4000), "gordura_visceral": (1, 30),
-    "idade_corporal": (20, 90), "percentual_proteina": (5.0, 30.0),
-}
-
-def _val(key, default, cast=float):
+def _val(key):
+    """Valor lido da imagem (dentro da faixa do campo) ou None."""
+    _, lo, hi, _, cast, _ = _CAMPOS_FORM[key]
+    v = ext.get(key)
     try:
-        v = cast(ext.get(key, default))
-        lo, hi = _RANGES.get(key, (None, None))
-        if lo is not None and not (lo <= v <= hi):
-            return cast(default)
-        return v
-    except Exception:
-        try:
-            return cast(default)
-        except Exception:
-            return cast(0)
+        return cast(v) if v is not None and lo <= cast(v) <= hi else None
+    except (TypeError, ValueError):
+        return None
+
+def _input(key):
+    label, lo, hi, step, _, obrig = _CAMPOS_FORM[key]
+    ultimo = latest.get(key)
+    return st.number_input(
+        label + ("" if obrig else " — opcional"), min_value=lo, max_value=hi, value=_val(key), step=step,
+        help=(f"Última medição: {ultimo}" if ultimo is not None else None),
+    )
 
 with form_col:
+    _lidos    = [k for k in _CAMPOS_FORM if _val(k) is not None]
+    _faltando = [c[0] for k, c in _CAMPOS_FORM.items() if c[5] and _val(k) is None]
     if ext:
-        st.success(f"✅ {len(ext)} campos preenchidos automaticamente — revise e salve")
+        st.success(f"✅ {len(_lidos)} campos lidos da imagem — confira e salve")
+        if _faltando:
+            st.warning("⚠️ Não encontrados na imagem — digite manualmente: **" + "**, **".join(_faltando) + "**")
     else:
-        st.caption("Campos pré-preenchidos com a **última medição** — atualize com os valores da imagem")
+        st.caption("Preencha os campos com os valores do app AiLink (a dica ⓘ de cada campo mostra a última medição).")
 
-    with st.form("nova_bio", clear_on_submit=True):
+    with st.form(f"nova_bio_{st.session_state['bio_form_n']}_{st.session_state['bio_img_key']}"):
         data_med = st.date_input(
             "📅 Data",
             value=date.fromisoformat(ext["date"]) if "date" in ext else date.today()
         )
+        valores = {}
         c1, c2 = st.columns(2)
         with c1:
-            peso         = st.number_input("Peso (kg)",               50.0, 200.0, _val("peso_kg",              latest["peso_kg"]),               0.1)
-            imc          = st.number_input("BMI",                      15.0,  50.0, _val("imc",                  latest["imc"]),                    0.1)
-            pct_gordura  = st.number_input("BFR — % Gordura",          1.0,   60.0, _val("percentual_gordura",   latest["percentual_gordura"]),      0.1)
-            massa_gordura= st.number_input("Massa Gorda (kg)",          1.0,  100.0, _val("massa_gordura_kg",     latest["massa_gordura_kg"]),        0.1)
-            musculo      = st.number_input("Massa Musc. Esq. (kg)",    10.0,   80.0, _val("musculo_esqueletico_kg", latest["musculo_esqueletico_kg"]), 0.1)
-            pct_musculo  = st.number_input("Velocidade Muscular (%)",  10.0,   80.0, _val("percentual_musculo",   latest.get("percentual_musculo", 66.3)), 0.1)
+            for k in _COL1:
+                valores[k] = _input(k)
         with c2:
-            pct_agua     = st.number_input("Taxa de Umidade (%)",      20.0,   80.0, _val("percentual_agua",      latest.get("percentual_agua", 49.7)),  0.1)
-            massa_ossea  = st.number_input("Massa Óssea (kg)",          1.0,    6.0, _val("massa_ossea_kg",       latest.get("massa_ossea_kg", 3.3)),    0.1)
-            tmb          = st.number_input("BMR / TMB (kcal)",        1000,   4000,  _val("tmb_kcal",             latest.get("tmb_kcal", 1743),   int),  1)
-            gordura_visc = st.number_input("Gordura Visceral",            1,     30,  _val("gordura_visceral",     latest.get("gordura_visceral", 14), int), 1)
-            idade_corp   = st.number_input("Idade do Corpo",             20,     90,  _val("idade_corporal",       latest.get("idade_corporal", 47),  int),  1)
-            pct_proteina = st.number_input("Taxa de Proteína (%)",      5.0,   30.0, _val("percentual_proteina",  latest.get("percentual_proteina", 13.5)), 0.1)
+            for k in _COL2:
+                valores[k] = _input(k)
         notas = st.text_input("Observações (opcional)")
         submitted = st.form_submit_button("💾 Salvar Medição", type="primary", use_container_width=True)
 
 if submitted:
-    new_id = max([b.get("id", 0) for b in bio_list], default=0) + 1
-    mg = round(massa_gordura, 1)
+    _vazios = [c[0] for k, c in _CAMPOS_FORM.items() if c[5] and valores[k] is None]
+    if _vazios:
+        st.error("Preencha antes de salvar: **" + "**, **".join(_vazios) + "**")
+        st.stop()
+    if any(b["date"] == str(data_med) for b in bio_list):
+        st.error(f"Já existe uma medição em {data_med.strftime('%d/%m/%Y')}. Confira a data ou exclua a "
+                 "medição anterior em **🗑️ Excluir medição** antes de salvar.")
+        st.stop()
+    peso = valores["peso_kg"]
+    mg = valores["massa_gordura_kg"]
+    if mg is None:   # telas sem "Massa gorda": calcula pelo % de gordura
+        mg = peso * valores["percentual_gordura"] / 100
+    mg = round(mg, 1)
     new_entry = {
-        "id": new_id, "date": str(data_med),
-        "peso_kg": peso, "imc": imc,
-        "percentual_gordura": pct_gordura, "massa_gordura_kg": mg,
+        "id": 0, "date": str(data_med),
+        "peso_kg": peso,
+        "imc": valores["imc"] if valores["imc"] is not None else round(peso / _altura_m ** 2, 1),
+        "percentual_gordura": valores["percentual_gordura"], "massa_gordura_kg": mg,
         "massa_magra_kg": round(peso - mg, 1),
-        "musculo_esqueletico_kg": musculo, "percentual_musculo": pct_musculo,
-        "percentual_agua": pct_agua, "massa_ossea_kg": massa_ossea,
-        "tmb_kcal": tmb, "gordura_visceral": gordura_visc,
-        "idade_corporal": int(idade_corp), "percentual_proteina": pct_proteina,
+        "musculo_esqueletico_kg": valores["musculo_esqueletico_kg"],
+        "percentual_musculo": valores["percentual_musculo"],
+        "percentual_agua": valores["percentual_agua"], "massa_ossea_kg": valores["massa_ossea_kg"],
+        "tmb_kcal": valores["tmb_kcal"], "gordura_visceral": valores["gordura_visceral"],
+        "idade_corporal": valores["idade_corporal"], "percentual_proteina": valores["percentual_proteina"],
         "device": "Smartwatch AiLink", "notes": notas
     }
+    if valores["massa_muscular_kg"] is not None:
+        new_entry["massa_muscular_kg"] = valores["massa_muscular_kg"]
     bio_list.append(new_entry)
     bio_list.sort(key=lambda x: x["date"])
     for _i, _b in enumerate(bio_list, start=1):  # IDs em ordem cronológica
         _b["id"] = _i
     save_bioimpedance(bio_list)
-    st.session_state["bio_ext"]      = {}
-    st.session_state["bio_img_key"]  = ""
-    st.session_state["bio_ocr_status"] = "idle"
+    st.session_state["bio_ext"]        = {}
+    st.session_state["bio_ocr_status"] = "saved"   # mantém bio_img_key: a mesma imagem não é relida
+    st.session_state["bio_form_n"]    += 1          # formulário novo, vazio
     st.success(f"✅ Medição de {data_med.strftime('%d/%m/%Y')} salva — {peso} kg")
     st.rerun()

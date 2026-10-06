@@ -114,9 +114,12 @@ musc_rep_desde = (None if musc_ok else
 musc_rep_n      = 0 if musc_ok else len(musculos) - _musc_rep                      # medições desde o início
 musc_rep_iguais = 0 if musc_ok else musculos[_musc_rep:].count(musculos[_musc_rep])  # quantas com o mesmo valor
 musc_rep_valor  = None if musc_ok else musculos[_musc_rep]
-# Com dados repetidos, a tendência usa só as medições até o início da repetição
-_n_musc   = len(musculos) if musc_ok else max(3, _musc_rep + 1)
-coef_musc = np.polyfit(x_dias[:_n_musc], musculos[:_n_musc], 1)
+# Mesma janela recente do peso; com dados repetidos, só as medições até o início da repetição
+if musc_ok:
+    coef_musc = np.polyfit(x_janela, musculos[_i_janela:], 1)
+else:
+    _n_musc   = max(3, _musc_rep + 1)
+    coef_musc = np.polyfit(x_dias[:_n_musc], musculos[:_n_musc], 1)
 
 # ── Predição original (primeiro terço dos dados — escala com o histórico) ──────
 # Mínimo de 6 medições (~6 semanas) para superar a fase inicial de adaptação
@@ -600,12 +603,12 @@ with c3:
 </div>""", unsafe_allow_html=True)
     else:
         cor3 = "#27AE60" if taxa_musc_kpi > 0 else "#F39C12"
-        seta3 = "↑" if taxa_musc_kpi > 0 else "→"
+        seta3 = "↑" if taxa_musc_kpi > 0.005 else ("↓" if taxa_musc_kpi < -0.005 else "→")
         st.markdown(f"""<div class='{kpi_class}'>
-<div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Ganho Muscular</div>
+<div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Músculo Esquelético</div>
 <div style='font-size:32px;font-weight:700;color:{cor3}'>{seta3} {abs(taxa_musc_kpi):.3f}</div>
 <div style='font-size:12px;color:#888'>kg/semana</div>
-<div style='font-size:12px;color:{cor3};font-weight:600'>+{taxa_musc_kpi*4.3:.2f} kg/mês</div>
+<div style='font-size:12px;color:{cor3};font-weight:600'>{taxa_musc_kpi*4.3:+.2f} kg/mês</div>
 </div>""", unsafe_allow_html=True)
 
 with c4:
@@ -849,9 +852,9 @@ with tab2:
             line=dict(color="#27AE60", width=2.5), marker=dict(size=7),
         ))
         fig_musc.add_trace(go.Scatter(
-            x=trend_datas,
-            y=[float(np.polyval(coef_musc, d)) for d in trend_x],
-            name="Tendência" if musc_ok else "Tendência (até o início da repetição)",
+            x=trend_datas_jan if musc_ok else trend_datas,
+            y=[float(np.polyval(coef_musc, d)) for d in (trend_x_jan if musc_ok else trend_x)],
+            name=f"Tendência recente ({JANELA_SEMANAS} sem)" if musc_ok else "Tendência (até o início da repetição)",
             mode="lines",
             line=dict(color="#1ABC9C", width=1.5, dash="dot"),
         ))
@@ -1257,7 +1260,7 @@ with tab3:
     _dt_82 = dt_peso_aj if usar_aj else dt_peso
     dt_82kg_str = _col_lbl(_dt_82.isoformat()) if _dt_82 else "Sem previsão"
     _dt_m = dt_musc_aj if usar_aj else dt_musc
-    dt_musc_str = (_col_lbl(_dt_m.isoformat()) if _dt_m else "2027+") if musc_ok else "Sem dado"
+    dt_musc_str = (_col_lbl(_dt_m.isoformat()) if _dt_m else "Sem previsão") if musc_ok else "Sem dado"
 
     # Verificar status atual de cada meta laboratorial para timeline dinâmica
     _tsh_cur    = _val("TSH")

@@ -54,24 +54,69 @@ if len(bio_recente) < 3:
 # Medições antigas (antes do acompanhamento semanal) — apenas contexto nos gráficos
 bio_historico = [b for b in bio_list if b["date"] < TRACKING_START]
 
-# ── Frequência e gasto calórico reais (últimos 60 dias) ───────────────────────
+# ── Musculação e passos reais (últimos 60 dias) ───────────────────────────────
+# Só musculação conta como "treino"; a caminhada do dia a dia entra pelos passos.
 _cutoff60 = (TODAY - timedelta(days=60)).strftime("%Y-%m-%d")
 _ex60     = [e for e in ex_list if e.get("date", "") >= _cutoff60]
-_dias_treino = len({e["date"] for e in _ex60})
-freq_real  = round(_dias_treino / (60 / 7), 1)          # sessões/semana (float)
-freq_real_slider = max(3, min(7, round(freq_real)))      # valor para o slider
-_kcal_vals = [e["calories_burned"] for e in _ex60 if e.get("calories_burned", 0) > 50]
-kcal_real  = max(200, min(700, int(sum(_kcal_vals) / len(_kcal_vals)))) if _kcal_vals else 420
+_musc60   = [e for e in _ex60 if e.get("type") == "Musculação"]
+freq_real = round(len({e["date"] for e in _musc60}) / (60 / 7), 1)   # sessões de musculação/semana
+freq_real_slider = max(0, min(7, round(freq_real)))                    # valor para o slider
+_kcal_vals = [e["calories_burned"] for e in _musc60 if e.get("calories_burned", 0) > 50]
+kcal_real  = max(100, min(700, int(sum(_kcal_vals) / len(_kcal_vals)))) if _kcal_vals else 250
+_passos_por_dia = {}
+for e in _ex60:
+    if e.get("steps", 0) > 100:
+        _passos_por_dia[e["date"]] = _passos_por_dia.get(e["date"], 0) + e["steps"]
+passos_real = int(sum(_passos_por_dia.values()) / len(_passos_por_dia)) if _passos_por_dia else 0
+passos_real_fmt = f"{passos_real:,}".replace(",", ".")
 
 x_dias   = [(datetime.strptime(b["date"], "%Y-%m-%d") - REF_DATE).days for b in bio_recente]
 pesos    = [b["peso_kg"] for b in bio_recente]
 gorduras = [b.get("percentual_gordura", 0) for b in bio_recente]
 musculos = [b.get("musculo_esqueletico_kg", 0) for b in bio_recente]
 
-# Regressão linear atual (todos os dados = projeção recalibrada)
-coef_peso = np.polyfit(x_dias, pesos, 1)
-coef_gord = np.polyfit(x_dias, gorduras, 1)
-coef_musc = np.polyfit(x_dias, musculos, 1)
+# ── Ritmo atual = regressão sobre as últimas JANELA_SEMANAS de medições ────────
+# Reflete o seu ritmo recente (dieta, treino e metabolismo de hoje), não a média
+# desde mar/2026, que mistura fases muito diferentes.
+JANELA_SEMANAS = 12
+_cut_janela = (TODAY - timedelta(weeks=JANELA_SEMANAS)).strftime("%Y-%m-%d")
+_i_janela   = next((i for i, b in enumerate(bio_recente) if b["date"] >= _cut_janela), len(bio_recente))
+_i_janela   = min(_i_janela, max(0, len(bio_recente) - 4))   # garante ≥ 4 medições
+x_janela    = x_dias[_i_janela:]
+coef_peso   = np.polyfit(x_janela, pesos[_i_janela:], 1)
+coef_gord   = np.polyfit(x_janela, gorduras[_i_janela:], 1)
+janela_inicio_str = datetime.strptime(bio_recente[_i_janela]["date"], "%Y-%m-%d").strftime("%d/%m/%Y")
+
+# Ritmo médio desde o início do acompanhamento (cenário de comparação)
+coef_peso_media = np.polyfit(x_dias, pesos, 1)
+
+# ── Músculo: detecta valores repetidos (leitura da imagem não captou o campo) ──
+def _inicio_repeticao(valores, janela=8, minimo=6):
+    """Se um mesmo valor domina as últimas medições (≥ minimo de `janela`), retorna o índice onde
+    essa sequência quase constante começa — tolerando desvios isolados. Senão, None."""
+    ultimos = valores[-janela:]
+    moda = max(set(ultimos), key=ultimos.count)
+    if len(ultimos) < janela or ultimos.count(moda) < minimo:
+        return None
+    i, inicio = len(valores) - 1, None
+    while i >= 0:
+        if valores[i] == moda:
+            inicio = i
+        elif not (i > 0 and valores[i - 1] == moda):   # dois valores diferentes seguidos: fim da sequência
+            break
+        i -= 1
+    return inicio
+
+_musc_rep = _inicio_repeticao(musculos)
+musc_ok   = _musc_rep is None
+musc_rep_desde = (None if musc_ok else
+                  datetime.strptime(bio_recente[_musc_rep]["date"], "%Y-%m-%d").strftime("%d/%m/%Y"))
+musc_rep_n      = 0 if musc_ok else len(musculos) - _musc_rep                      # medições desde o início
+musc_rep_iguais = 0 if musc_ok else musculos[_musc_rep:].count(musculos[_musc_rep])  # quantas com o mesmo valor
+musc_rep_valor  = None if musc_ok else musculos[_musc_rep]
+# Com dados repetidos, a tendência usa só as medições até o início da repetição
+_n_musc   = len(musculos) if musc_ok else max(3, _musc_rep + 1)
+coef_musc = np.polyfit(x_dias[:_n_musc], musculos[:_n_musc], 1)
 
 # ── Predição original (primeiro terço dos dados — escala com o histórico) ──────
 # Mínimo de 6 medições (~6 semanas) para superar a fase inicial de adaptação
@@ -102,16 +147,18 @@ peso_atual = bio_recente[-1]["peso_kg"]
 gord_atual = bio_recente[-1].get("percentual_gordura", 0)
 musc_atual = bio_recente[-1].get("musculo_esqueletico_kg", 0)
 
-# Taxas semanais da linha de base (3x/semana)
+# Taxas semanais do ritmo atual (últimas JANELA_SEMANAS)
 taxa_peso_sem = coef_peso[0] * 7
 taxa_gord_sem = coef_gord[0] * 7
 taxa_musc_sem = coef_musc[0] * 7
+taxa_peso_media_sem = coef_peso_media[0] * 7
 
 PESO_META = 82.0
-GORD_META = 22.0
+GORD_META = 20.0
 MUSC_META = 40.0
+RITMO_IDEAL_SEM = -2.0 / 4.33   # ~2 kg/mês: perda de gordura preservando músculo
 
-# Ponto projetado hoje (pelo modelo recalibrado)
+# Ponto de partida = valor da tendência recente hoje (menos ruído que a última pesagem)
 val_hoje_peso = float(np.polyval(coef_peso, TODAY_X))
 val_hoje_gord = float(np.polyval(coef_gord, TODAY_X))
 val_hoje_musc = float(np.polyval(coef_musc, TODAY_X))
@@ -174,13 +221,20 @@ if desvios_peso:
 <div style='font-size:12px;color:#888;margin-top:4px'>Previsto hoje: {pred_hoje_gord:.1f}% · Real: {gord_atual:.1f}%</div>
 </div>""", unsafe_allow_html=True)
     with a3:
-        st.markdown(f"""<div style='background:#f8f8f8;border-left:5px solid {cor_m};border-radius:8px;padding:14px;'>
+        if not musc_ok:
+            st.markdown(f"""<div style='background:#f8f8f8;border-left:5px solid #95A5A6;border-radius:8px;padding:14px;'>
+<div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Músculo — vs Predição</div>
+<div style='font-size:22px;font-weight:700;color:#7F8C8D'>⚠️ Sem dado confiável</div>
+<div style='font-size:12px;color:#888;margin-top:4px'>Mesmo valor ({musc_rep_valor:.1f} kg) em {musc_rep_iguais} de {musc_rep_n} medições desde {musc_rep_desde}.</div>
+</div>""", unsafe_allow_html=True)
+        else:
+            st.markdown(f"""<div style='background:#f8f8f8;border-left:5px solid {cor_m};border-radius:8px;padding:14px;'>
 <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Músculo — vs Predição</div>
 <div style='font-size:28px;font-weight:700;color:{cor_m}'>{emoji_m} {dev_musc_atual:+.1f} kg</div>
 <div style='font-size:13px;color:{cor_m};font-weight:600'>{txt_m}</div>
 <div style='font-size:12px;color:#888;margin-top:4px'>Previsto hoje: {pred_hoje_musc:.1f} kg · Real: {musc_atual:.1f} kg</div>
 </div>""", unsafe_allow_html=True)
-    st.caption(f"Predição original calculada com os {N_BASE} primeiros registros do acompanhamento semanal (mar/2026). A projeção é recalibrada com todos os dados desde então, incluindo o período pós-Puran T4.")
+    st.caption(f"Predição original calculada com os {N_BASE} primeiros registros do acompanhamento semanal (mar/2026). O ritmo atual usa as medições das últimas {JANELA_SEMANAS} semanas (desde {janela_inicio_str}).")
 
     # ═══════════════════════════════════════════════════════════════════════════
     # PARECER MÉDICO-ESPORTIVO — gerado a cada medição de bioimpedância
@@ -279,6 +333,13 @@ if desvios_peso:
         _musc_analise = f"Ganho muscular acima do previsto (+{dev_musc_atual:.1f} kg) — excelente resposta ao treino resistido com o Puran T4 regulando o anabolismo."
     else:
         _musc_analise = "Massa muscular mantida conforme esperado. Equilíbrio adequado entre déficit calórico e estímulo de treino."
+    if not musc_ok:
+        _musc_analise = (
+            f"Não é possível avaliar: o músculo esquelético aparece com o mesmo valor ({musc_rep_valor:.1f} kg) "
+            f"em {musc_rep_iguais} de {musc_rep_n} medições desde {musc_rep_desde}. Na prática ele sempre oscila um pouco "
+            "de uma semana para outra — o mais provável é que esse campo não esteja sendo lido da imagem do app AiLink "
+            "e o formulário tenha repetido o valor anterior. Confira o campo antes de salvar as próximas medições."
+        )
 
     # Orientações práticas (dinâmicas)
     _ori_items = []
@@ -287,18 +348,24 @@ if desvios_peso:
     )
     if freq_real < 3.0:
         _ori_items.append(
-            f"🏋️ <b>Aumente a frequência de treino:</b> você está em {freq_real:.1f} sessões/semana nos últimos 60 dias. "
+            f"🏋️ <b>Aumente a musculação:</b> você está em {freq_real:.1f} sessões/semana nos últimos 60 dias. "
             "O mínimo para preservar massa muscular em déficit calórico é 3x/semana de resistência."
         )
     elif freq_real < 4.5:
         _ori_items.append(
-            f"🏋️ <b>Frequência de treino ({freq_real:.1f}x/sem):</b> está dentro do mínimo adequado. "
+            f"🏋️ <b>Musculação ({freq_real:.1f}x/sem):</b> está dentro do mínimo adequado. "
             "Adicionar 1 sessão de cardio moderado (30–40 min, zona 2) entre os treinos de resistência acelera a perda de gordura visceral sem comprometer a recuperação."
         )
     else:
         _ori_items.append(
-            f"🏋️ <b>Frequência de treino ótima ({freq_real:.1f}x/sem):</b> consistência excelente. "
+            f"🏋️ <b>Musculação ótima ({freq_real:.1f}x/sem):</b> consistência excelente. "
             "Foque na progressão de carga e na qualidade das sessões."
+        )
+    if passos_real and passos_real < 7000:
+        _ori_items.append(
+            f"👣 <b>Passos ({passos_real_fmt} por dia em média nos últimos 60 dias):</b> abaixo da meta de 7.000. "
+            "Caminhar 10–15 min logo após almoço e jantar soma passos e reduz o pico de glicose das refeições — "
+            "use o simulador abaixo para ver o efeito na data da meta."
         )
     if _taxa_sem_real > -0.3:
         _ori_items.append(
@@ -317,7 +384,7 @@ if desvios_peso:
             "Os efeitos plenos da levotiroxina na taxa metabólica basal levam de 8 a 12 semanas. "
             "Não avalie o plano como falho com base nesta fase — o ritmo tende a se estabilizar após a normalização do TSH."
         )
-    if dev_musc_atual < -0.5:
+    if musc_ok and dev_musc_atual < -0.5:
         _ori_items.append(
             "🥩 <b>Ingestão proteica:</b> com a massa muscular abaixo do previsto, priorize a meta de 1,8–2,2g de proteína por kg de peso por dia. "
             "Distribua em pelo menos 4 refeições com ≥25g de proteína cada — especialmente no pós-treino (janela de 30–60 min)."
@@ -341,7 +408,8 @@ if desvios_peso:
 <div style='font-size:11px;color:#888;margin-top:2px'>{_fase_puran_desc}</div>
 <hr style='border:none;border-top:1px solid #EEE;margin:8px 0'>
 <b>Perda total (início):</b> {_total_perdido:.1f} kg<br>
-<b>Treino (60d):</b> {freq_real:.1f}x/sem · {kcal_real} kcal/sessão<br>
+<b>Musculação (60d):</b> {freq_real:.1f}x/sem · {kcal_real} kcal/sessão<br>
+<b>Passos (60d):</b> {passos_real_fmt}/dia<br>
 <b>Gordura visceral:</b> {'índice ' + str(int(_gv_atual_med)) if _gv_atual_med else 'sem dado'}<br>
 <hr style='border:none;border-top:1px solid #EEE;margin:8px 0'>
 <span style='font-size:10px;color:#AAA'>Atualizado automaticamente a cada nova medição. Não substitui avaliação médica presencial.</span>
@@ -367,125 +435,125 @@ if desvios_peso:
 
     st.markdown("")
 
-# ── Configurador de Cenário de Treino ─────────────────────────────────────────
-st.markdown("<div class='section-header'>⚙️ Simular Frequência de Treino</div>", unsafe_allow_html=True)
+# ── Simulador: musculação + passos ────────────────────────────────────────────
+st.markdown("<div class='section-header'>⚙️ Simular Mudanças na Rotina</div>", unsafe_allow_html=True)
+st.caption(f"Ponto de partida: sua rotina real nos últimos 60 dias — musculação {freq_real:.1f}x/semana "
+           f"e {passos_real_fmt} passos/dia. Mude os valores para ver o efeito na data da meta.")
 
-c_s1, c_s2, c_s3 = st.columns([3, 2, 3])
+c_s1, c_s2, c_s3 = st.columns([3, 3, 3])
 with c_s1:
     freq_treino = st.select_slider(
-        "Treinos por semana:",
-        options=[3, 4, 5, 6, 7],
+        "Musculação por semana:",
+        options=[0, 1, 2, 3, 4, 5, 6, 7],
         value=freq_real_slider,
         format_func=lambda x: f"{x}x/semana",
         key="freq_treino_slider",
-        help=f"Frequência calculada do seu histórico (60 dias): {freq_real:.1f}x/sem. Ajuste para simular cenários."
+        help=f"Sua frequência real de musculação (60 dias): {freq_real:.1f}x/sem. Caminhadas contam nos passos.",
+    )
+    kcal_por_sessao = st.number_input(
+        "Kcal por sessão de musculação:",
+        min_value=100, max_value=700, value=kcal_real, step=10,
+        key="kcal_sessao_input",
+        help=f"Média real das suas sessões de musculação recentes: {kcal_real} kcal",
     )
 with c_s2:
-    kcal_por_sessao = st.number_input(
-        "Kcal por treino:",
-        min_value=200, max_value=700, value=kcal_real, step=10,
-        key="kcal_sessao_input",
-        help=f"Média real dos seus treinos recentes: {kcal_real} kcal/sessão"
+    passos_alvo = st.number_input(
+        "Passos por dia:",
+        min_value=0, max_value=25000, value=passos_real, step=500,
+        key="passos_alvo_input",
+        help=f"Sua média real (60 dias): {passos_real_fmt} passos/dia",
     )
 
-# Cálculo do ajuste de cenário
-KCAL_POR_KG_GORDURA = 7700  # kcal necessárias para perder 1 kg de gordura
-extra_sessoes = freq_treino - freq_real  # delta em relação à frequência real
+# Cálculo do cenário (diferença em relação à sua rotina real)
+KCAL_POR_KG_GORDURA = 7700                 # kcal necessárias para perder 1 kg de gordura
+KCAL_POR_PASSO      = 0.0005 * peso_atual  # ~0,045 kcal/passo para ~90 kg
+extra_sessoes  = freq_treino - freq_real_slider
+extra_passos   = passos_alvo - passos_real
+extra_kcal_sem = extra_sessoes * kcal_por_sessao + extra_passos * KCAL_POR_PASSO * 7
+extra_peso_sem = extra_kcal_sem / KCAL_POR_KG_GORDURA            # kg/semana a mais de perda
+extra_gord_sem = extra_peso_sem / peso_atual * 100                # pontos de % de gordura/semana
+extra_musc_sem = min(max(extra_sessoes, 0) * 0.012, 0.048)        # kg/semana (limite fisiológico)
 
-# Impacto extra semanal (adicional ao baseline de 3x/sem)
-extra_kcal_sem   = extra_sessoes * kcal_por_sessao
-extra_peso_sem   = extra_kcal_sem / KCAL_POR_KG_GORDURA          # kg/semana a mais
-extra_gord_sem   = extra_sessoes * 0.04                            # pp/semana a mais (gordura %)
-extra_musc_sem   = min(extra_sessoes * 0.012, 0.048)              # kg/semana a mais (limite fisiológico)
-
-# Taxas ajustadas para o cenário
+# Taxas do cenário simulado
 taxa_peso_aj = taxa_peso_sem - extra_peso_sem   # mais negativo = mais perda
 taxa_gord_aj = taxa_gord_sem - extra_gord_sem
 taxa_musc_aj = taxa_musc_sem + extra_musc_sem
 
-# Slopes ajustados por dia (para projeção)
+# Slopes extras por dia (para projeção)
 adj_slope_peso = -extra_peso_sem / 7
 adj_slope_gord = -extra_gord_sem / 7
 adj_slope_musc = +extra_musc_sem / 7
 
+usar_aj = abs(extra_kcal_sem) >= 1
+
 with c_s3:
-    if extra_sessoes == 0:
-        st.info(f"📊 **Cenário atual** — frequência real calculada: {freq_real:.1f}x/semana (últimos 60 dias).")
+    if not usar_aj:
+        st.info(f"📊 **Rotina atual** — musculação {freq_real:.1f}x/semana · {passos_real_fmt} passos/dia.")
     else:
-        extra_kg_mes = extra_peso_sem * 4.3
+        _kg_mes = extra_peso_sem * 4.33
+        _efeito = "a mais" if _kg_mes > 0 else "a menos"
+        _passos_alvo_fmt = f"{passos_alvo:,}".replace(",", ".")
         st.markdown(f"""<div class='scenario-box'>
-<b>✅ Cenário: {freq_treino}x/semana</b><br>
-{extra_sessoes:+.1f} treino(s)/sem = <b>{extra_kcal_sem:+.0f} kcal/sem</b> gastas<br>
-→ <b>~{extra_kg_mes:+.2f} kg</b> de perda por mês em relação ao ritmo atual
+<b>✅ Cenário simulado</b><br>
+Musculação {freq_treino}x/sem · {_passos_alvo_fmt} passos/dia<br>
+<b>{extra_kcal_sem:+.0f} kcal/sem</b> gastas em relação à rotina atual<br>
+→ <b>~{abs(_kg_mes):.2f} kg {_efeito}</b> de perda por mês
 </div>""", unsafe_allow_html=True)
 
 # Dados para gráficos
 proj_x      = list(range(TODAY_X, TODAY_X + 40 * 7, 7))
 proj_datas  = [REF_DATE + timedelta(days=d) for d in proj_x]
 
-# Projeções baseline (3x/sem)
+# Projeções — ritmo atual (últimas JANELA_SEMANAS)
 proj_pesos    = [float(np.polyval(coef_peso, d)) for d in proj_x]
 proj_gorduras = [float(np.polyval(coef_gord, d)) for d in proj_x]
 proj_musculos = [float(np.polyval(coef_musc, d)) for d in proj_x]
 
-# Projeções ajustadas (cenário Xx/sem) — partem do valor de hoje projetado pelo modelo
+# Cenários de comparação para o peso — partem do mesmo ponto de hoje
+proj_pesos_media = [val_hoje_peso + coef_peso_media[0] * (d - TODAY_X) for d in proj_x]
+proj_pesos_ideal = [val_hoje_peso + RITMO_IDEAL_SEM / 7 * (d - TODAY_X) for d in proj_x]
+
+# Projeções do cenário simulado
 proj_pesos_aj    = [val_hoje_peso + (coef_peso[0] + adj_slope_peso) * (d - TODAY_X) for d in proj_x]
 proj_gorduras_aj = [val_hoje_gord + (coef_gord[0] + adj_slope_gord) * (d - TODAY_X) for d in proj_x]
 proj_musculos_aj = [val_hoje_musc + (coef_musc[0] + adj_slope_musc) * (d - TODAY_X) for d in proj_x]
 
-# Linha de tendência sobre histórico
-trend_x     = list(range(x_dias[0], TODAY_X + 1))
-trend_datas = [REF_DATE + timedelta(days=d) for d in trend_x]
-hist_datas  = [datetime.strptime(b["date"], "%Y-%m-%d") for b in bio_recente]
+# Linhas de tendência sobre o histórico
+trend_x         = list(range(x_dias[0], TODAY_X + 1))
+trend_datas     = [REF_DATE + timedelta(days=d) for d in trend_x]
+trend_x_jan     = list(range(x_janela[0], TODAY_X + 1))
+trend_datas_jan = [REF_DATE + timedelta(days=d) for d in trend_x_jan]
+hist_datas      = [datetime.strptime(b["date"], "%Y-%m-%d") for b in bio_recente]
 
-# Datas de meta — baseline
-if coef_peso[0] < 0:
-    d_falta = (PESO_META - val_hoje_peso) / coef_peso[0]
-    dt_peso = (TODAY + timedelta(days=int(d_falta))).date() if d_falta > 0 else None
-    dias_peso_falta = d_falta
-else:
-    dt_peso, dias_peso_falta = None, None
 
-if coef_gord[0] < 0:
-    d_falta = (GORD_META - val_hoje_gord) / coef_gord[0]
-    dt_gord = (TODAY + timedelta(days=int(d_falta))).date() if d_falta > 0 else None
-else:
-    dt_gord = None
+def _data_meta(atual, meta, slope_dia):
+    """(data, dias) em que a reta atinge a meta a partir de hoje; (None, None) se não atinge."""
+    if slope_dia == 0:
+        return None, None
+    dias = (meta - atual) / slope_dia
+    if dias <= 0:
+        return None, None
+    return (TODAY + timedelta(days=int(dias))).date(), dias
 
-if coef_musc[0] > 0:
-    d_falta = (MUSC_META - val_hoje_musc) / coef_musc[0]
-    dt_musc = (TODAY + timedelta(days=int(d_falta))).date() if d_falta > 0 else None
-    dias_musc_falta = d_falta
-else:
-    dt_musc, dias_musc_falta = None, None
 
-# Datas de meta — cenário ajustado
+# Datas de meta — ritmo atual e cenários de comparação
+dt_peso, dias_peso_falta       = _data_meta(val_hoje_peso, PESO_META, coef_peso[0])
+dt_peso_media, dias_peso_media = _data_meta(val_hoje_peso, PESO_META, coef_peso_media[0])
+dt_peso_ideal, dias_peso_ideal = _data_meta(val_hoje_peso, PESO_META, RITMO_IDEAL_SEM / 7)
+dt_gord, _                     = _data_meta(val_hoje_gord, GORD_META, coef_gord[0])
+dt_musc, dias_musc_falta       = (_data_meta(val_hoje_musc, MUSC_META, coef_musc[0]) if musc_ok
+                                  else (None, None))
+
+# Datas de meta — cenário simulado
 slope_peso_aj_dia = coef_peso[0] + adj_slope_peso
 slope_gord_aj_dia = coef_gord[0] + adj_slope_gord
 slope_musc_aj_dia = coef_musc[0] + adj_slope_musc
+dt_peso_aj, dias_peso_aj = _data_meta(val_hoje_peso, PESO_META, slope_peso_aj_dia)
+dt_gord_aj, _            = _data_meta(val_hoje_gord, GORD_META, slope_gord_aj_dia)
+dt_musc_aj, dias_musc_aj = (_data_meta(val_hoje_musc, MUSC_META, slope_musc_aj_dia) if musc_ok
+                            else (None, None))
 
-if slope_peso_aj_dia < 0:
-    d_aj = (PESO_META - val_hoje_peso) / slope_peso_aj_dia
-    dt_peso_aj = (TODAY + timedelta(days=int(d_aj))).date() if d_aj > 0 else None
-    dias_peso_aj = d_aj
-else:
-    dt_peso_aj, dias_peso_aj = None, None
-
-if slope_gord_aj_dia < 0:
-    d_aj = (GORD_META - val_hoje_gord) / slope_gord_aj_dia
-    dt_gord_aj = (TODAY + timedelta(days=int(d_aj))).date() if d_aj > 0 else None
-else:
-    dt_gord_aj = None
-
-if slope_musc_aj_dia > 0:
-    d_aj = (MUSC_META - val_hoje_musc) / slope_musc_aj_dia
-    dt_musc_aj = (TODAY + timedelta(days=int(d_aj))).date() if d_aj > 0 else None
-    dias_musc_aj = d_aj
-else:
-    dt_musc_aj, dias_musc_aj = None, None
-
-# Escolhe quais valores mostrar nos KPIs (ajustado quando freq > 3)
-usar_aj = extra_sessoes > 0
+# Escolhe quais valores mostrar nos KPIs (simulado quando a rotina foi alterada)
 taxa_peso_kpi = taxa_peso_aj if usar_aj else taxa_peso_sem
 taxa_gord_kpi = taxa_gord_aj if usar_aj else taxa_gord_sem
 taxa_musc_kpi = taxa_musc_aj if usar_aj else taxa_musc_sem
@@ -496,7 +564,9 @@ dias_peso_kpi = dias_peso_aj if usar_aj else dias_peso_falta
 st.markdown("<div class='section-header'>📊 Ritmo Projetado</div>", unsafe_allow_html=True)
 kpi_class = "kpi-box-adj" if usar_aj else "kpi-box"
 if usar_aj:
-    st.caption(f"Valores para o cenário de **{freq_treino}x/semana** (linha verde nos gráficos)")
+    st.caption("Valores do **cenário simulado** (linha verde nos gráficos)")
+else:
+    st.caption(f"Ritmo calculado com as suas medições das últimas {JANELA_SEMANAS} semanas (desde {janela_inicio_str}).")
 
 c1, c2, c3, c4 = st.columns(4)
 
@@ -521,9 +591,17 @@ with c2:
 </div>""", unsafe_allow_html=True)
 
 with c3:
-    cor3 = "#27AE60" if taxa_musc_kpi > 0 else "#F39C12"
-    seta3 = "↑" if taxa_musc_kpi > 0 else "→"
-    st.markdown(f"""<div class='{kpi_class}'>
+    if not musc_ok:
+        st.markdown(f"""<div class='{kpi_class}'>
+<div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Ganho Muscular</div>
+<div style='font-size:22px;font-weight:700;color:#7F8C8D'>⚠️ Sem dado</div>
+<div style='font-size:12px;color:#888'>valor repetido desde {musc_rep_desde}</div>
+<div style='font-size:12px;color:#888'>veja a aba Músculo</div>
+</div>""", unsafe_allow_html=True)
+    else:
+        cor3 = "#27AE60" if taxa_musc_kpi > 0 else "#F39C12"
+        seta3 = "↑" if taxa_musc_kpi > 0 else "→"
+        st.markdown(f"""<div class='{kpi_class}'>
 <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Ganho Muscular</div>
 <div style='font-size:32px;font-weight:700;color:{cor3}'>{seta3} {abs(taxa_musc_kpi):.3f}</div>
 <div style='font-size:12px;color:#888'>kg/semana</div>
@@ -535,7 +613,7 @@ with c4:
         meses = int(dias_peso_kpi / 30)
         st.markdown(f"""<div class='{kpi_class}'>
 <div style='font-size:11px;color:#666;font-weight:700;text-transform:uppercase'>Meta 82 kg</div>
-<div style='font-size:24px;font-weight:700;color:#7B2FBE'>{dt_peso_kpi.strftime('%b/%Y')}</div>
+<div style='font-size:24px;font-weight:700;color:#7B2FBE'>{dt_peso_kpi.strftime('%m/%Y')}</div>
 <div style='font-size:12px;color:#888'>em ~{meses} meses</div>
 <div style='font-size:12px;color:#7B2FBE;font-weight:600'>Faltam {peso_atual - PESO_META:.1f} kg</div>
 </div>""", unsafe_allow_html=True)
@@ -561,21 +639,21 @@ with tab1:
             _h_datas = [datetime.strptime(b["date"], "%Y-%m-%d") for b in bio_historico]
             _h_pesos = [b["peso_kg"] for b in bio_historico]
             fig_peso.add_trace(go.Scatter(
-                x=_h_datas, y=_h_pesos, name="Histórico pré-Puran T4",
+                x=_h_datas, y=_h_pesos, name="Histórico 2025",
                 mode="lines+markers", opacity=0.35,
                 line=dict(color="#95A5A6", width=1.5, dash="dot"),
                 marker=dict(size=5, color="#95A5A6"),
             ))
         fig_peso.add_trace(go.Scatter(
-            x=hist_datas, y=pesos, name="Peso real (pós-Puran T4)",
+            x=hist_datas, y=pesos, name="Peso real (desde mar/26)",
             mode="lines+markers",
             line=dict(color="#2980B9", width=2.5),
             marker=dict(size=7, color="#2980B9"),
         ))
         fig_peso.add_trace(go.Scatter(
-            x=trend_datas,
-            y=[float(np.polyval(coef_peso, d)) for d in trend_x],
-            name="Tendência recalibrada",
+            x=trend_datas_jan,
+            y=[float(np.polyval(coef_peso, d)) for d in trend_x_jan],
+            name=f"Tendência recente ({JANELA_SEMANAS} sem)",
             mode="lines",
             line=dict(color="#27AE60", width=1.5, dash="dot"),
         ))
@@ -587,14 +665,22 @@ with tab1:
             line=dict(color="#E67E22", width=1.5, dash="dashdot"),
         ))
         fig_peso.add_trace(go.Scatter(
-            x=proj_datas, y=proj_pesos, name=f"Projeção {freq_real_slider}x/sem (atual)",
+            x=proj_datas, y=proj_pesos_media, name="Se voltar à média desde mar/26",
+            mode="lines", line=dict(color="#95A5A6", width=1.5, dash="dot"),
+        ))
+        fig_peso.add_trace(go.Scatter(
+            x=proj_datas, y=proj_pesos_ideal, name="Ritmo ideal (2 kg/mês)",
+            mode="lines", line=dict(color="#16A085", width=1.5, dash="dot"),
+        ))
+        fig_peso.add_trace(go.Scatter(
+            x=proj_datas, y=proj_pesos, name="Projeção — ritmo atual",
             mode="lines",
             line=dict(color="#9B59B6", width=2, dash="dash"),
         ))
         if usar_aj:
             fig_peso.add_trace(go.Scatter(
                 x=proj_datas, y=proj_pesos_aj,
-                name=f"Projeção {freq_treino}x/sem",
+                name="Projeção — cenário simulado",
                 mode="lines",
                 line=dict(color="#27AE60", width=2.5, dash="longdash"),
             ))
@@ -604,13 +690,13 @@ with tab1:
             fig_peso.add_vline(
                 x=pd.Timestamp(dt_peso).value // 10**6,
                 line_dash="dot", line_color="#9B59B6", line_width=1,
-                annotation_text=f"3x: {dt_peso.strftime('%m/%Y')}", annotation_position="top right",
+                annotation_text=f"Atual: {dt_peso.strftime('%m/%Y')}", annotation_position="top right",
             )
         if usar_aj and dt_peso_aj:
             fig_peso.add_vline(
                 x=pd.Timestamp(dt_peso_aj).value // 10**6,
                 line_dash="dot", line_color="#27AE60", line_width=1.5,
-                annotation_text=f"{freq_treino}x: {dt_peso_aj.strftime('%m/%Y')}", annotation_position="top left",
+                annotation_text=f"Simulado: {dt_peso_aj.strftime('%m/%Y')}", annotation_position="top left",
             )
         fig_peso.add_vline(
             x=pd.Timestamp(PURAN_T4_DATE).value // 10**6,
@@ -618,7 +704,7 @@ with tab1:
             annotation_text="Puran T4", annotation_position="bottom right",
         )
         fig_peso.update_layout(
-            title=f"Projeção de Peso" + (f" — Comparativo {freq_real_slider}x vs {freq_treino}x/semana" if usar_aj else ""),
+            title="Projeção de Peso" + (" — ritmo atual vs cenário simulado" if usar_aj else ""),
             height=360, plot_bgcolor="white", paper_bgcolor="white",
             xaxis=dict(showgrid=False, automargin=True, tickangle=-15, tickformat="%b/%y"),
             yaxis=dict(showgrid=True, gridcolor="#eee", title="kg", automargin=True,
@@ -633,13 +719,13 @@ with tab1:
         if bio_historico:
             _h_gords = [b.get("percentual_gordura", 0) for b in bio_historico]
             fig_gord.add_trace(go.Scatter(
-                x=_h_datas, y=_h_gords, name="Histórico pré-Puran T4",
+                x=_h_datas, y=_h_gords, name="Histórico 2025",
                 mode="lines+markers", opacity=0.35,
                 line=dict(color="#95A5A6", width=1.5, dash="dot"),
                 marker=dict(size=5, color="#95A5A6"),
             ))
         fig_gord.add_trace(go.Scatter(
-            x=hist_datas, y=gorduras, name="Gordura real (pós-Puran T4)",
+            x=hist_datas, y=gorduras, name="Gordura real (desde mar/26)",
             mode="lines+markers",
             line=dict(color="#E74C3C", width=2.5), marker=dict(size=7),
         ))
@@ -651,14 +737,14 @@ with tab1:
             line=dict(color="#E67E22", width=1.5, dash="dashdot"),
         ))
         fig_gord.add_trace(go.Scatter(
-            x=proj_datas, y=proj_gorduras, name=f"Projeção {freq_real_slider}x/sem (atual)",
+            x=proj_datas, y=proj_gorduras, name="Projeção — ritmo atual",
             mode="lines",
             line=dict(color="#9B59B6", width=2, dash="dash"),
         ))
         if usar_aj:
             fig_gord.add_trace(go.Scatter(
                 x=proj_datas, y=proj_gorduras_aj,
-                name=f"Projeção {freq_treino}x/sem",
+                name="Projeção — cenário simulado",
                 mode="lines",
                 line=dict(color="#27AE60", width=2.5, dash="longdash"),
             ))
@@ -668,13 +754,13 @@ with tab1:
             fig_gord.add_vline(
                 x=pd.Timestamp(dt_gord).value // 10**6,
                 line_dash="dot", line_color="#9B59B6", line_width=1,
-                annotation_text=f"3x: {dt_gord.strftime('%m/%Y')}", annotation_position="top right",
+                annotation_text=f"Atual: {dt_gord.strftime('%m/%Y')}", annotation_position="top right",
             )
         if usar_aj and dt_gord_aj:
             fig_gord.add_vline(
                 x=pd.Timestamp(dt_gord_aj).value // 10**6,
                 line_dash="dot", line_color="#27AE60", line_width=1.5,
-                annotation_text=f"{freq_treino}x: {dt_gord_aj.strftime('%m/%Y')}", annotation_position="top left",
+                annotation_text=f"Simulado: {dt_gord_aj.strftime('%m/%Y')}", annotation_position="top left",
             )
         fig_gord.update_layout(
             title="Projeção de Gordura Corporal (%)",
@@ -691,42 +777,24 @@ with tab1:
         falta_peso = peso_atual - PESO_META
         falta_gord = gord_atual - GORD_META
 
-        # Cenário baseline
-        if dt_peso:
-            meses_b = int(dias_peso_falta / 30)
-            st.markdown(
-                f"<div class='proj-warn'><b>⚖️ {freq_real_slider}x/sem (atual) — Meta 82 kg</b><br>"
-                f"Chegará em <b>{dt_peso.strftime('%d/%m/%Y')}</b><br>"
-                f"~{meses_b} meses · {taxa_peso_sem:.2f} kg/sem</div>",
-                unsafe_allow_html=True,
-            )
-        else:
-            st.markdown(
-                f"<div class='proj-alert'><b>⚖️ Meta 82 kg</b><br>"
-                f"Faltam {falta_peso:.1f} kg<br>"
-                f"Tendência não alcança a meta</div>",
-                unsafe_allow_html=True,
-            )
-
-        # Cenário ajustado
-        if usar_aj:
-            if dt_peso_aj:
-                meses_aj = int(dias_peso_aj / 30)
-                acelerou = (int(dias_peso_falta) - int(dias_peso_aj)) if dt_peso and dt_peso_aj else 0
-                st.markdown(
-                    f"<div class='proj-scenario'><b>✅ {freq_treino}x/sem — Meta 82 kg</b><br>"
-                    f"Chegará em <b>{dt_peso_aj.strftime('%d/%m/%Y')}</b><br>"
-                    f"~{meses_aj} meses · {taxa_peso_aj:.2f} kg/sem<br>"
-                    + (f"<span style='color:#27AE60;font-weight:700'>⚡ {acelerou} dias mais rápido!</span>" if acelerou > 0 else "")
-                    + "</div>",
-                    unsafe_allow_html=True,
-                )
+        # Cenários para a meta de peso — todos partem do seu peso de hoje
+        def _card_meta(classe, titulo, dt, dias, taxa_sem):
+            if dt:
+                corpo = (f"Chega em <b>{dt.strftime('%m/%Y')}</b> (~{int(dias / 30)} meses)<br>"
+                         f"{abs(taxa_sem):.2f} kg/sem · {abs(taxa_sem) * 4.33:.1f} kg/mês")
             else:
-                st.markdown(
-                    f"<div class='proj-alert'><b>{freq_treino}x/sem — Meta 82 kg</b><br>"
-                    f"Tendência não alcança a meta</div>",
-                    unsafe_allow_html=True,
-                )
+                corpo = "Nesse ritmo, não alcança a meta"
+                classe = "proj-alert"
+            st.markdown(f"<div class='{classe}'><b>{titulo}</b><br>{corpo}</div>", unsafe_allow_html=True)
+
+        st.caption(f"Meta 82 kg — faltam {falta_peso:.1f} kg")
+        _card_meta("proj-warn", f"⚖️ Ritmo atual (últimas {JANELA_SEMANAS} sem)",
+                   dt_peso, dias_peso_falta, taxa_peso_sem)
+        if usar_aj:
+            _card_meta("proj-scenario", "✅ Cenário simulado", dt_peso_aj, dias_peso_aj, taxa_peso_aj)
+        _card_meta("proj-good", "🎯 Ritmo ideal (2 kg/mês)", dt_peso_ideal, dias_peso_ideal, RITMO_IDEAL_SEM)
+        _card_meta("proj-alert" if taxa_peso_media_sem > taxa_peso_sem else "proj-warn",
+                   "📉 Média desde mar/26", dt_peso_media, dias_peso_media, taxa_peso_media_sem)
 
         # Gordura
         if dt_gord:
@@ -755,26 +823,35 @@ with tab1:
 # TAB 2: MÚSCULO
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab2:
+    if not musc_ok:
+        st.warning(
+            f"⚠️ **Projeção de músculo suspensa.** O músculo esquelético aparece com exatamente o mesmo valor "
+            f"({musc_rep_valor:.1f} kg) em {musc_rep_iguais} de {musc_rep_n} medições desde {musc_rep_desde}. "
+            "O músculo sempre varia um pouco de uma semana para outra — mesmo valor repetido indica que o campo "
+            "não foi lido da imagem do app AiLink e o formulário manteve o valor anterior. "
+            "Sem dados reais, qualquer previsão aqui seria inventada. Confira o campo **Músculo Esquelético** "
+            "ao registrar as próximas medições; a projeção volta sozinha quando houver dados novos."
+        )
     col_mg, col_mr = st.columns([3, 1])
     with col_mg:
         fig_musc = go.Figure()
         if bio_historico:
             _h_muscs = [b.get("musculo_esqueletico_kg", 0) for b in bio_historico]
             fig_musc.add_trace(go.Scatter(
-                x=_h_datas, y=_h_muscs, name="Histórico pré-Puran T4",
+                x=_h_datas, y=_h_muscs, name="Histórico 2025",
                 mode="lines+markers", opacity=0.35,
                 line=dict(color="#95A5A6", width=1.5, dash="dot"),
                 marker=dict(size=5, color="#95A5A6"),
             ))
         fig_musc.add_trace(go.Scatter(
-            x=hist_datas, y=musculos, name="Músculo real (pós-Puran T4)",
+            x=hist_datas, y=musculos, name="Músculo registrado (desde mar/26)",
             mode="lines+markers",
             line=dict(color="#27AE60", width=2.5), marker=dict(size=7),
         ))
         fig_musc.add_trace(go.Scatter(
             x=trend_datas,
             y=[float(np.polyval(coef_musc, d)) for d in trend_x],
-            name="Tendência recalibrada",
+            name="Tendência" if musc_ok else "Tendência (até o início da repetição)",
             mode="lines",
             line=dict(color="#1ABC9C", width=1.5, dash="dot"),
         ))
@@ -785,15 +862,16 @@ with tab2:
             mode="lines",
             line=dict(color="#E67E22", width=1.5, dash="dashdot"),
         ))
-        fig_musc.add_trace(go.Scatter(
-            x=proj_datas, y=proj_musculos, name=f"Projeção {freq_real_slider}x/sem (atual)",
-            mode="lines",
-            line=dict(color="#9B59B6", width=2, dash="dash"),
-        ))
-        if usar_aj:
+        if musc_ok:
+            fig_musc.add_trace(go.Scatter(
+                x=proj_datas, y=proj_musculos, name="Projeção — ritmo atual",
+                mode="lines",
+                line=dict(color="#9B59B6", width=2, dash="dash"),
+            ))
+        if usar_aj and musc_ok:
             fig_musc.add_trace(go.Scatter(
                 x=proj_datas, y=proj_musculos_aj,
-                name=f"Projeção {freq_treino}x/sem",
+                name="Projeção — cenário simulado",
                 mode="lines",
                 line=dict(color="#F39C12", width=2.5, dash="longdash"),
             ))
@@ -803,13 +881,13 @@ with tab2:
             fig_musc.add_vline(
                 x=pd.Timestamp(dt_musc).value // 10**6,
                 line_dash="dot", line_color="#9B59B6", line_width=1,
-                annotation_text=f"3x: {dt_musc.strftime('%m/%Y')}", annotation_position="top right",
+                annotation_text=f"Atual: {dt_musc.strftime('%m/%Y')}", annotation_position="top right",
             )
         if usar_aj and dt_musc_aj:
             fig_musc.add_vline(
                 x=pd.Timestamp(dt_musc_aj).value // 10**6,
                 line_dash="dot", line_color="#F39C12", line_width=1.5,
-                annotation_text=f"{freq_treino}x: {dt_musc_aj.strftime('%m/%Y')}", annotation_position="top left",
+                annotation_text=f"Simulado: {dt_musc_aj.strftime('%m/%Y')}", annotation_position="top left",
             )
         fig_musc.update_layout(
             title="Projeção de Massa Muscular Esquelética",
@@ -834,18 +912,27 @@ with tab2:
         with c_m2:
             st.metric("% do peso corporal", f"{musc_pct:.1f}%")
         with c_m3:
-            taxa_kpi = taxa_musc_aj if usar_aj else taxa_musc_sem
-            st.metric("Ritmo projetado", f"+{taxa_kpi * 4.3:.2f} kg/mês",
-                      delta=f"{freq_treino}x/sem" if usar_aj else f"{freq_real_slider}x/sem")
+            if musc_ok:
+                taxa_kpi = taxa_musc_aj if usar_aj else taxa_musc_sem
+                st.metric("Ritmo projetado", f"{taxa_kpi * 4.3:+.2f} kg/mês",
+                          delta="cenário simulado" if usar_aj else "ritmo atual")
+            else:
+                st.metric("Ritmo projetado", "—", delta="sem dado confiável", delta_color="off")
 
     with col_mr:
         st.markdown("**📋 Projeção Muscular**")
         falta_musc = MUSC_META - musc_atual
 
-        if dt_musc and taxa_musc_sem > 0:
+        if not musc_ok:
+            st.markdown(
+                f"<div class='proj-alert'><b>💪 Meta {MUSC_META} kg</b><br>"
+                f"Sem projeção: valor repetido desde {musc_rep_desde}</div>",
+                unsafe_allow_html=True,
+            )
+        elif dt_musc and taxa_musc_sem > 0:
             meses_musc = int(dias_musc_falta / 30)
             st.markdown(
-                f"<div class='proj-warn'><b>💪 {freq_real_slider}x/sem (atual) — Meta {MUSC_META} kg</b><br>"
+                f"<div class='proj-warn'><b>💪 Ritmo atual — Meta {MUSC_META} kg</b><br>"
                 f"Chegará em <b>{dt_musc.strftime('%d/%m/%Y')}</b><br>"
                 f"~{meses_musc} meses</div>",
                 unsafe_allow_html=True,
@@ -862,7 +949,7 @@ with tab2:
             meses_aj = int(dias_musc_aj / 30)
             acelerou = (int(dias_musc_falta) - int(dias_musc_aj)) if dt_musc and dt_musc_aj else 0
             st.markdown(
-                f"<div class='proj-scenario'><b>✅ {freq_treino}x/sem</b><br>"
+                f"<div class='proj-scenario'><b>✅ Cenário simulado</b><br>"
                 f"Chegará em <b>{dt_musc_aj.strftime('%d/%m/%Y')}</b><br>"
                 f"~{meses_aj} meses<br>"
                 + (f"<span style='color:#27AE60;font-weight:700'>⚡ {acelerou} dias antes!</span>" if acelerou > 0 else "")
@@ -939,9 +1026,9 @@ Não é projetada por data — acompanhe a tendência nas medições semanais.</
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab3:
     st.markdown("**Projeções baseadas em evidências médicas e no seu histórico de tratamento (Puran T4 + dieta + exercício)**")
-    if usar_aj:
-        extra_hdl_mes = extra_sessoes * 0.5  # +0.5 mg/dL/mês por sessão extra (cardio)
-        st.info(f"Com {freq_treino}x/semana de treino, o HDL sobe ~{extra_hdl_mes:.1f} mg/dL a mais por mês do que a estimativa base.")
+    if extra_sessoes > 0:
+        extra_hdl_mes = extra_sessoes * 0.5  # +0.5 mg/dL/mês por sessão extra
+        st.info(f"Com musculação {freq_treino}x/semana, o HDL sobe ~{extra_hdl_mes:.1f} mg/dL a mais por mês do que a estimativa base.")
 
     results  = exams_data.get("results", [])
     sessions = {s["id"]: s["date"] for s in exams_data.get("sessions", [])}
@@ -1007,7 +1094,7 @@ with tab3:
         row["Status"]     = "✅ Normal" if ok else "🔴 Alterado"
         rows.append(row)
 
-    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(rows).astype(str), use_container_width=True, hide_index=True)
 
     # Projeções individuais
     st.markdown("### 🎯 Projeção de Normalização por Exame")
@@ -1015,7 +1102,7 @@ with tab3:
     # HDL: ajustado pela frequência de treino
     hdl_atual = _val("HDL") or 40  # fallback à meta mínima; dados reais têm prioridade
     hdl_melhora_mes_base = 1.5  # mg/dL/mês com exercício aeróbico ≥ 150 min/sem
-    hdl_melhora_mes_aj   = hdl_melhora_mes_base + (extra_sessoes * 0.5)
+    hdl_melhora_mes_aj   = max(0.5, hdl_melhora_mes_base + (extra_sessoes * 0.5))
     if hdl_atual < 40:
         hdl_meses_para_40 = (max(1, int((40 - hdl_atual) / hdl_melhora_mes_aj)) if usar_aj
                              else max(1, int((40 - hdl_atual) / hdl_melhora_mes_base)))
@@ -1078,8 +1165,8 @@ with tab3:
             "goal":       40,
             "expected":   hdl_expected,
             "confidence": "Alta",
-            "mechanism":  f"🏃 Exercício aeróbico — {freq_treino}x/sem (+{hdl_melhora_mes_aj:.1f} mg/dL/mês estimado)",
-            "note":       (f"Com {freq_treino}x/sem, HDL sobe ~{hdl_melhora_mes_aj:.1f} mg/dL/mês. "
+            "mechanism":  f"🏃 Exercício — musculação {freq_treino}x/sem + caminhada (+{hdl_melhora_mes_aj:.1f} mg/dL/mês estimado)",
+            "note":       (f"Com musculação {freq_treino}x/sem, HDL sobe ~{hdl_melhora_mes_aj:.1f} mg/dL/mês. "
                           f"De {hdl_atual} para 40 mg/dL em ~{hdl_meses_para_40} meses."),
         },
         {
@@ -1167,8 +1254,10 @@ with tab3:
     st.markdown("---")
     st.markdown("### 📅 Linha do Tempo de Melhoras Esperadas")
 
-    dt_82kg_str = dt_peso_aj.strftime("%b/%Y") if usar_aj and dt_peso_aj else (dt_peso.strftime("%b/%Y") if dt_peso else "2027")
-    dt_musc_str = dt_musc_aj.strftime("%b/%Y") if usar_aj and dt_musc_aj else (dt_musc.strftime("%b/%Y") if dt_musc else "2027+")
+    _dt_82 = dt_peso_aj if usar_aj else dt_peso
+    dt_82kg_str = _col_lbl(_dt_82.isoformat()) if _dt_82 else "Sem previsão"
+    _dt_m = dt_musc_aj if usar_aj else dt_musc
+    dt_musc_str = (_col_lbl(_dt_m.isoformat()) if _dt_m else "2027+") if musc_ok else "Sem dado"
 
     # Verificar status atual de cada meta laboratorial para timeline dinâmica
     _tsh_cur    = _val("TSH")
@@ -1191,7 +1280,7 @@ with tab3:
     _hdl_tl = (
         ("Atingido", "✅", f"HDL ≥ 40 mg/dL ✓ (atual: {_hdl_cur} mg/dL)")
         if _hdl_ok else
-        (f"~{hdl_meses_para_40} meses", "🟡", f"HDL atinge 40 mg/dL — com {freq_treino}x/sem de exercício")
+        (f"~{hdl_meses_para_40} meses", "🟡", f"HDL atinge 40 mg/dL — com musculação {freq_treino}x/sem")
     )
     timeline = [
         # Jul/2026 já passou — Puran T4 em andamento
@@ -1217,8 +1306,10 @@ with tab3:
          "TGO e TGP normalizados ✓" if _trans_ok
          else f"TGO e TGP normalizam após TSH controlado + resultado da US (TGO: {_tgo_cur}, TGP: {_tgp_cur})"),
         _hdl_tl,
-        (dt_82kg_str, "⚖️", f"Meta 82 kg — {peso_atual - PESO_META:.1f} kg abaixo do peso atual" + (f" (cenário {freq_treino}x/sem)" if usar_aj else "")),
-        (dt_musc_str, "💪", "Meta 40 kg de músculo esquelético"),
+        (dt_82kg_str, "⚖️", f"Meta 82 kg — {peso_atual - PESO_META:.1f} kg abaixo do peso atual"
+         + (" (cenário simulado)" if usar_aj else f" (ritmo das últimas {JANELA_SEMANAS} semanas)")),
+        (dt_musc_str, "💪", "Meta 40 kg de músculo esquelético"
+         + ("" if musc_ok else f" — sem projeção: valor repetido desde {musc_rep_desde}")),
     ]
 
     for mes, icon, desc in timeline:

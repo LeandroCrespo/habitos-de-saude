@@ -3583,6 +3583,17 @@
       "steps": 0,
       "sleep_score": 75,
       "notes": ""
+    },
+    {
+      "id": 351,
+      "date": "2026-10-03",
+      "type": "Bicicleta",
+      "duration_min": 15,
+      "calories_burned": 107,
+      "distance_km": 0.0,
+      "steps": 0,
+      "sleep_score": 75,
+      "notes": ""
     }
   ]
 }

@@ -3552,14 +3552,15 @@
     },
     {
       "date": "2026-10-01",
-      "type": "Corrida",
+      "type": "Caminhada",
       "start_time": "17:54",
-      "duration_min": 21,
-      "calories_burned": 146,
-      "steps": 4938,
+      "duration_min": 88,
+      "calories_burned": 251,
+      "steps": 4753,
       "sleep_score": 0,
       "notes": "Auto-importado Samsung Health",
-      "id": 348
+      "id": 348,
+      "distance_km": 3.38
     }
   ]
 }
